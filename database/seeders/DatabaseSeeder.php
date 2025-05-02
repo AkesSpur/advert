@@ -28,6 +28,9 @@ class DatabaseSeeder extends Seeder
         
         $this->call([
             LocationsAndServicesSeeder::class,
+            TariffSeeder::class,
+            ProfileSeeder::class,
+            ContentSeeder::class,
         ]);
     }
 }

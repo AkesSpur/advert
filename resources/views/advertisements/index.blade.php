@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
         <h1 class="text-2xl font-bold">Мои рекламные кампании</h1>
-        <a href="{{ route('advertisements.create') }}" class="mt-3 sm:mt-0 inline-flex items-center px-4 py-2 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded-md transition">
+        <a href="" class="mt-3 sm:mt-0 inline-flex items-center px-4 py-2 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded-md transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
             </svg>
@@ -191,7 +191,7 @@
             <h3 class="mt-2 text-sm font-medium">У вас нет активных рекламных кампаний</h3>
             <p class="mt-1 text-sm text-[#C2C2C2]">Создайте свою первую рекламную кампанию, чтобы повысить видимость ваших услуг.</p>
             <div class="mt-6">
-                <a href="{{ route('advertisements.create') }}" class="inline-flex items-center px-4 py-2 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded-md transition">
+                <a href="" class="inline-flex items-center px-4 py-2 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded-md transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
                     </svg>

@@ -62,9 +62,9 @@ class User extends Authenticatable
     /**
      * Get the profile associated with the user
      */
-    public function profile(): HasOne
+    public function profiles(): HasMany
     {
-        return $this->hasOne(Profile::class);
+        return $this->hasMany(Profile::class);
     }
 
     /**

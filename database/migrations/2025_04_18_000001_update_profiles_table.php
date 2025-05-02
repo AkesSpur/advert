@@ -20,7 +20,7 @@ return new class extends Migration
             
             // Ensure is_active field exists (it might already exist in some environments)
             if (!Schema::hasColumn('profiles', 'is_active')) {
-                $table->boolean('is_active')->default(true);
+                $table->boolean('is_active')->default(false);
             }
         });
     }

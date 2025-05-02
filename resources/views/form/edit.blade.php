@@ -171,7 +171,7 @@
                     {{-- Видео --}}
                     @if($profile->video)
                         <div class="relative">
-                            <video src="{{ asset('storage/' . $profile->video->first()->path) }}" 
+                            <video src="{{ asset('storage/' . $profile->video->path) }}" 
                                 class="aspect-[64/100] object-cover rounded-xl" controls></video>
                             <div class="absolute top-2 right-2">
                                 <label class="flex items-center justify-center w-6 h-6 bg-red-500 rounded-full cursor-pointer">
@@ -204,8 +204,8 @@
             <div x-data="{
                 showDistricts: false,
                 showStations: false,
-                selectedDistrictIds: {{ old('neighborhoods', $profile->neighborhoods->pluck('id')) ? json_encode(old('neighborhoods', $profile->neighborhoods->pluck('id'))) : '[]' }},
-                selectedStationIds: {{ old('metro_stations', $profile->metroStations->pluck('id')) ? json_encode(old('metro_stations', $profile->metroStations->pluck('id'))) : '[]' }},
+                selectedDistrictIds: {{ json_encode($profile->neighborhoods->pluck('id')) }},
+                selectedStationIds: {{ json_encode($profile->metroStations->pluck('id')) }},
                 allDistricts: {{ Js::from($neighborhoods->pluck('name', 'id')) }},
                 allStations: {{ Js::from($metroStations->pluck('name', 'id')) }},
                 selectedDistricts: [],
@@ -300,7 +300,6 @@
                     </div>
                 </div>
             </div>
-
             {{-- form of payment --}}
             <div class="bg-transparent p-6 rounded-xl mt-6">
                 <h3 class="text-lg font-semibold mb-4 text-white">Форма платежей</h3>

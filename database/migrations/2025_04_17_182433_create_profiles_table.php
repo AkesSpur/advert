@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('name');
-            $table->string('slug')->unique();
+            $table->string('slug');
             $table->integer('age')->nullable();
             $table->integer('weight')->nullable();
             $table->integer('height')->nullable();
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->text('bio')->nullable();
             $table->string('metro_station')->nullable();
             $table->string('district')->nullable();
-            $table->enum('status', ['active', 'premium'])->default('active');
+            $table->boolean('status')->default(false);
             $table->json('services')->nullable();
             $table->string('city')->nullable();
             $table->string('phone')->nullable();

@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 // Show upload option when image is marked for deletion
                                 const img = photoContainer.querySelector("img");
                                 const uploadLabel = document.createElement("label");
-                                uploadLabel.className = "cursor-pointer absolute inset-0 flex items-center justify-center text-center text-sm text-white bg-black bg-opacity-50 rounded-xl photo-label";
+                                uploadLabel.className = "cursor-pointer absolute inset-0 flex items-center justify-center text-center text-sm text-white bg-neutral-900 bg-opacity-50 rounded-xl photo-label";
                                 uploadLabel.innerHTML = `
                                     <div class="photo-placeholder">
                                         <div class="text-3xl mb-1">+</div>
@@ -99,6 +99,9 @@ document.addEventListener("DOMContentLoaded", function () {
                                     </div>
                                     <input type="file" name="photos[]" accept="image/*" class="hidden photo-input">
                                 `;
+                                
+                                // Mark this as a replacement upload
+                                uploadLabel.dataset.replacementFor = checkbox.value;
                                 
                                 // Add the upload label to the container
                                 const imgContainer = img.parentNode;
@@ -142,8 +145,11 @@ document.addEventListener("DOMContentLoaded", function () {
                                         newLabel.classList.remove("bg-red-700");
                                         photoContainer.classList.remove("opacity-50");
                                         
-                                        // Remove the upload label
-                                        uploadLabel.remove();
+                                        // Keep the file input but make it visible in the form
+                                        // This ensures the file is included in the form submission
+                                        uploadLabel.style.display = "none";
+                                        // Don't remove the label completely to keep the file input in the DOM
+                                        // uploadLabel.remove();
                                     });
                                 }
                             }
@@ -239,8 +245,10 @@ document.addEventListener("DOMContentLoaded", function () {
                                             newLabel.classList.remove("bg-red-700");
                                             photoContainer.classList.remove("opacity-50");
                                             
-                                            // Remove the upload label
-                                            uploadLabel.remove();
+                                            // Keep the file input but make it invisible
+                                            // This ensures the file is included in the form submission
+                                            uploadLabel.style.display = "none";
+                                            // Don't remove the label completely to keep the file input in the DOM
                                         });
                                     }
                                 }
@@ -277,6 +285,21 @@ document.addEventListener("DOMContentLoaded", function () {
     initializePricingCheckboxes();
     initializePaidServices();
     setupPricingInputs();
+    
+    // Add form submission handler to ensure all files are properly included
+    if (profileForm) {
+        profileForm.addEventListener('submit', function(e) {
+            // Make sure all hidden file inputs are included in the form submission
+            document.querySelectorAll('.photo-label[style="display: none;"], .video-label[style="display: none;"]').forEach(label => {
+                // Make sure the file input is still included in the form submission
+                const fileInput = label.querySelector('input[type="file"]');
+                if (fileInput && fileInput.files.length > 0) {
+                    // The file input already has files, so it will be included in the form submission
+                    console.log('File will be included in submission:', fileInput.files[0].name);
+                }
+            });
+        });
+    }
 
     // Setup delete video functionality
     const deleteVideoCheckbox = document.querySelector(
@@ -293,8 +316,92 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Visual feedback
                 if (deleteVideoCheckbox.checked) {
                     label.classList.add("bg-red-700");
+                    
+                    // Get the video container
+                    const videoContainer = label.closest(".relative");
+                    if (videoContainer) {
+                        // Add opacity to indicate deletion
+                        videoContainer.classList.add("opacity-50");
+                        
+                        // Create upload label for new video
+                        const uploadLabel = document.createElement("label");
+                        uploadLabel.className = "cursor-pointer absolute inset-0 flex items-center justify-center text-center text-sm text-white bg-neutral-900 bg-opacity-50 rounded-xl video-label";
+                        uploadLabel.innerHTML = `
+                            <div class="video-placeholder">
+                                <div class="text-3xl mb-1">+</div>
+                                Добавить видео
+                            </div>
+                            <input type="file" name="video" accept="video/*" class="hidden video-input">
+                        `;
+                        
+                        // Mark this as a replacement upload
+                        uploadLabel.dataset.replacementVideo = "true";
+                        
+                        // Add the upload label to the container
+                        videoContainer.appendChild(uploadLabel);
+                        
+                        // Setup the new file input
+                        const newInput = uploadLabel.querySelector(".video-input");
+                        if (newInput) {
+                            newInput.addEventListener("change", function(e) {
+                                const file = e.target.files[0];
+                                if (!file) return;
+                                
+                                // Validate file type
+                                const validVideoTypes = [
+                                    "video/mp4",
+                                    "video/quicktime",
+                                    "video/x-msvideo"
+                                ];
+                                if (!validVideoTypes.includes(file.type)) {
+                                    toastr.error(
+                                        "Пожалуйста, загрузите видео в формате MP4, MOV или AVI"
+                                    );
+                                    newInput.value = "";
+                                    return;
+                                }
+                                
+                                // Validate file size (max 20MB)
+                                if (file.size > 20 * 1024 * 1024) {
+                                    toastr.error("Размер видео не должен превышать 20MB");
+                                    newInput.value = "";
+                                    return;
+                                }
+                                
+                                // Create object URL for preview
+                                const objectUrl = URL.createObjectURL(file);
+                                const videoElement = videoContainer.querySelector("video");
+                                if (videoElement) {
+                                    videoElement.src = objectUrl;
+                                }
+                                
+                                // Unmark the video for deletion
+                                deleteVideoCheckbox.checked = false;
+                                label.classList.remove("bg-red-700");
+                                videoContainer.classList.remove("opacity-50");
+                                
+                                // Keep the file input but make it invisible
+                                // This ensures the file is included in the form submission
+                                uploadLabel.style.display = "none";
+                                // Don't remove the label completely to keep the file input in the DOM
+                            });
+                        }
+                    }
                 } else {
                     label.classList.remove("bg-red-700");
+                    
+                    // Get the video container
+                    const videoContainer = label.closest(".relative");
+                    if (videoContainer) {
+                        // Remove opacity
+                        videoContainer.classList.remove("opacity-50");
+                        
+                        // Remove the upload label if it exists
+                        const uploadLabel = videoContainer.querySelector(".video-label");
+                        if (uploadLabel) {
+                            uploadLabel.remove();
+                        }
+                    }
                 }
 
                 e.preventDefault(); // Prevent default label behavior
@@ -310,11 +417,93 @@ document.addEventListener("DOMContentLoaded", function () {
                     // Visual feedback
                     if (deleteVideoCheckbox.checked) {
                         label.classList.add("bg-red-700");
+                        
+                        // Get the video container
+                        const videoContainer = label.closest(".relative");
+                        if (videoContainer) {
+                            // Add opacity to indicate deletion
+                            videoContainer.classList.add("opacity-50");
+                            
+                            // Create upload label for new video
+                            const uploadLabel = document.createElement("label");
+                            uploadLabel.className = "cursor-pointer absolute inset-0 flex items-center justify-center text-center text-sm text-white bg-neutral-900 bg-opacity-50 rounded-xl video-label";
+                            uploadLabel.innerHTML = `
+                                <div class="video-placeholder">
+                                    <div class="text-3xl mb-1">+</div>
+                                    Добавить видео
+                                </div>
+                                <input type="file" name="video" accept="video/*" class="hidden video-input">
+                            `;
+                            
+                            // Add the upload label to the container
+                            videoContainer.appendChild(uploadLabel);
+                            
+                            // Setup the new file input
+                            const newInput = uploadLabel.querySelector(".video-input");
+                            if (newInput) {
+                                newInput.addEventListener("change", function(e) {
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+                                    
+                                    // Validate file type
+                                    const validVideoTypes = [
+                                        "video/mp4",
+                                        "video/quicktime",
+                                        "video/x-msvideo"
+                                    ];
+                                    if (!validVideoTypes.includes(file.type)) {
+                                        toastr.error(
+                                            "Пожалуйста, загрузите видео в формате MP4, MOV или AVI"
+                                        );
+                                        newInput.value = "";
+                                        return;
+                                    }
+                                    
+                                    // Validate file size (max 20MB)
+                                    if (file.size > 20 * 1024 * 1024) {
+                                        toastr.error("Размер видео не должен превышать 20MB");
+                                        newInput.value = "";
+                                        return;
+                                    }
+                                    
+                                    // Create object URL for preview
+                                    const objectUrl = URL.createObjectURL(file);
+                                    const videoElement = videoContainer.querySelector("video");
+                                    if (videoElement) {
+                                        videoElement.src = objectUrl;
+                                    }
+                                    
+                                    // Unmark the video for deletion
+                                    deleteVideoCheckbox.checked = false;
+                                    label.classList.remove("bg-red-700");
+                                    videoContainer.classList.remove("opacity-50");
+                                    
+                                    // Keep the file input but make it invisible
+                                    // This ensures the file is included in the form submission
+                                    uploadLabel.style.display = "none";
+                                    // Don't remove the label completely to keep the file input in the DOM
+                                });
+                            }
+                        }
                     } else {
                         label.classList.remove("bg-red-700");
+                        
+                        // Get the video container
+                        const videoContainer = label.closest(".relative");
+                        if (videoContainer) {
+                            // Remove opacity
+                            videoContainer.classList.remove("opacity-50");
+                            
+                            // Remove the upload label if it exists
+                            const uploadLabel = videoContainer.querySelector(".video-label");
+                            if (uploadLabel) {
+                                uploadLabel.remove();
+                            }
+                        }
                     }
 
                     e.stopPropagation(); // Prevent event from bubbling to label
+                    e.preventDefault(); // Prevent default behavior
                 });
             }
         }

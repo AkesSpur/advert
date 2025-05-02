@@ -3,9 +3,11 @@
 use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\TariffController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,33 +21,36 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::get('/', function () {
-    return view('home.index');
-})->name('home');
-Route::get('/chat', function () {
-    return view('chat.index');
-});
+
+Route::get('/', [PageController::class, 'index'])->name('home');
+Route::get('/filter', [PageController::class, 'filter'])->name('filter');
 
 
 // Route::get('/dashboard', function () {
 //     return view('dashboard');
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::group(['middleware'=>['auth'], 'prefix'=>'user', 'as'=>'user.'],function () {
+Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], function () {
 
     // Route::get('profiles', [ProfileController::class, 'index'])->name('profiles.index');
 
-        // Public profiles
-        Route::resource('profiles', ProfileController::class);
+    // Public profiles
+    Route::resource('profiles', ProfileController::class);
+
+    Route::get('/chat', function () {
+        return view('chat.index');
+    })->name('chat.index');
 
     Route::get('/transaction', function () {
         return view('transactions.index');
-    });
-    Route::get('/ads', function () {
-        return view('tariffs.index');
-    });
-    Route::get('/profiles/create', [FormController::class, 'index'])->name('form.index');
+    })->name('transaction.index');
+    Route::get('/ads', [TariffController::class, 'index'])->name('advert.index');
+    Route::post('/ads/activate', [TariffController::class, 'activate'])->name('advert.activate');
+    Route::post('/ads/{id}/pause', [TariffController::class, 'pause'])->name('advert.pause');
+    Route::post('/ads/{id}/resume', [TariffController::class, 'resume'])->name('advert.resume');
+    Route::post('/ads/{id}/cancel', [TariffController::class, 'cancel'])->name('advert.cancel');
 
+    Route::get('/profiles/create', [FormController::class, 'index'])->name('form.index');
 });
 
 // Route::get('/profiles', function () {
@@ -57,7 +62,7 @@ Route::get('/profiles/view/{id}', function ($id) {
     return view('profiles.profile', ['id' => $id]);
 })->name('profiles.view');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 
 

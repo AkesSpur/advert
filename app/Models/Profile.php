@@ -17,6 +17,7 @@ class Profile extends Model
      *
      * @var array<int, string>
      */
+    // Add these to the $fillable array
     protected $fillable = [
         'user_id',
         'phone',
@@ -49,6 +50,8 @@ class Profile extends Model
         'appartamenti_1hour',
         'appartamenti_2hours',
         'appartamenti_night',
+        'view_count',
+        'click_count',
     ];
 
     /**
@@ -162,5 +165,85 @@ class Profile extends Model
     public function video()
     {
         return $this->hasOne(ProfileVideo::class);
+    }
+    
+    /**
+     * Get the active advertisement tariffs for this profile
+     */
+    public function activeAds()
+    {
+        return $this->hasMany(ProfileAdTariff::class)
+            ->where('is_active', true)
+            ->where(function($query) {
+                $query->whereNull('expires_at')
+                      ->orWhere('expires_at', '>', now());
+            });
+    }
+
+    /**
+     * Increment the view count for this profile
+     */
+    public function incrementViewCount()
+    {
+        $this->increment('views_count');
+    }
+
+    /**
+     * Increment the click count for this profile
+     */
+    public function incrementClickCount()
+    {
+        $this->increment('clicks_count');
+    }
+
+    /**
+     * Check if profile has an active VIP tariff
+     */
+    public function hasActiveVipTariff()
+    {
+        return $this->activeTariffs()
+            ->where('ad_tariff_id', function ($query) {
+                $query->select('id')
+                    ->from('ad_tariffs')
+                    ->where('name', 'VIP');
+            })
+            ->exists();
+    }
+
+    // Add a scope to check if profile is VIP
+    public function scopeIsVip($query)
+    {
+        return $query->whereHas('activeAds', function($q) {
+            $q->whereHas('adTariff', function($q) {
+                $q->where('slug', 'vip');
+            })->where('is_paused', false);
+        });
+    }
+
+    // Add a scope to check if profile has video
+    public function scopeHasVideo($query)
+    {
+        return $query->whereHas('video', function ($q) {
+            $q->whereNotNull('path');
+        });
+    }
+    
+
+    // Add a scope to get new profiles (created in the last 7 days)
+    public function scopeIsNew($query)
+    {
+        return $query->where('created_at', '>=', now()->subDays(7));
+    }
+
+    // Add a scope to get cheap profiles (price below a certain threshold)
+    public function scopeIsCheap($query, $threshold = 5000)
+    {
+        return $query->where('vyezd_1hour', '<=', $threshold);
+    }
+
+    // Add a scope to get verified profiles
+    public function scopeIsVerified($query)
+    {
+        return $query->where('is_verified', true);
     }
 }

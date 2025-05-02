@@ -23,48 +23,15 @@ class ProfileController extends Controller
      */
     public function index(Request $request)
     {
-        // $query = Profile::query()->with(['user', 'services', 'reviews']);
 
-    //     // Apply filters if they exist
-    //     if ($request->filled('category')) {
-    //         $query->where('category', $request->category);
-    //     }
+        $profiles = Profile::where("user_id", Auth::id())
+            ->with(['primaryImage', 'services', 'metroStations', 'neighborhoods'])
+            ->orderBY('created_at', 'desc')
+            ->get();
 
-    //     if ($request->filled('city')) {
-    //         $query->where('city', 'like', '%' . $request->city . '%');
-    //     }
-
-    //     if ($request->filled('service_id')) {
-    //         $query->whereHas('services', function ($q) use ($request) {
-    //             $q->where('services.id', $request->service_id);
-    //         });
-    // }
-
-    //     // Apply sorting
-    //     $sortBy = $request->get('sort_by', 'created_at');
-    //     $sortDirection = $request->get('sort_direction', 'desc');
-
-    //     $allowedSorts = ['created_at', 'rating'];
-    //     if (in_array($sortBy, $allowedSorts)) {
-    //         if ($sortBy === 'rating') {
-    //             $query->withAvg('reviews', 'rating')
-    //                 ->orderBy('reviews_avg_rating', $sortDirection);
-    //         } else {
-    //             $query->orderBy($sortBy, $sortDirection);
-    //         }
-    //     }
-
-    //     $profiles = $query->paginate(12)->withQueryString();
-    //     $services = Service::all();
-
-    $profiles = Profile::where("user_id", Auth::id())
-                        ->with(['primaryImage', 'services', 'metroStations', 'neighborhoods'])
-                        ->orderBY('created_at', 'desc')
-                        ->get();
-    
-//     echo '<pre>';
-//  var_dump($profiles);
-//  die;
+        //     echo '<pre>';
+        //  var_dump($profiles);
+        //  die;
 
         return view('profiles.index', compact('profiles'));
     }
@@ -85,7 +52,7 @@ class ProfileController extends Controller
         $neighborhoods = Neighborhood::all();
         $metroStations = MetroStation::all();
         $categories = ['Массажист', 'Фотограф', 'Визажист', 'Стилист', 'Тренер'];
-        
+
         return view('profiles.create', compact('services', 'categories', 'neighborhoods', 'metroStations', 'paidServices'));
     }
 
@@ -153,7 +120,6 @@ class ProfileController extends Controller
         $profile->phone = $validated['phone'];
         $profile->description = $validated['description'] ?? null;
         $profile->bio = $validated['bio'] ?? null;
-        $profile->is_active = true; // Default to active
 
         // Set additional fields
         $profile->profile_type = $validated['profile_type'];
@@ -184,53 +150,69 @@ class ProfileController extends Controller
         if ($request->hasFile('photos')) {
             $isPrimary = true; // First photo is primary
             $sortOrder = 0;
-            
+
             foreach ($request->file('photos') as $photo) {
-                // Store original image
-                $path = $photo->store('profile-photos', 'public');
-                
-                // Convert to WebP for better compression if GD library is available
+                // Store image temporarily
+                $tempPath = $photo->store('temp-photos', 'public');
+                $originalPath = Storage::disk('public')->path($tempPath);
+
+                // Convert to WebP for better compression
                 try {
                     if (function_exists('imagecreatefromjpeg') && function_exists('imagewebp')) {
-                        $originalPath = Storage::disk('public')->path($path);
-                        $webpPath = pathinfo($originalPath, PATHINFO_DIRNAME) . '/' . 
-                                   pathinfo($originalPath, PATHINFO_FILENAME) . '.webp';
-                        
+                        // Create a unique filename for the WebP version
+                        $webpFilename = Str::uuid() . '.webp';
+                        $webpPath = 'profile-photos/' . $webpFilename;
+                        $webpFullPath = Storage::disk('public')->path($webpPath);
+
                         // Create image resource based on file type
                         $extension = strtolower(pathinfo($originalPath, PATHINFO_EXTENSION));
                         $imageResource = null;
-                        
+
                         if ($extension === 'jpg' || $extension === 'jpeg') {
                             $imageResource = imagecreatefromjpeg($originalPath);
                         } elseif ($extension === 'png') {
                             $imageResource = imagecreatefrompng($originalPath);
+                        } elseif ($extension === 'gif') {
+                            $imageResource = imagecreatefromgif($originalPath);
+                        } elseif ($extension === 'webp') {
+                            $imageResource = imagecreatefromwebp($originalPath);
                         }
-                        
+
                         if ($imageResource) {
+                            // Ensure the profile-photos directory exists
+                            Storage::disk('public')->makeDirectory('profile-photos');
+
                             // Convert to WebP with 80% quality
-                            imagewebp($imageResource, $webpPath, 80);
+                            imagewebp($imageResource, $webpFullPath, 80);
                             imagedestroy($imageResource);
-                            
-                            // Update path to use WebP version
-                            $webpRelativePath = 'profile-photos/' . pathinfo($path, PATHINFO_FILENAME) . '.webp';
-                            if (file_exists($webpPath)) {
-                                $path = $webpRelativePath;
-                            }
+
+                            // Set path to the WebP version
+                            $path = $webpPath;
+                        } else {
+                            // If conversion fails, use the original file
+                            $path = $photo->store('profile-photos', 'public');
                         }
+                    } else {
+                        // If WebP conversion is not available, use the original file
+                        $path = $photo->store('profile-photos', 'public');
                     }
                 } catch (\Exception $e) {
-                    // Log error but continue with original image
+                    // Log error and use the original image
                     Log::error('Failed to convert image to WebP: ' . $e->getMessage());
+                    $path = $photo->store('profile-photos', 'public');
                 }
-                
+
+                // Delete the temporary file
+                Storage::disk('public')->delete($tempPath);
+
                 $profileImage = new ProfileImage([
                     'path' => $path,
                     'is_primary' => $isPrimary,
                     'sort_order' => $sortOrder,
                 ]);
-                
+
                 $profile->images()->save($profileImage);
-                
+
                 $isPrimary = false; // Only first photo is primary
                 $sortOrder++;
             }
@@ -240,17 +222,17 @@ class ProfileController extends Controller
         if ($request->hasFile('video')) {
             $videoFile = $request->file('video');
             $path = $videoFile->store('profile-videos', 'public');
-            
+
             // Generate thumbnail from video
             $thumbnailPath = null;
             try {
                 // Create a thumbnail from the first frame of the video
                 $thumbnailName = pathinfo($videoFile->getClientOriginalName(), PATHINFO_FILENAME) . '_thumbnail.jpg';
                 $thumbnailPath = 'profile-videos/thumbnails/' . $thumbnailName;
-                
+
                 // Ensure the thumbnails directory exists
                 Storage::disk('public')->makeDirectory('profile-videos/thumbnails');
-                
+
                 // Use FFMpeg if available, otherwise fallback to simple method
                 if (class_exists('\FFMpeg\FFMpeg') && class_exists('\FFMpeg\Coordinate\TimeCode')) {
                     try {
@@ -274,12 +256,12 @@ class ProfileController extends Controller
                 // Log the error but continue without a thumbnail
                 Log::error('Failed to create video thumbnail: ' . $e->getMessage());
             }
-            
+
             $profileVideo = new ProfileVideo([
                 'path' => $path,
                 'thumbnail_path' => $thumbnailPath,
             ]);
-            
+
             $profile->video()->save($profileVideo);
         }
 
@@ -307,33 +289,33 @@ class ProfileController extends Controller
         // Attach paid services with prices
         if (!empty($validated['paid_services'])) {
             $paidServiceData = [];
-            
+
             foreach ($validated['paid_services'] as $paidServiceId) {
                 $price = $validated['paid_service_prices'][$paidServiceId] ?? null;
-                
+
                 $paidServiceData[$paidServiceId] = [
                     'price' => $price,
                 ];
             }
-            
-        $profile->has_telegram = $validated['has_telegram'] ?? false;
-        $profile->has_viber = $validated['has_viber'] ?? false;
-        $profile->has_whatsapp = $validated['has_whatsapp'] ?? false;
-        $profile->vyezd = $validated['vyezd'] ?? false;
-        $profile->appartamenti = $validated['appartamenti'] ?? false;
-        $profile->vyezd_1hour = $validated['vyezd_1hour'] ?? null;
-        $profile->vyezd_2hours = $validated['vyezd_2hours'] ?? null;
-        $profile->vyezd_night = $validated['vyezd_night'] ?? null;
-        $profile->appartamenti_1hour = $validated['appartamenti_1hour'] ?? null;
-        $profile->appartamenti_2hours = $validated['appartamenti_2hours'] ?? null;
-        $profile->appartamenti_night = $validated['appartamenti_night'] ?? null;
 
-        $profile->paidServices()->sync($paidServiceData);
+            $profile->has_telegram = $validated['has_telegram'] ?? false;
+            $profile->has_viber = $validated['has_viber'] ?? false;
+            $profile->has_whatsapp = $validated['has_whatsapp'] ?? false;
+            $profile->vyezd = $validated['vyezd'] ?? false;
+            $profile->appartamenti = $validated['appartamenti'] ?? false;
+            $profile->vyezd_1hour = $validated['vyezd_1hour'] ?? null;
+            $profile->vyezd_2hours = $validated['vyezd_2hours'] ?? null;
+            $profile->vyezd_night = $validated['vyezd_night'] ?? null;
+            $profile->appartamenti_1hour = $validated['appartamenti_1hour'] ?? null;
+            $profile->appartamenti_2hours = $validated['appartamenti_2hours'] ?? null;
+            $profile->appartamenti_night = $validated['appartamenti_night'] ?? null;
+
+            $profile->paidServices()->sync($paidServiceData);
         } else {
             $profile->paidServices()->detach();
         }
 
-        return redirect()->route('user.profiles.index', $profile)
+        return redirect()->route('user.profiles.index')
             ->with('success', 'Профиль успешно создан!');
     }
 
@@ -352,10 +334,10 @@ class ProfileController extends Controller
         $neighborhoods = Neighborhood::all();
         $metroStations = MetroStation::all();
         $categories = ['Массажист', 'Фотограф', 'Визажист', 'Стилист', 'Тренер'];
-        
+
         // Load profile with relationships
         $profile->load(['services', 'paidServices', 'neighborhoods', 'metroStations', 'images', 'video']);
-        
+
         return view('form.edit', compact('profile', 'services', 'categories', 'neighborhoods', 'metroStations', 'paidServices'));
     }
 
@@ -364,6 +346,9 @@ class ProfileController extends Controller
      */
     public function update(Request $request, Profile $profile)
     {
+        //    echo '<pre>';
+        // var_dump($request->all());
+        // die;
         // Ensure the user can only update their own profile
         if ($profile->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
@@ -418,6 +403,7 @@ class ProfileController extends Controller
 
         // Update profile basic information
         $profile->name = $validated['name'];
+        $profile->slug = Str::slug($validated['name']);
         $profile->age = $validated['age'] ?? null;
         $profile->weight = $validated['weight'] ?? null;
         $profile->height = $validated['height'] ?? null;
@@ -451,101 +437,90 @@ class ProfileController extends Controller
 
         $profile->save();
 
-        // Delete photos if requested
-        if (!empty($validated['delete_photos'])) {
-            $photosToDelete = ProfileImage::whereIn('id', $validated['delete_photos'])
-                ->where('profile_id', $profile->id)
-                ->get();
-            
-            $hasPrimaryToDelete = $photosToDelete->where('is_primary', true)->count() > 0;
-                
-            foreach ($photosToDelete as $photo) {
-                Storage::disk('public')->delete($photo->path);
-                $photo->delete();
-            }
-            
-            // If primary image was deleted, set a new primary image
-            if ($hasPrimaryToDelete) {
-                $remainingImage = $profile->images()->first();
-                if ($remainingImage) {
-                    $remainingImage->is_primary = true;
-                    $remainingImage->save();
-                }
-            }
-        }
-
-        // Delete video if requested
-        if (!empty($validated['delete_video']) && $profile->videos()->exists()) {
-            foreach ($profile->videos as $video) {
-                Storage::disk('public')->delete($video->path);
-                if ($video->thumbnail_path) {
-                    Storage::disk('public')->delete($video->thumbnail_path);
-                }
-                $video->delete();
-            }
-        }
-
-        // Handle new photo uploads
+        // Process new photo uploads first
+        $newPhotosUploaded = false;
         if ($request->hasFile('photos')) {
+            $newPhotosUploaded = true;
             $currentPhotoCount = $profile->images()->count();
             $allowedNewPhotos = 5 - $currentPhotoCount;
-            
+
             if ($allowedNewPhotos > 0) {
                 $photosToProcess = array_slice($request->file('photos'), 0, $allowedNewPhotos);
                 $sortOrder = $profile->images()->max('sort_order') + 1;
-                
+
                 foreach ($photosToProcess as $photo) {
-                    // Store original image
-                    $path = $photo->store('profile-photos', 'public');
-                    
-                    // Convert to WebP for better compression if GD library is available
+                    // Store image temporarily
+                    $tempPath = $photo->store('temp-photos', 'public');
+                    $originalPath = Storage::disk('public')->path($tempPath);
+
+                    // Convert to WebP for better compression
                     try {
                         if (function_exists('imagecreatefromjpeg') && function_exists('imagewebp')) {
-                            $originalPath = Storage::disk('public')->path($path);
-                            $webpPath = pathinfo($originalPath, PATHINFO_DIRNAME) . '/' . 
-                                       pathinfo($originalPath, PATHINFO_FILENAME) . '.webp';
-                            
+                            // Create a unique filename for the WebP version
+                            $webpFilename = Str::uuid() . '.webp';
+                            $webpPath = 'profile-photos/' . $webpFilename;
+                            $webpFullPath = Storage::disk('public')->path($webpPath);
+
                             // Create image resource based on file type
                             $extension = strtolower(pathinfo($originalPath, PATHINFO_EXTENSION));
                             $imageResource = null;
-                            
+
                             if ($extension === 'jpg' || $extension === 'jpeg') {
                                 $imageResource = imagecreatefromjpeg($originalPath);
                             } elseif ($extension === 'png') {
                                 $imageResource = imagecreatefrompng($originalPath);
+                            } elseif ($extension === 'gif') {
+                                $imageResource = imagecreatefromgif($originalPath);
+                            } elseif ($extension === 'webp') {
+                                $imageResource = imagecreatefromwebp($originalPath);
                             }
-                            
+
                             if ($imageResource) {
+                                // Ensure the profile-photos directory exists
+                                Storage::disk('public')->makeDirectory('profile-photos');
+
                                 // Convert to WebP with 80% quality
-                                imagewebp($imageResource, $webpPath, 80);
+                                imagewebp($imageResource, $webpFullPath, 80);
                                 imagedestroy($imageResource);
-                                
-                                // Update path to use WebP version
-                                $webpRelativePath = 'profile-photos/' . pathinfo($path, PATHINFO_FILENAME) . '.webp';
-                                if (file_exists($webpPath)) {
-                                    $path = $webpRelativePath;
-                                }
+
+                                // Set path to the WebP version
+                                $path = $webpPath;
+                            } else {
+                                // If conversion fails, use the original file
+                                $path = $photo->store('profile-photos', 'public');
                             }
+                        } else {
+                            // If WebP conversion is not available, use the original file
+                            $path = $photo->store('profile-photos', 'public');
                         }
                     } catch (\Exception $e) {
-                        // Log error but continue with original image
+                        // Log error and use the original image
                         Log::error('Failed to convert image to WebP: ' . $e->getMessage());
+                        $path = $photo->store('profile-photos', 'public');
                     }
-                    
+
+                    // Delete the temporary file
+                    Storage::disk('public')->delete($tempPath);
+
+                    // Check if this is the first image for the profile
+                    $isPrimary = $profile->images()->count() === 0;
+
                     $profileImage = new ProfileImage([
                         'path' => $path,
-                        'is_primary' => $currentPhotoCount === 0 && $sortOrder === 0, // Primary only if no existing photos
+                        'is_primary' => $isPrimary,
                         'sort_order' => $sortOrder,
                     ]);
-                    
+
                     $profile->images()->save($profileImage);
                     $sortOrder++;
                 }
             }
         }
 
-        // Handle new video upload
-        if ($request->hasFile('video') && !$profile->videos()->exists()) {
+        // Process new video upload first
+        $newVideoUploaded = false;
+        if ($request->hasFile('video')) {
+            $newVideoUploaded = true;
             $videoFile = $request->file('video');
             $path = $videoFile->store('profile-videos', 'public');
             
@@ -582,11 +557,135 @@ class ProfileController extends Controller
                 Log::error('Failed to create video thumbnail: ' . $e->getMessage());
             }
             
+            // Delete existing video if there is one
+            if ($profile->video) {
+                Storage::disk('public')->delete($profile->video->path);
+                if ($profile->video->thumbnail_path) {
+                    Storage::disk('public')->delete($profile->video->thumbnail_path);
+                }
+                $profile->video->delete();
+            }
+            
             $profileVideo = new ProfileVideo([
                 'path' => $path,
                 'thumbnail_path' => $thumbnailPath,
             ]);
             
+            $profile->video()->save($profileVideo);
+        }
+
+        // Delete photos if requested
+        if (!empty($validated['delete_photos'])) {
+            $photosToDelete = ProfileImage::whereIn('id', $validated['delete_photos'])
+                ->where('profile_id', $profile->id)
+                ->get();
+
+            $hasPrimaryToDelete = $photosToDelete->where('is_primary', true)->count() > 0;
+            $totalPhotos = $profile->images()->count();
+            $totalPhotosToDelete = $photosToDelete->count();
+
+            // Check if user is trying to delete the only primary photo without uploading a new one
+            if ($hasPrimaryToDelete && $totalPhotos === $totalPhotosToDelete && !$newPhotosUploaded) {
+                return redirect()->back()
+                    ->with('error', 'Невозможно удалить единственное фото профиля. Пожалуйста, загрузите новое фото перед удалением.')
+                    ->withInput();
+            }
+
+            foreach ($photosToDelete as $photo) {
+                Storage::disk('public')->delete($photo->path);
+
+                // If this is the original file (not WebP), also delete it
+                $originalPath = str_replace('.webp', '', $photo->path);
+                $originalExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+
+                foreach ($originalExtensions as $ext) {
+                    $possibleOriginal = $originalPath . $ext;
+                    if (Storage::disk('public')->exists($possibleOriginal)) {
+                        Storage::disk('public')->delete($possibleOriginal);
+                    }
+                }
+
+                $photo->delete();
+            }
+
+            // If primary image was deleted, set a new primary image
+            if ($hasPrimaryToDelete) {
+                // Get the first remaining image and set it as primary
+                $remainingImage = $profile->images()->first();
+                if ($remainingImage) {
+                    $remainingImage->is_primary = true;
+                    $remainingImage->save();
+                }
+            }
+
+            // Always ensure there's a primary image if any images exist
+            $hasPrimary = $profile->images()->where('is_primary', true)->exists();
+            if (!$hasPrimary && $profile->images()->count() > 0) {
+                $firstImage = $profile->images()->first();
+                $firstImage->is_primary = true;
+                $firstImage->save();
+            }
+        }
+
+        // Delete video if requested and no new video was uploaded
+        if (!empty($validated['delete_video']) && $profile->video()->exists() && !$newVideoUploaded) {
+            $video = $profile->video;
+
+            if ($video) {
+                Storage::disk('public')->delete($video->path);
+                if ($video->thumbnail_path) {
+                    Storage::disk('public')->delete($video->thumbnail_path);
+                }
+                $video->delete();
+            }
+        }
+
+        // Photo uploads are now handled before deletion logic
+        // No need to process photos again here
+
+        // Handle new video upload
+        if ($request->hasFile('video') && !$profile->video()->exists()) {
+            $videoFile = $request->file('video');
+            $path = $videoFile->store('profile-videos', 'public');
+
+            // Generate thumbnail from video
+            $thumbnailPath = null;
+            try {
+                // Create a thumbnail from the first frame of the video
+                $thumbnailName = pathinfo($videoFile->getClientOriginalName(), PATHINFO_FILENAME) . '_thumbnail.jpg';
+                $thumbnailPath = 'profile-videos/thumbnails/' . $thumbnailName;
+
+                // Ensure the thumbnails directory exists
+                Storage::disk('public')->makeDirectory('profile-videos/thumbnails');
+
+                // Use FFMpeg if available, otherwise fallback to simple method
+                if (class_exists('\FFMpeg\FFMpeg') && class_exists('\FFMpeg\Coordinate\TimeCode')) {
+                    try {
+                        $ffmpeg = \FFMpeg\FFMpeg::create();
+                        $video = $ffmpeg->open(Storage::disk('public')->path($path));
+                        $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1));
+                        $frame->save(Storage::disk('public')->path($thumbnailPath));
+                    } catch (\Exception $e) {
+                        Log::error('FFMpeg error: ' . $e->getMessage());
+                        // Continue with fallback method
+                    }
+                } else {
+                    // Fallback method - store a placeholder thumbnail
+                    $placeholderPath = public_path('assets/images/video-placeholder.jpg');
+                    if (file_exists($placeholderPath)) {
+                        Storage::disk('public')->put($thumbnailPath, file_get_contents($placeholderPath));
+                    }
+                }
+            } catch (\Exception $e) {
+                // Log the error but continue without a thumbnail
+                Log::error('Failed to create video thumbnail: ' . $e->getMessage());
+            }
+
+            $profileVideo = new ProfileVideo([
+                'path' => $path,
+                'thumbnail_path' => $thumbnailPath,
+            ]);
+
             $profile->video()->save($profileVideo);
         }
 
@@ -614,15 +713,15 @@ class ProfileController extends Controller
         // Update paid services with prices
         if (!empty($validated['paid_services'])) {
             $paidServiceData = [];
-            
+
             foreach ($validated['paid_services'] as $paidServiceId) {
                 $price = $validated['paid_service_prices'][$paidServiceId] ?? null;
-                
+
                 $paidServiceData[$paidServiceId] = [
                     'price' => $price,
                 ];
             }
-            
+
             $profile->paidServices()->sync($paidServiceData);
         } else {
             $profile->paidServices()->detach();
@@ -645,6 +744,17 @@ class ProfileController extends Controller
         // Delete profile images if exist
         foreach ($profile->images as $image) {
             Storage::disk('public')->delete($image->path);
+
+            // If this is the WebP file, also delete any possible original files
+            $originalPath = str_replace('.webp', '', $image->path);
+            $originalExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+
+            foreach ($originalExtensions as $ext) {
+                $possibleOriginal = $originalPath . $ext;
+                if (Storage::disk('public')->exists($possibleOriginal)) {
+                    Storage::disk('public')->delete($possibleOriginal);
+                }
+            }
         }
 
         // Delete profile video if exists
