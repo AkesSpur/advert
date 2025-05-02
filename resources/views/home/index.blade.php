@@ -428,90 +428,53 @@
         </div>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 px-6 max-w-screen-2xl mx-auto">
-            @php
-                $names = ['Алина', 'Виктория', 'Екатерина', 'Марина', 'Наташа', 'Ольга', 'София', 'Юлия', 'Анжела', 'Диана'];
-                $ages = [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32];
-                $weights = ['50 кг', '52 кг', '54 кг', '56 кг', '58 кг', '60 кг', '62 кг', '64 кг', '66 кг', '68 кг'];
-                $heights = ['160 см', '165 см', '168 см', '170 см', '172 см', '175 см', '178 см', '180 см'];
-                $sizes = ['1 размер', '2 размер', '3 размер', '4 размер', '5 размер'];
-                $metros = [
-                    'м. Автово', 'м. Адмиралтейская, м. Автово', 'м. Академическая, Василеостровская', 'м. Балтийская', 
-                    'м. Василеостровская', 'м. Владимирская', 'м. Выборгская', 'м. Горьковская', 
-                    'м. Достоевска, м. Автово', 'м. Звездная', 'м. Ладожская', 'м. Маяковская', 'м. Невский проспект'
-                ];
-                $districts = [
-                    'р. Адмиралтейский', 'р. Василеостровский', 'р. Выборгский', 'р. Калининский', 
-                    'р. Кировский', 'р. Московский', 'р. Невский', 'р. Петроградский', 'р. Приморский', 'р. Центральный'
-                ];
-                $prices = [
-                    [
-                        'hour' => '3000 руб.',
-                        'two_hours' => '6000 руб.',
-                        'night' => '12000 руб.'
-                    ],
-                    [
-                        'hour' => '4000 руб.',
-                        'two_hours' => '8000 руб.',
-                        'night' => '15000 руб.'
-                    ],
-                    [
-                        'hour' => '5000 руб.',
-                        'two_hours' => '10000 руб.',
-                        'night' => '20000 руб.'
-                    ],
-                    [
-                        'hour' => '6000 руб.',
-                        'two_hours' => '12000 руб.',
-                        'night' => '25000 руб.'
-                    ],
-                    [
-                        'hour' => '7000 руб.',
-                        'two_hours' => '14000 руб.',
-                        'night' => '30000 руб.'
-                    ]
-                ];
-                $phones = [
-                    '+7 (931) 123-45-67',
-                    '+7 (921) 234-56-78',
-                    '+7 (911) 345-67-89',
-                    '+7 (981) 456-78-90',
-                    '+7 (904) 567-89-01',
-                    '+7 (905) 678-90-12',
-                    '+7 (906) 789-01-23',
-                    '+7 (907) 890-12-34'
-                ];
-            @endphp
-            
-            @for ($i = 0; $i < 20; $i++)
+            @forelse ($profiles as $profile)
                 <div class="h-full">
                     <x-ad-card
-                        :verified="rand(0, 1)"
-                        :name="$names[array_rand($names)]"
-                        :age="$ages[array_rand($ages)]"
-                        :weight="$weights[array_rand($weights)]"
-                        :height="$heights[array_rand($heights)]"
-                        :size="$sizes[array_rand($sizes)]"
-                        :metro="$metros[array_rand($metros)]"
-                        :district="$districts[array_rand($districts)]"
-                        :phone="$phones[array_rand($phones)]"
-                        :prices="$prices[array_rand($prices)]"
+                        :new="$profile->created_at >= now()->subDays(7) ?? false"
+                        :vip="$profile->is_vip ?? false"
+                        :video="isset($profile->video->path) ?? false "
+                        :verified="$profile->is_verified ?? false"
+                        :name="$profile->name"
+                        :age="$profile->age"
+                        :weight="$profile->weight . ' кг'"
+                        :height="$profile->height . ' см'"
+                        :size="$profile->size . ' размер'"
+                        :district="$profile->neighborhoods->isNotEmpty() ? 'р. ' . $profile->neighborhoods->first()->name : ''"
+                        :metro="$profile->metroStations->isNotEmpty() ? 'м. ' . $profile->metroStations->pluck('name')->implode(', м. ') : ''"
+                        :phone="$profile->phone"
+                        :prices="[
+                            'hour' => $profile->vyezd_1hour . ' руб.',
+                            'two_hours' => $profile->vyezd_2hours . ' руб.',
+                            'night' => $profile->vyezd_night . ' руб.',
+                        ]"
+                        :img="$profile->images"
                     />
                 </div>
-            @endfor
+            @empty
+                <div class="col-span-full py-10 text-center">
+                    <div class="text-2xl font-bold text-white mb-4">Анкеты не найдены</div>
+                    <p class="text-gray-400 mb-6">К сожалению, по вашему запросу не найдено ни одной анкеты.</p>
+                    <a href="{{ route('home') }}" class="px-6 py-3 bg-[#6340FF] text-white rounded-lg hover:bg-[#5030EF] transition-colors">
+                        Сбросить фильтры
+                    </a>
+                </div>
+            @endforelse
             
-        </div>
+        </div>    
 
-        <!-- Pagination -->
-        <div class="mt-8">
-            {{ $profiles->appends(request()->query())->links() }}
-        </div>
-        
+        @if($profiles->isNotEmpty())
         <!-- Show More Button (for future implementation) -->
-        <div class="mt-6 text-center">
-            <button id="show-more-btn" class="px-6 py-2 bg-[#6340FF] hover:bg-[#333333] text-white rounded-lg transition" style="">
-                Показать еще
-            </button>
-        </div>
+<div class="mt-6 text-center">
+<button id="show-more-btn" class="px-6 py-2 bg-[#6340FF] hover:bg-[#333333] text-white rounded-lg transition" style="">
+ Показать еще
+</button>
+</div>
+
+ <div class="col-span-full mt-8 flex justify-center">
+     {{ $profiles->appends(request()->query())->links() }}
+ </div>
+@endif
         
     </div>
 

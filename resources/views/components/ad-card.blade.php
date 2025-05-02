@@ -1,4 +1,8 @@
 @props([
+    'id' => 4,
+    'vip' => false,
+    'new' => false,
+    'video' => false,
     'verified' => false,
     'name' => 'Анюта',
     'age' => 23,
@@ -13,6 +17,7 @@
         'two_hours' => '8000 руб.',
         'night' => '15000 руб.',
     ],
+    'img' => [],
     ])
 
 <a href="/profiles/view/4" >
@@ -25,9 +30,11 @@
         touchStartX: 0,
         touchEndX: 0,
         images: [
-            '{{ asset('assets/images/222-bg.png') }}',
-            '{{ asset('assets/images/hero.jpg') }}',
-            '{{ asset('assets/images/profile.jpeg') }}',
+            @foreach ($img as $image)
+               '{{ asset('storage/' .$image->path) }}',
+            @endforeach
+
+           
         ],
         nextSlide() {
             this.current = (this.current === this.images.length - 1) ? 0 : this.current + 1;
@@ -59,17 +66,28 @@
 
         <!-- Top badges -->
         <div class="absolute top-3 left-3 flex flex-col items-start gap-2 z-20">
+            @if ($video)
+            <!-- Video badge -->
             <div class="w-7 h-7 flex items-center justify-center rounded-full bg-pink-500 text-white">
                 <img src="{{asset('assets/svg/vid.png')}}" class="w-4 h-3">
 
-            </div>
-            {{-- <path d="M3 6a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6z" /> --}}
+            </div>                
+            @endif
+
+            @if ($new)
             <div
                 class="w-8 h-8 flex items-center justify-center text-xs font-semibold bg-[#4059FF] text-white rounded-full">
-                New</div>
+                New
+            </div>                
+            @endif
+
+            @if($vip)
             <div
                 class="w-8 h-8 flex items-center justify-center text-xs font-semibold bg-[#D3A25B] text-white rounded-full">
-                VIP</div>
+                VIP
+            </div>
+            @endif
+
         </div>
 
         <!-- Like button -->
@@ -142,7 +160,19 @@
                 <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#4059FF"
                     font-family="Arial, sans-serif">M</text>
             </svg>
-            <a href="#" class="text-[#FFFFFF] line-clamp-2 hover:underline transition duration-300">{{ $metro }}</a>
+            @if($metro)
+                @php
+                    $metroStations = explode(', ', str_replace('м. ', '', $metro));
+                @endphp
+                <div class="text-[#FFFFFF] line-clamp-2">
+                    @foreach($metroStations as $index => $station)
+                        <a href="{{ route('home', ['metro' => $station]) }}" class="hover:text-[#6340FF] transition-colors">
+                            м. {{ $station }}</a>@if($index < count($metroStations) - 1), @endif
+                    @endforeach
+                </div>
+            @else
+                <span class="text-[#FFFFFF66]">Метро не указано</span>
+            @endif
         </div>
 
         <div class="flex items-center gap-2">
@@ -150,7 +180,16 @@
                 <path
                     d="M12 2C7.589 2 4 5.589 4 9.995C4 15.4 12 22 12 22C12 22 20 15.4 20 9.995C20 5.589 16.411 2 12 2ZM12 14C9.791 14 8 12.209 8 10C8 7.791 9.791 6 12 6C14.209 6 16 7.791 16 10C16 12.209 14.209 14 12 14Z" />
             </svg>
-            <a href="#" class="text-[#FFFFFF] hover:underline transition duration-300">{{ $district }}</a>
+            @if($district)
+                @php
+                    $districtName = str_replace('р. ', '', $district);
+                @endphp
+                <a href="{{ route('home', ['district' => $districtName]) }}" class="text-[#FFFFFF] hover:text-[#6340FF] transition-colors">
+                    {{ $district }}
+                </a>
+            @else
+                <span class="text-[#FFFFFF66]">Район не указан</span>
+            @endif
         </div>
 
         <div class="flex items-center gap-2">

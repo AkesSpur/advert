@@ -213,11 +213,7 @@ class Profile extends Model
     // Add a scope to check if profile is VIP
     public function scopeIsVip($query)
     {
-        return $query->whereHas('activeAds', function($q) {
-            $q->whereHas('adTariff', function($q) {
-                $q->where('slug', 'vip');
-            })->where('is_paused', false);
-        });
+        return $query->where('is_vip', true);
     }
 
     // Add a scope to check if profile has video
@@ -232,7 +228,7 @@ class Profile extends Model
     // Add a scope to get new profiles (created in the last 7 days)
     public function scopeIsNew($query)
     {
-        return $query->where('created_at', '>=', now()->subDays(7));
+        return $query->where('profiles.created_at', '>=', now()->subDays(7));
     }
 
     // Add a scope to get cheap profiles (price below a certain threshold)

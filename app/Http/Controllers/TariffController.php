@@ -21,75 +21,75 @@ class TariffController extends Controller
     {
         // Получаем все активные тарифы
         $tariffs = AdTariff::where('is_active', true)->get();
-        
+
         // Получаем активные тарифы текущего пользователя
         $userActiveTariffs = [];
         $nextAvailableVipDate = null;
-        
+
         if (Auth::check()) {
             $userProfiles = Auth::user()->profiles;
             $profileIds = $userProfiles->pluck('id')->toArray();
-            
+
             $userActiveTariffs = ProfileAdTariff::whereIn('profile_id', $profileIds)
                 ->where('is_active', true)
-                ->where(function($query) {
+                ->where(function ($query) {
                     $query->where('expires_at', '>', now())
-                          ->orWhereNull('expires_at');
+                        ->orWhereNull('expires_at');
                 })
                 ->with(['adTariff', 'profile'])
                 ->get();
         }
-        
+
         // Проверяем количество активных VIP тарифов
         $activeVipCount = ProfileAdTariff::whereHas('adTariff', function ($query) {
             $query->where('slug', 'vip');
         })
-        ->where('is_active', true)
-        ->where('is_paused', false)
-        ->where('expires_at', '>', now())
-        ->where('queue_position', 0) // Только активные VIP, не в очереди
-        ->count();
-        
+            ->where('is_active', true)
+            ->where('is_paused', false)
+            ->where('expires_at', '>', now())
+            ->where('queue_position', 0) // Только активные VIP, не в очереди
+            ->count();
+
         // Если все 3 VIP слота заняты, определяем ближайшую доступную дату
         if ($activeVipCount >= 3) {
             // Находим VIP с самой ранней датой истечения
             $earliestExpiringVip = ProfileAdTariff::whereHas('adTariff', function ($query) {
                 $query->where('slug', 'vip');
             })
-            ->where('is_active', true)
-            ->where('is_paused', false)
-            ->where('queue_position', 0)
-            ->orderBy('expires_at', 'asc')
-            ->first();
-            
+                ->where('is_active', true)
+                ->where('is_paused', false)
+                ->where('queue_position', 0)
+                ->orderBy('expires_at', 'asc')
+                ->first();
+
             if ($earliestExpiringVip) {
                 // Проверяем, есть ли профили в очереди ожидания VIP
                 $queuedVipsCount = ProfileAdTariff::whereHas('adTariff', function ($query) {
                     $query->where('slug', 'vip');
                 })
-                ->where('is_active', true)
-                ->where('queue_position', '>', 0)
-                ->count();
-                
+                    ->where('is_active', true)
+                    ->where('queue_position', '>', 0)
+                    ->count();
+
                 // Если есть профили в очереди, нужно учесть их при расчете даты
                 if ($queuedVipsCount > 0) {
                     // Получаем максимальную позицию в очереди
                     $maxQueuePosition = ProfileAdTariff::whereHas('adTariff', function ($query) {
                         $query->where('slug', 'vip');
                     })
-                    ->where('is_active', true)
-                    ->max('queue_position');
-                    
+                        ->where('is_active', true)
+                        ->max('queue_position');
+
                     // Находим все активные VIP тарифы, отсортированные по дате истечения
                     $activeVips = ProfileAdTariff::whereHas('adTariff', function ($query) {
                         $query->where('slug', 'vip');
                     })
-                    ->where('is_active', true)
-                    ->where('is_paused', false)
-                    ->where('queue_position', 0)
-                    ->orderBy('expires_at', 'asc')
-                    ->get();
-                    
+                        ->where('is_active', true)
+                        ->where('is_paused', false)
+                        ->where('queue_position', 0)
+                        ->orderBy('expires_at', 'asc')
+                        ->get();
+
                     // Если пользователь будет последним в очереди, ему нужно ждать освобождения
                     // нескольких слотов, поэтому берем соответствующий VIP по порядку
                     $vipIndex = min($maxQueuePosition, $activeVips->count() - 1);
@@ -103,7 +103,7 @@ class TariffController extends Controller
                 }
             }
         }
-        
+
         return view('tariffs.index', compact(
             'tariffs',
             'userActiveTariffs',
@@ -111,7 +111,7 @@ class TariffController extends Controller
             'nextAvailableVipDate'
         ));
     }
-    
+
 
     /**
      * Activate a tariff for a profile.
@@ -133,34 +133,55 @@ class TariffController extends Controller
 
         // Получаем тариф по типу
         $tariff = AdTariff::where('slug', $validated['tariff_type'])->firstOrFail();
-        
+
         // Начинаем транзакцию
         return DB::transaction(function () use ($validated, $profile, $tariff) {
             $user = Auth::user();
             $now = Carbon::now();
             $dailyCharge = 0;
             $expiresAt = null;
-            
+
             // Рассчитываем стоимость и дату окончания в зависимости от типа тарифа
             switch ($tariff->slug) {
                 case 'basic':
                     $dailyCharge = 1; // 1 рубль в день
                     // Базовый тариф не имеет даты окончания, списывается ежедневно
                     break;
-                    
+
                 case 'priority':
                     $priorityLevel = $validated['priority_level'] ?? 1;
                     $dailyCharge = 1 + $priorityLevel; // Базовая цена + уровень приоритета
+                    
+                    // Проверяем, есть ли уже активный приоритетный тариф для этого профиля
+                    $existingPriorityTariff = ProfileAdTariff::where('profile_id', $profile->id)
+                        ->whereHas('adTariff', function ($query) {
+                            $query->where('slug', 'priority');
+                        })
+                        ->where('is_active', true)
+                        ->where('is_paused', false)
+                        ->first();
+                    
+                    // Если уже есть активный приоритетный тариф, обновляем его вместо создания нового
+                    if ($existingPriorityTariff) {
+                        // Обновляем уровень приоритета и дневную плату
+                        $existingPriorityTariff->priority_level = $priorityLevel;
+                        $existingPriorityTariff->daily_charge = $dailyCharge;
+                        $existingPriorityTariff->save();
+                        
+                        // Возвращаем успешный результат
+                        return redirect()->route('user.advert.index')
+                            ->with('success', 'Уровень приоритета успешно обновлен для вашего профиля.');
+                    }
                     // Приоритетный тариф не имеет даты окончания, списывается ежедневно
                     break;
-                    
+
                 case 'vip':
                     $duration = $validated['vip_duration'] ?? '1_day';
-                    
+
                     // Рассчитываем стоимость и дату окончания для VIP
                     // VIP тарифы имеют фиксированную стоимость, а не ежедневную плату
                     $dailyCharge = 0; // VIP не списывается ежедневно
-                    
+
                     switch ($duration) {
                         case '1_day':
                             $totalCost = $tariff->fixed_price; // *** рублей за день
@@ -175,26 +196,26 @@ class TariffController extends Controller
                             $expiresAt = $now->copy()->addMonth();
                             break;
                     }
-                    
+
                     // Проверяем количество активных VIP тарифов (не в очереди)
                     $activeVipCount = ProfileAdTariff::whereHas('adTariff', function ($query) {
                         $query->where('slug', 'vip');
                     })->where('is_active', true)
-                      ->where('is_paused', false)
-                      ->where('expires_at', '>', $now)
-                      ->where('queue_position', 0)
-                      ->count();
-                    
+                        ->where('is_paused', false)
+                        ->where('expires_at', '>', $now)
+                        ->where('queue_position', 0)
+                        ->count();
+
                     // Определяем позицию в очереди
                     if ($activeVipCount >= 3) {
                         // Если все слоты заняты, находим максимальную позицию в очереди
                         $maxQueuePosition = ProfileAdTariff::whereHas('adTariff', function ($query) {
                             $query->where('slug', 'vip');
                         })
-                        ->where('is_active', true)
-                        ->where('queue_position', '>', 0)
-                        ->max('queue_position') ?? 0;
-                        
+                            ->where('is_active', true)
+                            ->where('queue_position', '>', 0)
+                            ->max('queue_position') ?? 0;
+
                         // Назначаем следующую позицию в очереди
                         $queuePosition = $maxQueuePosition + 1;
                     } else {
@@ -203,7 +224,7 @@ class TariffController extends Controller
                     }
                     break;
             }
-            
+
             // Проверяем баланс пользователя
             if ($tariff->slug === 'vip') {
                 // Для VIP тарифа уже рассчитана полная стоимость выше
@@ -212,11 +233,11 @@ class TariffController extends Controller
                 // Для basic и priority тарифов проверяем только дневную плату
                 $totalCost = $dailyCharge;
             }
-            
+
             if ($user->balance < $totalCost) {
                 return back()->with('error', 'Недостаточно средств на балансе. Пополните баланс.');
             }
-            
+
             // Создаем запись о тарифе для профиля
             $profileTariff = ProfileAdTariff::create([
                 'profile_id' => $profile->id,
@@ -230,18 +251,20 @@ class TariffController extends Controller
                 'daily_charge' => $dailyCharge,
             ]);
 
-            //set profile active
-            $profile->update(['is_active' => true]);
-            
             // Для VIP тарифа списываем всю сумму сразу
             if ($tariff->slug === 'vip') {
                 // Получаем свежий экземпляр модели User и списываем средства с баланса
                 $freshUser = User::find($user->id);
                 $freshUser->balance -= $totalCost;
                 $freshUser->save();
-                
-            //set profile active
-            $profile->update(['is_vip' => true]);
+
+                //set profile is_vip active 
+                $profile->is_vip = true;
+                $profile->save();   
+
+                // Получаем свежий экземпляр модели User и списываем средства с баланса
+                $freshUser = User::find($user->id);
+                $freshUser->balance -= $totalCost;
 
                 // Создаем запись о списании
                 AdTariffCharge::create([
@@ -250,7 +273,7 @@ class TariffController extends Controller
                     'amount' => $totalCost,
                     'charged_at' => $now,
                 ]);
-                
+
                 // Создаем транзакцию
                 $freshUser->transactions()->create([
                     'amount' => -$totalCost,
@@ -259,7 +282,12 @@ class TariffController extends Controller
                     'reference_id' => 'vip_tariff_' . $profileTariff->id,
                 ]);
             }
-            
+
+            //set profile active
+            $profile->is_active = true;
+            $profile->save();   
+
+
             return redirect()->route('user.advert.index')
                 ->with('success', 'Тариф успешно активирован для вашего профиля.');
         });
@@ -271,19 +299,19 @@ class TariffController extends Controller
     public function pause(Request $request, $id)
     {
         $profileTariff = ProfileAdTariff::findOrFail($id);
-        
+
         // Проверяем, что тариф принадлежит текущему пользователю
         if ($profileTariff->profile->user_id !== Auth::id()) {
             return back()->with('error', 'Тариф не принадлежит вам.');
         }
-        
+
         // VIP тарифы нельзя приостанавливать
         if ($profileTariff->isVip()) {
             return back()->with('error', 'VIP тарифы нельзя приостанавливать.');
         }
-        
+
         $profileTariff->pause();
-        
+
         return back()->with('success', 'Тариф успешно приостановлен.');
     }
 
@@ -293,20 +321,20 @@ class TariffController extends Controller
     public function resume(Request $request, $id)
     {
         $profileTariff = ProfileAdTariff::findOrFail($id);
-        
+
         // Проверяем, что тариф принадлежит текущему пользователю
         if ($profileTariff->profile->user_id !== Auth::id()) {
             return back()->with('error', 'Тариф не принадлежит вам.');
         }
-        
+
         // Проверяем баланс пользователя
         $user = Auth::user();
         if ($user->balance < $profileTariff->daily_charge) {
             return back()->with('error', 'Недостаточно средств на балансе для возобновления тарифа.');
         }
-        
+
         $profileTariff->resume();
-        
+
         return back()->with('success', 'Тариф успешно возобновлен.');
     }
 
@@ -316,19 +344,19 @@ class TariffController extends Controller
     public function cancel(Request $request, $id)
     {
         $profileTariff = ProfileAdTariff::findOrFail($id);
-        
+
         // Проверяем, что тариф принадлежит текущему пользователю
         if ($profileTariff->profile->user_id !== Auth::id()) {
             return back()->with('error', 'Тариф не принадлежит вам.');
         }
-        
+
         // VIP тарифы нельзя отменять
         if ($profileTariff->isVip()) {
             return back()->with('error', 'VIP тарифы нельзя отменять.');
         }
-        
+
         $profileTariff->deactivate();
-        
+
         return back()->with('success', 'Тариф успешно отменен.');
     }
 }

@@ -52,6 +52,10 @@ class ManageVipTariffs extends Command
                 // Use the deactivate method to properly update both the tariff and profile status
                 $expiredVip->deactivate();
                 
+                // Update the profile's is_vip status to false
+                $expiredVip->profile->update(['is_vip' => false]);
+                $this->info("Updated is_vip status to false for profile {$expiredVip->profile->id}.");
+                
                 // Notify user about VIP expiration
                 $user = $expiredVip->profile->user;
                 try {
