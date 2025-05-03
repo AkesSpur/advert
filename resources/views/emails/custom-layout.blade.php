@@ -23,9 +23,9 @@
             background-color: #121212;
         }
         .email-header {
+            position: absolute;
             text-align: center;
             padding: 25px 0;
-            background-color: #191919;
         }
         .email-hero {
             position: relative;

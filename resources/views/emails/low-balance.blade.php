@@ -1,4 +1,4 @@
-@extends('emails.layout')
+@extends('emails.custom-layout')
 
 @section('content')
     <h2>Недостаточно средств на балансе</h2>
