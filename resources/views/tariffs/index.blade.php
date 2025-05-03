@@ -43,7 +43,7 @@
                         <div class="text-sm text-[#C2C2C2]">
                             <div>
                                 <span class="text-white font-medium">{{ $activeTariff->adTariff->name }}</span>
-                                @if($activeTariff->isVip() && $activeTariff->expires_at && $activeTariff->expires_at->isFuture())
+                                @if($activeTariff->isVip() && !$activeTariff->profile->is_vip)
                                     <span class="ml-2 px-2 py-1 bg-yellow-900 text-yellow-300 text-xs rounded-full">Ожидает</span>
                                 @elseif($activeTariff->is_paused)
                                     <span class="ml-2 px-2 py-1 bg-yellow-900 text-yellow-300 text-xs rounded-full">Приостановлен</span>

@@ -446,9 +446,9 @@
                         :metro="$profile->metroStations->isNotEmpty() ? 'м. ' . $profile->metroStations->pluck('name')->implode(', м. ') : ''"
                         :phone="$profile->phone"
                         :prices="[
-                            'hour' => $profile->vyezd_1hour . ' руб.',
-                            'two_hours' => $profile->vyezd_2hours . ' руб.',
-                            'night' => $profile->vyezd_night . ' руб.',
+                            'hour' => $profile->vyezd_1hour ?? 0,
+                            'two_hours' => $profile->vyezd_2hours ?? 0,
+                            'night' => $profile->vyezd_night ?? 0,
                         ]"
                         :img="$profile->images"
                     />

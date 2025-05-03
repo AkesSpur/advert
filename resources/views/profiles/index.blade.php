@@ -197,10 +197,9 @@
         font-family="Arial, sans-serif">M</text>
       </svg>
       @foreach ($profile->neighborhoods as $key => $neighborhood)
-      {{ $neighborhood->name }}
-      @if ($key < count($profile->neighborhoods) - 1)
-      ,
-    @endif
+     <span>
+      {{$neighborhood->name}}{{$key < count($profile->neighborhoods) - 1 ? ',' : '' ;}}
+     </span>
     @endforeach
       </div>
       <div class="flex items-center text-[#C2C2C2]">

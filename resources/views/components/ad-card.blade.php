@@ -207,15 +207,15 @@
     <div class="bg-[#191919] mt-auto px-4 rounded-br-3xl rounded-bl-3xl py-3 space-y-2">
         <div class="flex justify-between border-b border-[#FFFFFF4D] items-center">
             <div class="md:text-sm  text-[#FFFFFFCC]">За один час</div>
-            <div class="text-[#FFFFFFCC] md:text-sm  font-semibold">{{ $prices['hour'] }}</div>
+            <div class="text-[#FFFFFFCC] md:text-sm  font-semibold">{{ round($prices['hour']) }} руб.</div>
         </div>
         <div class="flex justify-between border-b border-[#FFFFFF4D] items-center">
             <div class="md:text-sm  text-[#FFFFFFCC]">За 2 часа</div>
-            <div class="text-[#FFFFFFCC] md:text-sm  font-semibold">{{ $prices['two_hours'] }}</div>
+            <div class="text-[#FFFFFFCC] md:text-sm  font-semibold">{{ round($prices['two_hours']) }} руб.</div>
         </div>
         <div class="flex justify-between items-center">
             <div class="md:text-sm  text-[#FFFFFFCC]">За всю ночь</div>
-            <div class="text-[#FFFFFFCC] md:text-sm  font-semibold">{{ $prices['night'] }}</div>
+            <div class="text-[#FFFFFFCC] md:text-sm  font-semibold">{{ round($prices['night']) }} руб.</div>
         </div>
     </div>
    </div>

@@ -19,6 +19,64 @@ use Illuminate\Validation\Rule;
 class ProfileController extends Controller
 {
     /**
+     * Create a fallback thumbnail when FFMpeg is not available or fails
+     * 
+     * @param string $thumbnailPath The path where the thumbnail should be stored
+     * @return string The thumbnail path if successful, null otherwise
+     */
+    private function createFallbackThumbnail($thumbnailPath)
+    {
+        try {
+            // Try to use a placeholder image
+            $placeholderPath = public_path('assets/images/video-placeholder.jpg');
+            
+            // If placeholder exists, use it
+            if (file_exists($placeholderPath)) {
+                // Ensure the directory exists
+                $fullThumbnailPath = Storage::disk('public')->path($thumbnailPath);
+                $thumbnailDir = dirname($fullThumbnailPath);
+                
+                if (!file_exists($thumbnailDir)) {
+                    mkdir($thumbnailDir, 0755, true);
+                }
+                
+                // Copy the placeholder to the thumbnail location
+                if (Storage::disk('public')->put($thumbnailPath, file_get_contents($placeholderPath))) {
+                    return $thumbnailPath;
+                }
+            } else {
+                // Create a simple black image if no placeholder is available
+                $fullThumbnailPath = Storage::disk('public')->path($thumbnailPath);
+                $thumbnailDir = dirname($fullThumbnailPath);
+                
+                if (!file_exists($thumbnailDir)) {
+                    mkdir($thumbnailDir, 0755, true);
+                }
+                
+                // Create a simple black image
+                if (function_exists('imagecreatetruecolor')) {
+                    $image = imagecreatetruecolor(320, 240);
+                    $bgColor = imagecolorallocate($image, 0, 0, 0);
+                    imagefill($image, 0, 0, $bgColor);
+                    
+                    // Add text "Video" in white
+                    $textColor = imagecolorallocate($image, 255, 255, 255);
+                    imagestring($image, 5, 120, 110, 'Video', $textColor);
+                    
+                    // Save as JPEG
+                    imagejpeg($image, $fullThumbnailPath, 90);
+                    imagedestroy($image);
+                    
+                    return $thumbnailPath;
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to create fallback thumbnail: ' . $e->getMessage());
+        }
+        
+        return null;
+    }
+    /**
      * Display a listing of the profiles.
      */
     public function index(Request $request)
@@ -227,8 +285,9 @@ class ProfileController extends Controller
             $thumbnailPath = null;
             try {
                 // Create a thumbnail from the first frame of the video
-                $thumbnailName = pathinfo($videoFile->getClientOriginalName(), PATHINFO_FILENAME) . '_thumbnail.jpg';
+                $thumbnailName = Str::uuid() . '_thumbnail.jpg';
                 $thumbnailPath = 'profile-videos/thumbnails/' . $thumbnailName;
+                $fullThumbnailPath = Storage::disk('public')->path($thumbnailPath);
 
                 // Ensure the thumbnails directory exists
                 Storage::disk('public')->makeDirectory('profile-videos/thumbnails');
@@ -239,18 +298,29 @@ class ProfileController extends Controller
                         $ffmpeg = \FFMpeg\FFMpeg::create();
                         $video = $ffmpeg->open(Storage::disk('public')->path($path));
                         $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1));
-                        $frame->save(Storage::disk('public')->path($thumbnailPath));
+                        
+                        // Ensure the directory exists before saving
+                        $thumbnailDir = dirname($fullThumbnailPath);
+                        if (!file_exists($thumbnailDir)) {
+                            mkdir($thumbnailDir, 0755, true);
+                        }
+                        
+                        // Save the thumbnail
+                        $frame->save($fullThumbnailPath);
+                        
+                        // Verify the thumbnail was created
+                        if (!file_exists($fullThumbnailPath)) {
+                            Log::error('Thumbnail file was not created at: ' . $fullThumbnailPath);
+                            throw new \Exception('Failed to create thumbnail file');
+                        }
                     } catch (\Exception $e) {
                         Log::error('FFMpeg error: ' . $e->getMessage());
                         // Continue with fallback method
+                        $thumbnailPath = $this->createFallbackThumbnail($thumbnailPath);
                     }
                 } else {
                     // Fallback method - store a placeholder thumbnail
-                    // In production, you would want to install FFMpeg for proper thumbnail generation
-                    $placeholderPath = public_path('assets/images/video-placeholder.jpg');
-                    if (file_exists($placeholderPath)) {
-                        Storage::disk('public')->put($thumbnailPath, file_get_contents($placeholderPath));
-                    }
+                    $thumbnailPath = $this->createFallbackThumbnail($thumbnailPath);
                 }
             } catch (\Exception $e) {
                 // Log the error but continue without a thumbnail

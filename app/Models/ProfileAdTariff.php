@@ -157,6 +157,13 @@ class ProfileAdTariff extends Model
         }
     }
 
+    public function deactivateBasic(): void
+    {
+        $this->is_active = false;
+        $this->save();
+    }
+
+
     /**
      * Get the remaining days for this tariff
      */

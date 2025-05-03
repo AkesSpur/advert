@@ -78,10 +78,10 @@ class ManageVipTariffs extends Command
             ->where('queue_position', '<=', 0)
             ->where('expires_at', '>', $now)
             ->count();
+            $this->info("{$activeVipCount} VIP is active.");
             
             $slotsAvailable = 3 - $activeVipCount;
-            $this->info("{$activeVipCount} VIP is active.");
-            $this->info("{$slotsAvailable} VIP slots available for activation.");
+
             if ($slotsAvailable > 0) {
                 $this->info("{$slotsAvailable} VIP slots available for activation.");
                 
