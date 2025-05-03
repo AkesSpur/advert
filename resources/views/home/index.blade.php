@@ -392,9 +392,10 @@
                 <!-- Sort Dropdown -->
                 <div class="relative" x-data="{ 
                     showSortOptions: false, 
-                    selectedSort: '{{ $sort == "popular" ? "Самые популярные" : ($sort == "cheapest" ? "Дешевые" : ($sort == "expensive" ? "Дорогие" : "Самые популярные")) }}' 
+                    selectedSort: '{{ $sort == "popular" ? "Самые популярные" : ($sort == "cheapest" ? "Дешевые" : ($sort == "expensive" ? "Дорогие" : "Сортировать по умолчанию")) }}' 
                 }">
-                    <button @click="showSortOptions = !showSortOptions" 
+    
+                <button @click="showSortOptions = !showSortOptions" 
                             class="flex items-center w-full px-4 py-2 text-white rounded-lg hover:bg-[#252525] transition-colors">
                         <span class="text-white" x-text="selectedSort"></span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" :class="{'transform rotate-180': showSortOptions}">
@@ -431,6 +432,7 @@
             @forelse ($profiles as $profile)
                 <div class="h-full">
                     <x-ad-card
+                        :id="$profile->id"
                         :new="$profile->created_at >= now()->subDays(7) ?? false"
                         :vip="$profile->is_vip ?? false"
                         :video="isset($profile->video->path) ?? false "

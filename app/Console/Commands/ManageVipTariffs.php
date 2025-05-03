@@ -53,7 +53,8 @@ class ManageVipTariffs extends Command
                 $expiredVip->deactivate();
                 
                 // Update the profile's is_vip status to false
-                $expiredVip->profile->update(['is_vip' => false]);
+                $expiredVip->profile->is_vip = false;
+                $expiredVip->profile->save();
                 $this->info("Updated is_vip status to false for profile {$expiredVip->profile->id}.");
                 
                 // Notify user about VIP expiration
@@ -74,11 +75,13 @@ class ManageVipTariffs extends Command
             })
             ->where('is_active', true)
             ->where('is_paused', false)
+            ->where('queue_position', '<=', 0)
             ->where('expires_at', '>', $now)
             ->count();
             
             $slotsAvailable = 3 - $activeVipCount;
-            
+            $this->info("{$activeVipCount} VIP is active.");
+            $this->info("{$slotsAvailable} VIP slots available for activation.");
             if ($slotsAvailable > 0) {
                 $this->info("{$slotsAvailable} VIP slots available for activation.");
                 
@@ -95,6 +98,11 @@ class ManageVipTariffs extends Command
                 foreach ($nextVips as $nextVip) {
                     $nextVip->queue_position = 0;
                     $nextVip->save();
+                    
+                    // Update the profile's is_vip status to true
+                    $nextVip->profile->is_vip = true;
+                    $nextVip->profile->save();
+                    $this->info("Updated is_vip status to true for profile {$nextVip->profile->id}.");
                     
                     // Notify user about VIP activation
                     $user = $nextVip->profile->user;

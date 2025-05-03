@@ -39,11 +39,15 @@ class ProcessDailyTariffCharges extends Command
             $now = Carbon::now();
             
             // Get all active and non-paused Basic and Priority tariffs
+            // Exclude tariffs for profiles that are VIP
             $tariffs = ProfileAdTariff::whereHas('adTariff', function ($query) {
                 $query->whereIn('slug', ['basic', 'priority']);
             })
             ->where('is_active', true)
             ->where('is_paused', false)
+            ->whereHas('profile', function($query) {
+                $query->where('is_vip', false);
+            })
             ->get();
             
             $this->info("Found {$tariffs->count()} active Basic and Priority tariffs.");

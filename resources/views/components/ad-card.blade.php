@@ -20,7 +20,7 @@
     'img' => [],
     ])
 
-<a href="/profiles/view/4" >
+<a href="{{route('profiles.clicks', $id)}}" >
 <div
     class="bg-[#191919] rounded-2xl mb-3 mr-1 overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:ring-2 hover:ring-[#6340FF] w-full">
     <!-- Image section with gradient overlay -->

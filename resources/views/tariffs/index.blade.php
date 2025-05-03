@@ -12,70 +12,111 @@
     </div>
 
     @if(isset($userActiveTariffs) && $userActiveTariffs->count() > 0)
-    <!-- Current Subscriptions -->
-    <div class="bg-[#191919] rounded-xl p-6 mb-8">
+    <div x-data="{ showAll: false }" class="bg-[#191919] rounded-xl p-6 mb-8">
         <h2 class="text-xl font-bold mb-4">Ваши активные тарифы</h2>
-        
+    
         <div class="space-y-4">
-            @foreach($userActiveTariffs as $activeTariff)
-            <div class="border-b border-[#363636] pb-4 last:border-0 last:pb-0">
+            @foreach($userActiveTariffs as $index => $activeTariff)
+            <div 
+                x-show="showAll || {{ $index }} < 2"
+                class="border-b border-[#363636] pb-4 last:border-0 last:pb-0"
+            >
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div class="mb-4 md:mb-0">
-                        <div class="flex items-center">
-                            <h3 class="text-lg font-bold">{{ $activeTariff->profile->name }}: <span class="text-[#6340FF]">{{ $activeTariff->adTariff->name }}</span></h3>
-                            @if($activeTariff->is_paused)
-                                <span class="ml-3 px-2 py-1 bg-yellow-900 text-yellow-300 text-xs rounded-full">Приостановлен</span>
-                            @else
-                                <span class="ml-3 px-2 py-1 bg-green-900 text-green-300 text-xs rounded-full">Активен</span>
-                            @endif
-                        </div>
-                        @if($activeTariff->expires_at)
-                            <p class="text-[#C2C2C2] text-sm mt-1">Действует до: {{ $activeTariff->expires_at->format('d.m.Y') }} (осталось {{ $activeTariff->getRemainingDays() }} дней)</p>
-                        @else
-                            <p class="text-[#C2C2C2] text-sm mt-1">Ежедневное списание: {{ $activeTariff->daily_charge }} ₽</p>
-                        @endif
-                        <div class="mt-2 text-sm">
-                            @if($activeTariff->isPriority() && $activeTariff->priority_level)
-                                <span class="text-white">Уровень приоритета:</span>
-                                <span class="text-[#C2C2C2] ml-2">{{ $activeTariff->priority_level }}</span>
-                            @elseif($activeTariff->isVip() && $activeTariff->queue_position > 0)
-                                <span class="text-white">Позиция в очереди VIP:</span>
-                                <span class="text-[#C2C2C2] ml-2">{{ $activeTariff->queue_position }}</span>
-                            @endif
+                    <!-- Profile Info -->
+                    <div class="flex items-center space-x-4">
+                        <img src="{{ asset('storage/' . $activeTariff->profile->primaryImage->path) }}" class="w-12 h-12 rounded-full object-cover" />
+                        <div>
+                            <div class="text-white font-medium">
+                                {{ $activeTariff->profile->name }}, {{ $activeTariff->profile->age }}
+                                @if($activeTariff->profile->is_active)
+                                <span class="ml-2 text-xs bg-[#5FD013] text-black px-2 py-0.5 rounded-md">Активна</span>
+                                @else
+                                <span class="ml-2 text-xs bg-[#49494999] text-white px-2 py-0.5 rounded-md">Неактивна</span>
+                                @endif
+                            </div>
+                            <div class="text-xs mt-0.5 text-[#636363]">Анкета добавлена {{ $activeTariff->profile->created_at->format('d.m.Y') }}</div>
                         </div>
                     </div>
-                    <div class="flex space-x-2">
-                        @if(!$activeTariff->isVip())
-                            @if($activeTariff->is_paused)
-                                <form action="{{ route('user.advert.resume', $activeTariff->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="px-4 py-2 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded-md transition">
-                                        Возобновить
-                                    </button>
-                                </form>
+    
+                    <!-- Ad Details + Actions -->
+                    <div class="mt-4 md:mt-0 flex flex-col md:flex-row md:items-center md:space-x-6 w-full justify-between">
+                        <div class="text-sm text-[#C2C2C2]">
+                            <div>
+                                <span class="text-white font-medium">{{ $activeTariff->adTariff->name }}</span>
+                                @if($activeTariff->isVip() && $activeTariff->expires_at && $activeTariff->expires_at->isFuture())
+                                    <span class="ml-2 px-2 py-1 bg-yellow-900 text-yellow-300 text-xs rounded-full">Ожидает</span>
+                                @elseif($activeTariff->is_paused)
+                                    <span class="ml-2 px-2 py-1 bg-yellow-900 text-yellow-300 text-xs rounded-full">Приостановлен</span>
+                                @else
+                                    <span class="ml-2 px-2 py-1 bg-green-900 text-green-300 text-xs rounded-full">Активен</span>
+                                @endif
+                            </div>
+                            @if($activeTariff->expires_at)
+                                <div class="mt-1">Действует до: {{ $activeTariff->expires_at->format('d.m.Y') }} ({{ $activeTariff->getRemainingDays() }} дней)</div>
                             @else
-                                <form action="{{ route('user.advert.pause', $activeTariff->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="px-4 py-2 bg-[#323232] hover:bg-[#3d3d3d] text-white rounded-md transition">
-                                        Приостановить
-                                    </button>
-                                </form>
+                                <div class="mt-1">Ежедневное списание: {{ $activeTariff->daily_charge }} ₽</div>
                             @endif
-                            
-                            <form action="{{ route('user.advert.cancel', $activeTariff->id) }}" method="POST">
+                            @if($activeTariff->isPriority() && $activeTariff->priority_level)
+                                <div class="mt-1">Уровень приоритета: {{ $activeTariff->priority_level }}</div>
+                            @elseif($activeTariff->isVip() && $activeTariff->queue_position > 0)
+                                <div class="mt-1">Очередь VIP: {{ $activeTariff->queue_position }}</div>
+                            @endif
+                        </div>
+    
+                        @if(!$activeTariff->isVip())
+                        <div class="flex space-x-3 mt-4 md:mt-0">
+                            @if($activeTariff->is_paused)
+                            <!-- Resume button (▶️) -->
+                            <form action="{{ route('user.advert.resume', $activeTariff->id) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="px-4 py-2 bg-[#323232] hover:bg-[#3d3d3d] text-white rounded-md transition">
-                                    Отменить
+                                <button type="submit" class="p-2 hover:bg-[#5737e7] bg-[#6340FF] text-white rounded-full transition" title="Возобновить">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
                                 </button>
                             </form>
+                            @else
+                            <!-- Pause button (⏸️) -->
+                            <form action="{{ route('user.advert.pause', $activeTariff->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="p-2 bg-[#323232] hover:bg-[#3d3d3d] text-white rounded-full transition" title="Приостановить">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <rect x="6" y="5" width="4" height="14" />
+                                        <rect x="14" y="5" width="4" height="14" />
+                                    </svg>
+                                </button>
+                            </form>
+                            @endif
+                        
+                            <!-- Deactivate button (⏹️) -->
+                            <form action="{{ route('user.advert.cancel', $activeTariff->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="p-2 bg-red-700 hover:bg-red-900 text-white rounded-full transition" title="Отменить">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <rect x="6" y="6" width="12" height="12" />
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
                         @endif
-                    </div>
+                                            </div>
                 </div>
             </div>
             @endforeach
         </div>
+    
+        @if($userActiveTariffs->count() > 2)
+        <div class="mt-4 text-center">
+            <button @click="showAll = !showAll" class="text-[#6340FF] hover:underline text-sm">
+                <span x-show="!showAll">Показать ещё</span>
+                <span x-show="showAll">Скрыть</span>
+            </button>
+        </div>
+        @endif
     </div>
     @endif
+    
+    
 
     <!-- Tariffs Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 mb-6">
@@ -233,7 +274,6 @@
                                 
                                 <div class="space-y-3 max-h-[300px] overflow-y-auto custom-scrollbar mt-4">
                                     @foreach ($userProfiles as $profile)
-                                        @if (!$profile->is_vip)
                                         <label class="flex items-start space-x-3 p-3 rounded cursor-pointer">
                                             <input type="radio" name="profile_id" value="{{ $profile->id }}" required class="my-auto w-6 h-6 text-[#6340FF] bg-transparent accent-[#6340FF]">
                                             <div class="flex">
@@ -276,8 +316,6 @@
                                                 </div>
                                             </div>
                                         </label>
-                                                
-                                        @endif
                                 @endforeach
                                 </div>
                                 

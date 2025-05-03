@@ -22,13 +22,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+require __DIR__ . '/auth.php';
+
+
 Route::get('/', [PageController::class, 'index'])->name('home');
-Route::get('/filter', [PageController::class, 'filter'])->name('filter');
 
-
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/profiles/click/{id}', [PageController::class, 'profileClick'])->name('profiles.clicks');
+Route::get('/profiles/{id}', [PageController::class, 'show'])->name('profiles.view');
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], function () {
 
@@ -41,9 +41,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], fu
         return view('chat.index');
     })->name('chat.index');
 
-    Route::get('/transaction', function () {
-        return view('transactions.index');
-    })->name('transaction.index');
+    Route::get('/transaction', [TransactionController::class, 'index'] )->name('transaction.index');
     Route::get('/ads', [TariffController::class, 'index'])->name('advert.index');
     Route::post('/ads/activate', [TariffController::class, 'activate'])->name('advert.activate');
     Route::post('/ads/{id}/pause', [TariffController::class, 'pause'])->name('advert.pause');
@@ -52,17 +50,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], fu
 
     Route::get('/profiles/create', [FormController::class, 'index'])->name('form.index');
 });
-
-// Route::get('/profiles', function () {
-//     return view('profiles.index');
-// })->name('profiles.index');
-
-// Display individual profile page using the second-layout
-Route::get('/profiles/view/{id}', function ($id) {
-    return view('profiles.profile', ['id' => $id]);
-})->name('profiles.view');
-
-require __DIR__ . '/auth.php';
 
 
 

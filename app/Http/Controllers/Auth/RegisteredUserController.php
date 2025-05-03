@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\WelcomeNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,7 +42,18 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        $user->balance = 15000;
+        $user->save();
+
+        $user->transactions()->create([
+            'amount' => +15000,
+            'status' => 'completed',
+        ]);
+
         event(new Registered($user));
+        
+        // Send welcome notification
+        $user->notify(new WelcomeNotification());
 
         Auth::login($user);
 

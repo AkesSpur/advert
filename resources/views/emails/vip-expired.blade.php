@@ -9,7 +9,7 @@
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
-        <a href="{{ url('/tariffs') }}" class="btn" target="_blank">Продлить VIP статус</a>
+        <a href="{{ url('/user/traffis') }}" class="btn" target="_blank">Продлить VIP статус</a>
     </div>
 
     <div>

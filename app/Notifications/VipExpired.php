@@ -44,10 +44,19 @@ class VipExpired extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('Срок действия VIP статуса истек')
-            ->line('Уведомляем вас, что срок действия VIP статуса для вашего профиля "' . $this->profile->name . '" истек.')
-            ->line('Ваше объявление теперь отображается в обычном порядке.')
-            ->action('Продлить VIP статус', url('/tariffs'))
-            ->line('Спасибо за использование нашего сервиса!');
+            ->view('emails.custom-notification', [
+                'title' => 'VIP статус истек',
+                'greeting' => 'Здравствуйте!',
+                'introLines' => [
+                    'Уведомляем вас, что срок действия VIP статуса для вашего профиля "' . $this->profile->name . '" истек.',
+                    'Ваше объявление теперь отображается в обычном порядке.'
+                ],
+                'actionText' => 'Продлить VIP статус',
+                'actionUrl' => url('/user/profiles'),
+                'outroLines' => [
+                    'Спасибо за использование нашего сервиса!'
+                ]
+            ]);
     }
 
     /**

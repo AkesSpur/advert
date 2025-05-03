@@ -4,12 +4,28 @@
     <div class="max-w-screen-2xl mx-auto px-1 md:px-4 py-6">
         <!-- Breadcrumbs -->
         <div class="text-sm text-gray-400 mb-4 pl-4 flex justify-between">
+            <nav class="text-sm text-[#A0A0A0] mb-4" aria-label="Breadcrumb">
+                <ol class="list-reset flex items-center space-x-1">
+                  <li>
+                    <a href="/" class="hover:text-[#A0A0A0] text-[#636363]">Главная</a>
+                  </li>
+                  <li><span>/</span></li>
+                  <li>
+                    <a href="#" class="hover:text-[#A0A0A0] text-[#636363]">
+                        @if ($profile->profile_type == 'individual')
+                            Индивидуалки
+                        @else
+                            Интим-салон
+                        @endif
+                    </a>
+                  </li>
+                  <li><span>/</span></li>
+                  <li class="text-[#6340FF] font-medium" aria-current="page">{{$profile->name}}</li>
+                </ol>
+              </nav>
+              
             <div>
-                <a href="/" class="hover:text-white">Главная</a> / <a href="#" class="hover:text-white">Проститутки</a> /
-                <span class="text-white">Лиза</span>
-            </div>
-            <div>
-                <span class="text-[#636363] text-sm hidden md:block">Анкета добавлена 23.05.2023</span>
+                <span class="text-[#636363] text-sm hidden md:block">Анкета добавлена {{$profile->created_at->format('d.m.Y')}}</span>
             </div>
         </div>
 
@@ -18,8 +34,8 @@
             <!-- Profile Info for small and medium screens (shown above gallery) -->
             <div class="block md:block lg:hidden py-2 px-4">
                 <div class="flex items-center mb-1 md:mb-none">
-                    <h1 class="text-4xl font-semibold text-white mr-2 relative">
-                        Лиза, 23
+                    <h1 class="text-3xl font-semibold text-white mr-2 relative">
+                        {{$profile->name . ', ' . $profile->age}}
                         <span class="absolute -top-1 -right-5">
                             <img src="{{ asset('assets/svg/verified.png') }}" class="w-4 h-4">
                         </span>
@@ -31,38 +47,48 @@
 
                 <!-- Attributes for small and medium screens -->
                 <div class="flex md:hidden overflow-x-auto hide-scrollbar gap-3">
-                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">60 кг</span>
-                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">175 см</span>
-                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">3 размер</span>
-                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">Шатенка</span>
-                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">Славянка</span>
-                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">Есть тату</span>
-                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">Интимная стрижка</span>
+                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{$profile->weight}} кг</span>
+                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{$profile->height}} см</span>
+                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{$profile->size}} размер</span>
+                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{$profile->hair_color}}</span>
+                    {{-- <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">Славянка</span> --}}
+                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{$profile->tattoo}} тату</span>
+                    {{-- <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">Интимная стрижка</span> --}}
                 </div>
             </div>
 
 
             <div class="flex flex-col lg:flex-row">
-                <span class="text-[#636363] px-4 text-sm md:hidden">Анкета добавлена 23.05.2023</span>
+                <span class="text-[#636363] px-4 text-sm md:hidden">Анкета добавлена {{$profile->created_at->format('d.m.Y')}}</span>
                 <!-- Gallery Section -->
                 <div class="w-full lg:w-1/2 p-4">
                     <div class="flex flex-row h-full gap-4">
                         <!-- Thumbnails on the left (visible on medium and large screens) -->
                         <div class="hidden md:flex flex-col gap-2 w-1/4 h-full justify-between">
-                            <!-- Thumbnail 1 -->
-                            <div class="h-[33%] rounded-xl overflow-hidden cursor-pointer" onclick="showSlide(0)">
-                                <img src="{{ asset('assets/images/222-bg.png') }}" alt="Thumbnail 1"
+                            @php
+                                $slide = 0;
+                            @endphp
+
+                            @foreach ($profile->images as $image)
+                            <!-- Thumbnail  -->
+                            <div class="h-[33%] rounded-xl overflow-hidden cursor-pointer" onclick="showSlide({{$slide}})">
+                                <img src="{{ asset('storage/' . $image->path) }}" alt="Thumbnail {{$slide}}"
                                     class="w-full h-full object-cover">
+                                  @php
+                                      $slide++;                                      
+                                  @endphp
                             </div>
-                            <!-- Thumbnail 2 -->
-                            <div class="h-[33%] rounded-xl overflow-hidden cursor-pointer" onclick="showSlide(1)">
-                                <img src="{{ asset('assets/images/hero.jpg') }}" alt="Thumbnail 2"
-                                    class="w-full h-full object-cover">
-                            </div>
+                            @if ($slide > 1)
+                            
+                            @break
+                            @endif
+                            @endforeach
+
+                            @if (isset($profile->video->path))
                             <!-- Video Thumbnail -->
                             <div class="h-[33%] rounded-xl overflow-hidden cursor-pointer" onclick="showVideo()">
                                 <div class="relative w-full h-full">
-                                    <img src="{{ asset('assets/images/prof.jpg') }}" alt="Video Thumbnail"
+                                    <img src="{{ asset('storage/' , $profile->video->thumbnail_path) }}" alt="Video Thumbnail"
                                         class="w-full h-full object-cover opacity-75">
                                     <div class="absolute inset-0 flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none"
@@ -75,50 +101,63 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            @else
+                            
+                            @endif
+
                         </div>
                         <!-- Main Image/Video Carousel on the right -->
                         <div class="relative rounded-xl flex-grow w-full md:w-3/4">
                             <!-- Fixed height container to match thumbnails -->
-                            <div class="w-full h-[400px] md:h-full relative">
+                            <div class="w-full h-[450px] md:h-full relative">
                                 <!-- Top badges -->
                                 <div class="absolute top-3 left-3 flex flex-col items-start gap-2 z-10">
+                                    @if (isset($profile->video->path))
                                     <div
                                         class="w-7 h-7 flex items-center justify-center rounded-full bg-pink-500 text-white">
                                         <img src="{{asset('assets/svg/vid.png')}}" class="w-4 h-3">
-                                    </div>
+                                    </div>                                        
+                                    @endif
+                                    @if ($profile->created_at >= now()->subDays(7))
                                     <div
                                         class="w-8 h-8 flex items-center justify-center text-xs font-semibold bg-[#4059FF] text-white rounded-full">
                                         New
-                                    </div>
+                                    </div>                                                                                
+                                    @endif
+                                    @if ($profile->is_vip)
                                     <div
                                         class="w-8 h-8 flex items-center justify-center text-xs font-semibold bg-[#D3A25B] text-white rounded-full">
                                         VIP
-                                    </div>
+                                    </div>                                        
+                                    @endif
                                 </div>
                                 <!-- Carousel container -->
                                 <div class="carousel-container rounded-xl h-full w-full relative">
+                                    @php
+                                    $slide = 1;
+                                @endphp
                                     <!-- Images (in carousel) -->
+                                    @foreach ($profile->images as $image)
                                     <div
-                                        class="carousel-slide absolute inset-0 opacity-100 transition-opacity rounded-xl duration-300">
-                                        <img src="{{ asset('assets/images/222-bg.png') }}" alt="Image 1"
-                                            class="w-full rounded-xl h-full object-cover">
-                                    </div>
-                                    <div class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-300">
-                                        <img src="{{ asset('assets/images/hero.jpg') }}" alt="Image 2"
-                                            class="w-full h-full rounded-xl object-cover">
-                                    </div>
-                                    <div class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-300">
-                                        <img src="{{ asset('assets/images/prof.jpg') }}" alt="Image 3"
-                                            class="w-full h-full rounded-xl object-cover">
-                                    </div>
+                                    class="carousel-slide absolute inset-0 opacity-100 transition-opacity rounded-xl duration-300">
+                                    <img src="{{ asset('storage/' . $image->path) }}" alt="Image {{$slide}}"
+                                        class="w-full rounded-xl h-full object-cover">
+                                </div>
+                                @php
+                                $slide++;
+                            @endphp
+                                    @endforeach
 
+                                    @if (isset($profile->video->path))
                                     <!-- Video (hidden by default) -->
                                     <div class="video-slide absolute inset-0 opacity-0 transition-opacity duration-300">
                                         <video class="w-full h-full object-cover" controls>
-                                            <source src="{{asset('assets/videos/clown.mp4')}}" type="video/mp4">
+                                            <source src="{{asset('storage/' . $profile->video->path)}}" type="video/mp4">
                                             Your browser does not support the video tag.
                                         </video>
                                     </div>
+                                    @endif
                                 </div>
 
                                 <!-- Carousel Controls -->
@@ -154,7 +193,7 @@
                                     </button>
                                 </div>
 
-                                <!-- Mobile indicators (visible on small and medium screens) -->
+                                {{-- <!-- Mobile indicators (visible on small and medium screens) -->
                                 <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 lg:hidden">
                                     <button class="h-2 w-2 rounded-full bg-white opacity-100"
                                         onclick="showSlide(0)"></button>
@@ -163,7 +202,7 @@
                                     <button class="h-2 w-2 rounded-full bg-white opacity-50"
                                         onclick="showSlide(2)"></button>
                                     <button class="h-2 w-2 rounded-full bg-white opacity-50" onclick="showVideo()"></button>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
                     </div>

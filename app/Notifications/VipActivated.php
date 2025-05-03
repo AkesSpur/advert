@@ -18,6 +18,13 @@ class VipActivated extends Notification implements ShouldQueue
      * @var \App\Models\Profile
      */
     protected $profile;
+    
+    /**
+     * The date when VIP status expires.
+     *
+     * @var \DateTime
+     */
+    protected $expiresAt;
 
     /**
      * Create a new notification instance.
@@ -25,6 +32,7 @@ class VipActivated extends Notification implements ShouldQueue
     public function __construct(Profile $profile)
     {
         $this->profile = $profile;
+        $this->expiresAt = now()->addDays(30); // Default 30 days, adjust as needed
     }
 
     /**
@@ -43,11 +51,21 @@ class VipActivated extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Ваш профиль активирован как VIP!')
-            ->line('Поздравляем! Ваш профиль "' . $this->profile->name . '" теперь имеет статус VIP.')
-            ->line('Ваше объявление будет отображаться в приоритетном порядке.')
-            ->action('Посмотреть профиль', url('/profiles/' . $this->profile->id))
-            ->line('Спасибо за использование нашего сервиса!');
+            ->subject('VIP статус активирован')
+            ->view('emails.custom-notification', [
+                'title' => 'VIP статус активирован',
+                'greeting' => 'Поздравляем!',
+                'introLines' => [
+                    'VIP статус для вашего профиля "' . $this->profile->name . '" успешно активирован.',
+                    'Ваше объявление теперь будет отображаться в топе списка и получит специальную отметку.',
+                    'Срок действия VIP статуса: ' . $this->expiresAt->format('d.m.Y')
+                ],
+                'actionText' => 'Просмотреть профиль',
+                'actionUrl' => url('/user/profiles'),
+                'outroLines' => [
+                    'Спасибо за использование нашего сервиса!'
+                ]
+            ]);
     }
 
     /**

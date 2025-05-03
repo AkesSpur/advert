@@ -238,11 +238,48 @@ class TariffController extends Controller
                 return back()->with('error', 'Недостаточно средств на балансе. Пополните баланс.');
             }
 
+            // If creating a priority ad, deactivate any existing basic ads
+            if ($tariff->slug === 'priority') {
+                // Find and deactivate any active basic ads for this profile
+                $basicAds = ProfileAdTariff::whereHas('adTariff', function ($query) {
+                    $query->where('slug', 'basic');
+                })
+                ->where('profile_id', $profile->id)
+                ->where('is_active', true)
+                ->get();
+                
+                foreach ($basicAds as $basicAd) {
+                    $basicAd->deactivate();
+                }
+            }
+            
             // Создаем запись о тарифе для профиля
+            $startsAt = $now; // По умолчанию начинается сейчас
+            
+            // Если это VIP тариф и он в очереди, устанавливаем starts_at на время истечения соответствующего активного VIP
+            if ($tariff->slug === 'vip' && isset($queuePosition) && $queuePosition > 0) {
+                // Находим все активные VIP тарифы, отсортированные по дате истечения
+                $activeVips = ProfileAdTariff::whereHas('adTariff', function ($query) {
+                    $query->where('slug', 'vip');
+                })
+                ->where('is_active', true)
+                ->where('is_paused', false)
+                ->where('queue_position', 0)
+                ->where('expires_at', '>', $now)
+                ->orderBy('expires_at', 'asc')
+                ->get();
+                
+                // Определяем, какой VIP будет заменен этим (на основе позиции в очереди)
+                $vipIndex = min($queuePosition - 1, $activeVips->count() - 1);
+                if (isset($activeVips[$vipIndex])) {
+                    $startsAt = $activeVips[$vipIndex]->expires_at;
+                }
+            }
+            
             $profileTariff = ProfileAdTariff::create([
                 'profile_id' => $profile->id,
                 'ad_tariff_id' => $tariff->id,
-                'starts_at' => $now,
+                'starts_at' => $startsAt,
                 'expires_at' => $expiresAt,
                 'is_active' => true,
                 'is_paused' => false,
@@ -259,8 +296,10 @@ class TariffController extends Controller
                 $freshUser->save();
 
                 //set profile is_vip active 
-                $profile->is_vip = true;
-                $profile->save();   
+                if ($queuePosition === 0) {
+                    $profile->is_vip = true;
+                    $profile->save();   
+                }
 
                 // Получаем свежий экземпляр модели User и списываем средства с баланса
                 $freshUser = User::find($user->id);

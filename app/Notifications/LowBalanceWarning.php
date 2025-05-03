@@ -51,12 +51,21 @@ class LowBalanceWarning extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Недостаточно средств на балансе')
-            ->line('Уведомляем вас, что на вашем балансе недостаточно средств для списания ежедневной платы.')
-            ->line('Ваш профиль "' . $this->profile->name . '" был приостановлен.')
-            ->line('Требуемая сумма для возобновления: ' . $this->requiredAmount . ' руб.')
-            ->action('Пополнить баланс', url('/user/balance'))
-            ->line('После пополнения баланса вы сможете возобновить работу профиля.');
+            ->subject('Предупреждение о низком балансе')
+            ->view('emails.custom-notification', [
+                'title' => 'Низкий баланс',
+                'greeting' => 'Здравствуйте!',
+                'introLines' => [
+                    'Уведомляем вас, что на вашем балансе недостаточно средств для списания ежедневной платы.',
+                    'Ваш профиль "' . $this->profile->name . '" был приостановлен.',
+                    'Требуемая сумма для возобновления: ' . $this->requiredAmount . ' руб.'
+                ],
+                'actionText' => 'Пополнить баланс',
+                'actionUrl' => url('/user/balance'),
+                'outroLines' => [
+                    'Спасибо за использование нашего сервиса!'
+                ]
+            ]);
     }
 
     /**

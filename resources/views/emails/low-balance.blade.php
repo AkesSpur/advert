@@ -10,7 +10,7 @@
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
-        <a href="{{ url('/user/balance') }}" class="btn" target="_blank">Пополнить баланс</a>
+        <a href="{{ url('/user/profiles') }}" class="btn" target="_blank">Пополнить баланс</a>
     </div>
 
     <div>
