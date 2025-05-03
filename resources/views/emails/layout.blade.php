@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ config('app.name') }}</title>
+    <meta name="x-apple-disable-message-reformatting">
+    <title>{{ __('Notification') }}</title>
     <style>
         body {
             background-color: #121212;
@@ -79,7 +80,7 @@
 <body>
     <div class="email-wrapper">
         <div class="email-header">
-            <h1>{{ config('app.name', 'Laravel') }}</h1>
+            <h1>{{ __('Important Notification') }}</h1>
         </div>
         
         <div class="email-body">
@@ -87,8 +88,8 @@
         </div>
         
         <div class="email-footer">
-            <p>© {{ date('Y') }} {{ config('app.name', 'Laravel') }}. Все права защищены.</p>
-            <p>Если вы не запрашивали это письмо, никаких действий не требуется.</p>
+            <p>© {{ date('Y') }}. {{ __('All rights reserved') }}.</p>
+            <p>{{ __('If you did not request this email, no action is required') }}.</p>
         </div>
     </div>
 </body>

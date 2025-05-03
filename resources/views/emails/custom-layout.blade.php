@@ -4,9 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ config('app.name') }}</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <meta name="x-apple-disable-message-reformatting">
+    <title>{{ __('Notification') }}</title>
     <style>
         body {
             margin: 0;
@@ -23,7 +22,6 @@
             background-color: #121212;
         }
         .email-header {
-            position: absolute;
             text-align: center;
             padding: 25px 0;
         }
@@ -108,9 +106,6 @@
 </head>
 <body>
     <div class="email-wrapper">
-        <div class="email-header">
-            <h1>{{ config('app.name', 'Laravel') }}</h1>
-        </div>
         
         <div class="email-hero">
             <div class="email-hero-overlay">
@@ -123,8 +118,8 @@
         </div>
         
         <div class="email-footer">
-            <p>© {{ date('Y') }} {{ config('app.name', 'Laravel') }}. Все права защищены.</p>
-            <p>Если вы не запрашивали это письмо, никаких действий не требуется.</p>
+            <p>© {{ date('Y') }}. {{ __('All rights reserved') }}.</p>
+            <p>{{ __('If you did not request this email, no action is required') }}.</p>
         </div>
     </div>
 </body>

@@ -17,6 +17,6 @@
     </div>
 
     <div style="margin-top: 25px;">
-        <p>С уважением,<br>{{ config('app.name') }}</p>
+        <p>С уважением,<br>{{ env('MAIL_FROM_ADDRESS', 'hello@example.com') }}</p>
     </div>
 @endsection
