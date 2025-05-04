@@ -132,6 +132,14 @@ class Profile extends Model
     }
 
     /**
+     * Get the comments for the profile.
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
      * Get the average rating of the profile.
      */
     public function getAverageRatingAttribute()

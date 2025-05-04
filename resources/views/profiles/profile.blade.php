@@ -590,47 +590,45 @@
 
                 <!-- Comments List -->
                 <div class="space-y-6">
-                    <!-- Comment 1 -->
-                    <div class="bg-[#1A1A1A] rounded-xl p-6">
-                        <div class="flex flex-col mb-2">
-                            <div class="text-lg font-semibold">Андрей</div>
-                            <span class="text-gray-400">23.05.2023</span>
+                    @forelse($profile->comments as $comment)
+                        <div class="bg-[#1A1A1A] rounded-xl p-6">
+                            <div class="flex flex-col mb-2">
+                                <div class="text-lg font-semibold">{{ $comment->name }}</div>
+                                <span class="text-gray-400">{{ $comment->created_at->format('d.m.Y') }}</span>
+                            </div>
+                            <p class="text-gray-300">{{ $comment->content }}</p>
                         </div>
-                        <p class="text-gray-300">Привет, сейчас на ул. Плесецкая, на пару часов, один мужчина классика.
-                            приедешь? Новый дом, все красиво.</p>
-                    </div>
-
-                    <!-- Comment 2 -->
-                    <div class="bg-[#1A1A1A] rounded-xl p-6">
-                        <div class="flex flex-col mb-2">
-                            <h4 class="text-lg font-semibold">Владимир</h4>
-                            <span class="text-gray-400">23.05.2023</span>
+                    @empty
+                        <div class="bg-[#1A1A1A] rounded-xl p-6 text-center">
+                            <p class="text-gray-300">Пока нет комментариев. Будьте первым!</p>
                         </div>
-                        <p class="text-gray-300">Привет, сейчас на ул. Плесецкая, на пару часов, один мужчина классика.
-                            приедешь? Новый дом, все красиво. Привет солнце сегодня возможно подъехать в гости?</p>
-                    </div>
-
-                    <!-- Comment 3 -->
-                    <div class="bg-[#1A1A1A] rounded-xl p-6">
-                        <div class="flex flex-col mb-2">
-                            <h4 class="text-lg font-semibold">Андрей</h4>
-                            <span class="text-gray-400">23.05.2023</span>
-                        </div>
-                        <p class="text-gray-300">Привет красотка сейчас свободно?</p>
-                    </div>
+                    @endforelse
                 </div>
 
                 <!-- Comment Form -->
                 <div class="mt-8">
                     <h3 class="text-xl font-semibold mb-4">Добавить свой вопрос/комментарий</h3>
-                    <form class="space-y-4">
+                    @if(session('success'))
+                        <div class="bg-green-500 text-white p-4 rounded-lg mb-4">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+                    <form class="space-y-4" method="POST" action="{{ route('comments.store') }}">
+                        @csrf
+                        <input type="hidden" name="profile_id" value="{{ $profile->id }}">
                         <div>
-                            <input type="text" placeholder="Введите имя"
+                            <input type="text" name="name" placeholder="Введите имя" required
                                 class="w-full px-6 py-5 bg-[#191919] border-0 text-white placeholder-[#FFFFFF66] focus:ring-0 rounded-lg">
+                            @error('name')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
-                            <textarea rows="5" placeholder="Текст вопроса/комментария"
+                            <textarea rows="5" name="content" placeholder="Текст вопроса/комментария" required
                                 class="w-full px-6 py-5 bg-[#191919] border-0 text-white placeholder-[#FFFFFF66] focus:ring-0 rounded-lg"></textarea>
+                            @error('content')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="flex justify-end">
                             <button type="submit"
@@ -644,125 +642,40 @@
             <div id="tab-content-reviews" class="tab-content hidden">
                 <!-- Reviews List -->
                 <div class="space-y-6">
-                    <!-- Review 1 -->
-                    <div class="bg-[#1A1A1A] rounded-xl p-6">
-                        <div class="flex flex-col mb-2">
-                            <div class="text-lg font-semibold">Максим</div>
-                            <span class="text-gray-400">15.06.2023</span>
+                    @forelse($profile->reviews as $review)
+                        <div class="bg-[#1A1A1A] rounded-xl p-6">
+                            <div class="flex flex-col mb-2">
+                                <div class="text-lg font-semibold">{{ $review->name }}</div>
+                                <span class="text-gray-400">{{ $review->created_at->format('d.m.Y') }}</span>
+                            </div>
+                            <p class="text-gray-300">{{ $review->comment }}</p>
                         </div>
-                        <div class="flex mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
+                    @empty
+                        <div class="bg-[#1A1A1A] rounded-xl p-6 text-center">
+                            <p class="text-gray-300">Пока нет отзывов. Будьте первым!</p>
                         </div>
-                        <p class="text-gray-300">Отличная девушка, все было на высшем уровне. Рекомендую!</p>
-                    </div>
-
-                    <!-- Review 2 -->
-                    <div class="bg-[#1A1A1A] rounded-xl p-6">
-                        <div class="flex flex-col mb-2">
-                            <h4 class="text-lg font-semibold">Алексей</h4>
-                            <span class="text-gray-400">10.06.2023</span>
-                        </div>
-                        <div class="flex mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                        </div>
-                        <p class="text-gray-300">Очень приятная девушка, все было хорошо. Приеду еще.</p>
-                    </div>
+                    @endforelse
                 </div>
 
                 <!-- Review Form -->
                 <div class="mt-8">
                     <h3 class="text-xl font-semibold mb-4">Оставить отзыв</h3>
-                    <form class="space-y-4">
+                    <form class="space-y-4" method="POST" action="{{ route('reviews.store') }}">
+                        @csrf
+                        <input type="hidden" name="profile_id" value="{{ $profile->id }}">
                         <div>
-                            <input type="text" placeholder="Введите имя"
+                            <input type="text" name="name" placeholder="Введите имя" required
                                 class="w-full px-6 py-5 bg-[#191919] border-0 text-white placeholder-[#FFFFFF66] focus:ring-0 rounded-lg">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-white mb-2">Ваша оценка</label>
-                            <div class="flex space-x-2">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-8 w-8 text-gray-400 cursor-pointer hover:text-yellow-400" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-8 w-8 text-gray-400 cursor-pointer hover:text-yellow-400" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-8 w-8 text-gray-400 cursor-pointer hover:text-yellow-400" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-8 w-8 text-gray-400 cursor-pointer hover:text-yellow-400" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-8 w-8 text-gray-400 cursor-pointer hover:text-yellow-400" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                            </div>
+                            @error('name')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
-                            <textarea rows="5" placeholder="Текст отзыва"
+                            <textarea rows="5" name="comment" placeholder="Текст отзыва" required
                                 class="w-full px-6 py-5 bg-[#191919] border-0 text-white placeholder-[#FFFFFF66] focus:ring-0 rounded-lg"></textarea>
+                            @error('comment')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="flex justify-end">
                             <button type="submit"

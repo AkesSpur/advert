@@ -30,6 +30,10 @@ Route::get('/', [PageController::class, 'index'])->name('home');
 Route::get('/profiles/click/{id}', [PageController::class, 'profileClick'])->name('profiles.clicks');
 Route::get('/profiles/{id}', [PageController::class, 'show'])->name('profiles.view');
 
+// Comment and Review routes (no auth required)
+Route::post('/comments', [App\Http\Controllers\CommentController::class, 'store'])->name('comments.store');
+Route::post('/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
+
 Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], function () {
 
     // Route::get('profiles', [ProfileController::class, 'index'])->name('profiles.index');

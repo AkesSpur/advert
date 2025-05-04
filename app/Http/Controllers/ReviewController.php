@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Review;
+use App\Models\Profile;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
@@ -27,7 +29,15 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'profile_id' => 'required|exists:profiles,id',
+            'name' => 'required|string|max:255',
+            'comment' => 'required|string',
+        ]);
+
+        $review = Review::create($validated);
+
+        return redirect()->back()->with('success', 'Отзыв успешно добавлен!');
     }
 
     /**

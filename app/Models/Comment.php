@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Review extends Model
+class Comment extends Model
 {
     use HasFactory;
 
@@ -18,19 +18,11 @@ class Review extends Model
     protected $fillable = [
         'profile_id',
         'name',
-        'comment',
+        'content',
     ];
 
     /**
-     * Get the user that owns the review.
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    /**
-     * Get the profile that the review is for.
+     * Get the profile that owns the comment.
      */
     public function profile(): BelongsTo
     {
