@@ -82,6 +82,22 @@ class User extends Authenticatable
     {
         return $this->hasMany(Message::class, 'recipient_id');
     }
+    
+    /**
+     * Get the conversations that the user participates in as a regular user
+     */
+    public function conversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class, 'user_id');
+    }
+    
+    /**
+     * Get the conversations that the user participates in as an admin
+     */
+    public function adminConversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class, 'admin_id');
+    }
 
     /**
      * Get the transactions associated with the user

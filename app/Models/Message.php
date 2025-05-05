@@ -16,10 +16,11 @@ class Message extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'conversation_id',
         'sender_id',
         'recipient_id',
         'content',
-        'is_read',
+        'read_at',
     ];
 
     /**
@@ -28,8 +29,16 @@ class Message extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'is_read' => 'boolean',
+        'read_at' => 'datetime',
     ];
+    
+    /**
+     * Get the conversation that owns the message.
+     */
+    public function conversation(): BelongsTo
+    {
+        return $this->belongsTo(Conversation::class);
+    }
 
     /**
      * Get the sender of the message.
@@ -54,10 +63,20 @@ class Message extends Model
      */
     public function markAsRead(): self
     {
-        if (!$this->is_read) {
-            $this->update(['is_read' => true]);
+        if (is_null($this->read_at)) {
+            $this->update(['read_at' => now()]);
         }
 
         return $this;
+    }
+    
+    /**
+     * Check if the message is read
+     *
+     * @return bool
+     */
+    public function isRead(): bool
+    {
+        return !is_null($this->read_at);
     }
 }

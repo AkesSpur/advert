@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 require __DIR__ . '/auth.php';
+require __DIR__ . '/chat.php';
 
 
 Route::get('/', [PageController::class, 'index'])->name('home');
