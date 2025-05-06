@@ -21,7 +21,12 @@ class ChatController extends Controller
             ->orderBy('last_message_at', 'desc')
             ->get();
             
-        return view('admin.messenger.index', compact('conversations'));
+        // Get all users for the new message feature
+        $allUsers = User::where('role', '!=', 'admin')
+            ->orderBy('name')
+            ->get();
+            
+        return view('admin.messenger.index', compact('conversations', 'allUsers'));
     }
     
     /**
@@ -94,5 +99,43 @@ class ChatController extends Controller
         broadcast(new MessageSent($chatMessage))->toOthers();
         
         return response()->json($chatMessage->load('sender'));
+    }
+    
+    /**
+     * Create or get a conversation with a user.
+     */
+    public function createConversation(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+        
+        $admin = Auth::user();
+        
+        // Ensure user is admin
+        if ($admin->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        $userId = $request->user_id;
+        
+        // Check if conversation already exists
+        $conversation = Conversation::where('user_id', $userId)
+            ->where('admin_id', $admin->id)
+            ->first();
+            
+        // Create new conversation if it doesn't exist
+        if (!$conversation) {
+            $conversation = Conversation::create([
+                'user_id' => $userId,
+                'admin_id' => $admin->id,
+                'last_message_at' => now(),
+            ]);
+        }
+        
+        return response()->json([
+            'conversation_id' => $conversation->id,
+            'user_name' => $conversation->user->name
+        ]);
     }
 }

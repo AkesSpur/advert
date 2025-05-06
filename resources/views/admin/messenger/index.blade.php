@@ -1,6 +1,23 @@
 @extends('admin.layouts.master')
 
 @section('content')
+<x-pusher-config />
+
+<style>
+  .user-item {
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .user-item:hover {
+    background-color: #f8f9fa;
+  }
+  .modal {
+    z-index: 1050 !important;
+  }
+  .modal-backdrop {
+    z-index: 1040 !important;
+  }
+</style>
 <section class="section">
     <div class="section-header">
       <h1>Messages</h1>
@@ -15,8 +32,9 @@
       <div class="row align-items-center justify-content-center">
         <div class="col-md-3">
           <div class="card" style="height: 70vh;">
-            <div class="card-header">
-              <h4>Users</h4>
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h4>Conversations</h4>
+              <button class="btn btn-sm btn-primary" id="show-all-users-btn">New Message</button>
             </div>
             <div class="card-body conversation-list">
               <ul class="list-unstyled list-unstyled-border">
@@ -53,6 +71,45 @@
                 </li>
                 @endforeach
               </ul>
+            </div>
+          </div>
+          
+          <!-- All Users Modal -->
+          <div class="modal fade" id="allUsersModal" tabindex="-1" role="dialog" aria-labelledby="allUsersModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="allUsersModalLabel">Select User to Message</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="form-group">
+                    <input type="text" class="form-control" id="userSearchInput" placeholder="Search users...">
+                  </div>
+                  <ul class="list-unstyled list-unstyled-border" id="allUsersList">
+                    @foreach ($allUsers as $user)
+                      @if($user->id != auth()->id())
+                      <li class="media user-item" data-id="{{ $user->id }}" data-name="{{ $user->name }}" style="cursor: pointer;">
+                        <div class="mr-3">
+                          <div class="avatar-initial rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; color: white; font-weight: bold;">
+                            {{ substr($user->name, 0, 1) }}
+                          </div>
+                        </div>
+                        <div class="media-body">
+                          <div class="mt-0 mb-1 font-weight-bold">{{ $user->name }}</div>
+                          <div class="text-small text-muted">{{ $user->email }}</div>
+                        </div>
+                      </li>
+                      @endif
+                    @endforeach
+                  </ul>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -94,6 +151,9 @@
     const conversationIdInput = document.getElementById('conversation_id');
     const notificationSound = document.getElementById('notification-sound');
     const chatHeader = document.getElementById('chat-inbox-title');
+    const showAllUsersBtn = document.getElementById('show-all-users-btn');
+    const userSearchInput = document.getElementById('userSearchInput');
+    const allUsersList = document.getElementById('allUsersList');
     const userId = {{ auth()->id() }};
     let activeConversationId = null;
     
@@ -269,6 +329,164 @@
     if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
       Notification.requestPermission();
     }
+    
+    // Show all users modal
+    showAllUsersBtn.addEventListener('click', function() {
+      $('#allUsersModal').modal({
+        backdrop: 'static',
+        keyboard: false
+      });
+      $('#allUsersModal').modal('show');
+    });
+    
+    // Close modal when close button is clicked
+    document.querySelector('.modal .close').addEventListener('click', function() {
+      $('#allUsersModal').modal('hide');
+    });
+    
+    // Filter users in the modal
+    userSearchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      const userItems = allUsersList.querySelectorAll('.user-item');
+      
+      userItems.forEach(item => {
+        const userName = item.dataset.name.toLowerCase();
+        if (userName.includes(searchTerm)) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+    
+    // Function to handle user selection and create conversation
+    function createConversationWithUser(userId, userName) {
+      // Show loading indicator
+      const loadingHtml = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></div>';
+      $('#allUsersList').append(loadingHtml);
+      
+      // Create or get conversation with this user
+      fetch('/admin/chat/create-conversation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Close the modal
+        $('#allUsersModal').modal('hide');
+        
+        // Check if conversation already exists in the list
+        const existingConversation = document.querySelector(`.conversation-item[data-id="${data.conversation_id}"]`);
+        
+        if (existingConversation) {
+          // If it exists, click on it
+          existingConversation.click();
+        } else {
+          // If it's a new conversation, we need to add it to the list and select it
+          const newConversationHtml = `
+            <li class="media conversation-item active" data-id="${data.conversation_id}" data-user-name="${data.user_name}">
+              <div class="mr-3 position-relative">
+                <div class="avatar-initial rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; color: white; font-weight: bold;">
+                  ${data.user_name.substr(0, 1)}
+                </div>
+              </div>
+              <div class="media-body">
+                <div class="mt-0 mb-1 font-weight-bold">${data.user_name}</div>
+                <div class="text-small text-muted">No messages yet</div>
+              </div>
+            </li>
+          `;
+          
+          // Add to the conversation list
+          document.querySelector('.conversation-list ul').insertAdjacentHTML('afterbegin', newConversationHtml);
+          
+          // Update active conversation
+          const conversationItems = document.querySelectorAll('.conversation-item');
+          conversationItems.forEach(i => i.classList.remove('active'));
+          const newConversationItem = document.querySelector(`.conversation-item[data-id="${data.conversation_id}"]`);
+          newConversationItem.classList.add('active');
+          
+          // Add click event to the new conversation item
+          newConversationItem.addEventListener('click', function() {
+            const conversationId = this.dataset.id;
+            const userName = this.dataset.userName;
+            
+            // Update active conversation
+            conversationItems.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update chat header
+            chatHeader.textContent = `Chat with ${userName}`;
+            
+            // Load messages
+            loadMessages(conversationId);
+            
+            // Remove unread indicator if present
+            const unreadBadge = this.querySelector('.badge-danger');
+            if (unreadBadge) {
+              unreadBadge.remove();
+            }
+          });
+          
+          // Load the conversation
+          chatHeader.textContent = `Chat with ${data.user_name}`;
+          loadMessages(data.conversation_id);
+        }
+      })
+      .catch(error => {
+        console.error('Error creating conversation:', error);
+        alert('There was an error creating the conversation. Please try again.');
+        $('#allUsersModal').modal('hide');
+      })
+      .finally(() => {
+        // Remove loading indicator
+        $('#allUsersList .spinner-border').parent().remove();
+      });
+    }
+    
+    // Handle user selection via click events
+    $(document).on('click', '.user-item', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const userId = $(this).data('id');
+      const userName = $(this).data('name');
+      
+      createConversationWithUser(userId, userName);
+    });
+    
+    // Also handle direct selection for initial user items
+    const userItems = document.querySelectorAll('.user-item');
+    userItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const userId = this.dataset.id;
+        const userName = this.dataset.name;
+        
+        createConversationWithUser(userId, userName);
+      });
+    });
+    
+    // Ensure modal can be closed with ESC key
+    $(document).on('keydown', function(e) {
+      if (e.key === 'Escape' && $('#allUsersModal').hasClass('show')) {
+        $('#allUsersModal').modal('hide');
+      }
+    });
   });
 </script>
 @endpush

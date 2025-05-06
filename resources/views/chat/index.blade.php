@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-pusher-config />
     <div class="flex items-center justify-between mb-4">
         <h1 class="text-2xl font-bold">Сообщения</h1>
     </div>
@@ -6,7 +7,7 @@
         <div class="max-w-7xl mx-auto">
             <div class="text-gray-900 dark:text-gray-100">
                 <div class="w-full flex flex-col md:flex-row gap-4">
-                    @if(auth()->user()->role === 'admin' && count($conversations) > 0)
+                    @if(auth()->user()->role === 'admin' && filled($conversations) && is_countable($conversations) && count($conversations) > 0)
                     <!-- Conversations List (Admin Only) -->
                     <div class="w-full md:w-1/4 bg-[#191919] border border-[#2B2B2B] rounded-lg overflow-hidden">
                         <div class="p-4 border-b border-[#2B2B2B]">

@@ -42,7 +42,7 @@
         <!-- Navbar Content End-->
 
         <!-- sidebar Content -->
-            @include('admin.layouts.sidebar')
+            {{-- @include('admin.layouts.sidebar') --}}
         <!-- sidebar Content -->
 
       <!-- Main Content -->
@@ -83,6 +83,7 @@
   <!-- Template JS File -->
   <script src="{{asset('backend/assets/js/scripts.js')}}"></script>
   <script src="{{asset('backend/assets/js/custom.js')}}"></script>
+  <script src="{{asset('backend/assets/js/modal-fix.js')}}"></script>
 
   <script>
     @if ($errors->any())
@@ -94,7 +95,7 @@
 
   <!-- Dynamic Delete alart -->
 
-  <script>
+  {{-- <script>
     $(document).ready(function(){
 
         $.ajaxSetup({
@@ -150,7 +151,7 @@
         })
 
     })
-  </script>
+  </script> --}}
 
 
   @stack('scripts')

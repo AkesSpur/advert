@@ -16,28 +16,29 @@ class MessageController extends Controller
      */
     public function index()
     {
-        // Regular users can only see their conversation with admin
-        if (!Auth::user()->isAdmin()) {
-            $conversation = Conversation::firstOrCreate(
-                ['user_id' => Auth::id()],
-                ['last_message_at' => now()]
-            );
-            
-            // Mark all unread messages as read
-            Message::where('conversation_id', $conversation->id)
-                ->where('recipient_id', Auth::id())
-                ->whereNull('read_at')
-                ->update(['read_at' => now()]);
-                
-            return view('chat.index', compact('conversation'));
+        // If user is admin, redirect to admin messenger
+        if (Auth::user()->isAdmin()) {
+            return redirect()->route('admin.messenger.index');
         }
         
-        // Admin can see all conversations
-        $conversations = Conversation::with(['user', 'latestMessage'])
-            ->orderBy('last_message_at', 'desc')
-            ->get();
-            
-        return view('admin.messenger.index', compact('conversations'));
+        // Regular users can only see their conversation with admin
+        $conversation = Conversation::firstOrCreate(
+            ['user_id' => Auth::id()],
+            ['last_message_at' => now()]
+        );
+        
+        // Mark all unread messages as read
+        Message::where('conversation_id', $conversation->id)
+            ->where('recipient_id', Auth::id())
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+        
+        // Create an array with the single conversation for consistent view handling
+        $conversations = collect([$conversation]);
+                    
+        return view('chat.index', compact('conversation', 'conversations'));
+        
+
     }
     
     /**

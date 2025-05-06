@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdvertisementController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PageController;
@@ -32,8 +33,8 @@ Route::get('/profiles/click/{id}', [PageController::class, 'profileClick'])->nam
 Route::get('/profiles/{id}', [PageController::class, 'show'])->name('profiles.view');
 
 // Comment and Review routes (no auth required)
-Route::post('/comments', [App\Http\Controllers\CommentController::class, 'store'])->name('comments.store');
-Route::post('/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
+Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], function () {
 
@@ -42,9 +43,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], fu
     // Public profiles
     Route::resource('profiles', ProfileController::class);
 
-    Route::get('/chat', function () {
-        return view('chat.index');
-    })->name('chat.index');
+    Route::get('chat', [MessageController::class, 'index'])->name('chat.index');
+    Route::post('chat/send', [MessageController::class, 'sendMessage'])->name('chat.send');
+    Route::get('chat/messages', [MessageController::class, 'getMessages'])->name('chat.messages');
 
     Route::get('/transaction', [TransactionController::class, 'index'] )->name('transaction.index');
     Route::get('/ads', [TariffController::class, 'index'])->name('advert.index');
