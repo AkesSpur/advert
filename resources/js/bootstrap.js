@@ -10,28 +10,56 @@ import Pusher from 'pusher-js';
 // Initialize Pusher
 window.Pusher = Pusher;
 
-// Initialize Laravel Echo if Pusher key is available
-// First check if process.env is defined
-if (typeof process !== 'undefined' && process.env && process.env.MIX_PUSHER_APP_KEY) {
+// Initialize Laravel Echo
+// First check if window.Laravel is defined (from pusher-config.blade.php)
+if (window.Laravel?.pusherKey) {
+    console.log('Initializing Echo with Laravel config');
+    
+    // Enable Pusher logging for debugging
+    Pusher.logToConsole = true;
+    
     window.Echo = new Echo({
         broadcaster: 'pusher',
-        key: process.env.MIX_PUSHER_APP_KEY,
-        cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-        forceTLS: true
+        key: window.Laravel.pusherKey,
+        cluster: window.Laravel.pusherCluster,
+        forceTLS: true,
+        enabledTransports: ['ws', 'wss'],
+        disableStats: true
+    });
+    
+    // Add connection event handlers
+    const pusher = window.Echo.connector.pusher;
+    pusher.connection.bind('connected', () => {
+        console.log('Successfully connected to Pusher');
+    });
+    pusher.connection.bind('error', (err) => {
+        console.error('Pusher connection error:', err);
+    });
+} 
+// Fallback to Vite env variables if window.Laravel is not available
+else if (import.meta.env.VITE_PUSHER_APP_KEY) {
+    console.log('Initializing Echo with Vite env variables');
+    
+    // Enable Pusher logging for debugging
+    Pusher.logToConsole = true;
+    
+    window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: import.meta.env.VITE_PUSHER_APP_KEY,
+        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+        forceTLS: true,
+        enabledTransports: ['ws', 'wss'],
+        disableStats: true
+    });
+    
+    // Add connection event handlers
+    const pusher = window.Echo.connector.pusher;
+    pusher.connection.bind('connected', () => {
+        console.log('Successfully connected to Pusher (via Vite env)');
+    });
+    pusher.connection.bind('error', (err) => {
+        console.error('Pusher connection error (Vite env):', err);
     });
 } else {
-    // Try to get values from window.Laravel if defined
-    const pusherKey = window.Laravel?.pusherKey || '{{ env("PUSHER_APP_KEY") }}';
-    const pusherCluster = window.Laravel?.pusherCluster || '{{ env("PUSHER_APP_CLUSTER") }}';
-    
-    if (pusherKey && pusherKey !== '{{ env("PUSHER_APP_KEY") }}') {
-        window.Echo = new Echo({
-            broadcaster: 'pusher',
-            key: pusherKey,
-            cluster: pusherCluster,
-            forceTLS: true
-        });
-    } else {
-        console.warn('Pusher configuration is missing. Real-time messaging will not work.');
-    }
+    console.warn('Pusher configuration is missing. Real-time messaging will not work.');
 }

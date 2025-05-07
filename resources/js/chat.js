@@ -38,9 +38,9 @@ function appendMessage(message) {
     const messageHtml = createMessageHtml(message, isCurrentUser);
     
     // Add message to the chat container
-    const chatContent = document.querySelector('.chat-content');
-    if (chatContent) {
-        chatContent.innerHTML += messageHtml;
+    const messagesContainer = document.getElementById('messages-container');
+    if (messagesContainer) {
+        messagesContainer.innerHTML += messageHtml;
     }
 }
 
@@ -71,15 +71,15 @@ function formatTime(dateTimeString) {
 
 // Scroll chat to bottom
 function scrollToBottom() {
-    const chatContent = document.querySelector('.chat-content');
-    if (chatContent) {
-        chatContent.scrollTop = chatContent.scrollHeight;
+    const messagesContainer = document.getElementById('messages-container');
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 }
 
 // Play notification sound
 function playNotificationSound() {
-    const audio = new Audio('/sounds/notification.mp3');
+    const audio = new Audio('/sounds/notifications.mp3');
     audio.play().catch(e => console.error('Error playing notification sound:', e));
 }
 
@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Send message function
 function sendMessage() {
-    const messageInput = document.querySelector('.message-box');
+    const messageInput = document.getElementById('message-input');
     const message = messageInput.value.trim();
     
     if (message === '') return;
@@ -144,7 +144,7 @@ function sendMessage() {
     
     // Determine the endpoint based on the user role
     const isAdmin = typeof isAdminUser !== 'undefined' ? isAdminUser : false;
-    const endpoint = isAdmin ? '/admin/chat/send' : '/chat/send';
+    const endpoint = isAdmin ? '/admin/chat/send' : '/user/chat/send';
     
     // Prepare the request body
     const requestBody = {

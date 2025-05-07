@@ -347,7 +347,6 @@
                         <div @click="selectPrice(price.range); activeFilter = null" 
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
                             <span x-text="price.range"></span>
-                            <span x-text="'(' + price.count + ')'"></span>
                         </div>
                     </template>
                 </div>
@@ -360,7 +359,6 @@
                         <div @click="selectAge(age.range); activeFilter = null" 
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
                             <span x-text="age.range"></span>
-                            <span x-text="'(' + age.count + ')'"></span>
                         </div>
                     </template>
                 </div>
@@ -397,7 +395,7 @@
     
                 <button @click="showSortOptions = !showSortOptions" 
                             class="flex items-center w-full px-4 py-2 text-white rounded-lg hover:bg-[#252525] transition-colors">
-                        <span class="text-white" x-text="selectedSort"></span>
+                        <span class="text-white pr-2" x-text="selectedSort"></span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" :class="{'transform rotate-180': showSortOptions}">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>

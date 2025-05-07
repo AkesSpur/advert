@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\MessageSent;
 use App\Models\Conversation;
-use App\Models\Message;
+use App\Models\ChatMessage;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,12 +24,12 @@ class MessageController extends Controller
         // Regular users can only see their conversation with admin
         $conversation = Conversation::firstOrCreate(
             ['user_id' => Auth::id()],
-            ['last_message_at' => now()]
+            ['admin_id' => User::where('role', 'admin')->first()->id ?? null, 'last_message_at' => now()]
         );
         
         // Mark all unread messages as read
-        Message::where('conversation_id', $conversation->id)
-            ->where('recipient_id', Auth::id())
+        ChatMessage::where('conversation_id', $conversation->id)
+            ->where('receiver_id', Auth::id())
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
         
@@ -61,7 +61,7 @@ class MessageController extends Controller
         
         // Mark messages as read
         $conversation->messages()
-            ->where('recipient_id', Auth::id())
+            ->where('receiver_id', Auth::id())
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
             
@@ -75,7 +75,7 @@ class MessageController extends Controller
     {
         $request->validate([
             'conversation_id' => 'required|exists:conversations,id',
-            'content' => 'required|string'
+            'message' => 'required|string'
         ]);
         
         $conversation = Conversation::findOrFail($request->conversation_id);
@@ -91,11 +91,11 @@ class MessageController extends Controller
             : ($conversation->admin_id ?? User::where('role', 'admin')->first()->id);
             
         // Create message
-        $message = Message::create([
+        $message = ChatMessage::create([
             'conversation_id' => $conversation->id,
             'sender_id' => Auth::id(),
-            'recipient_id' => $recipientId,
-            'content' => $request->content
+            'receiver_id' => $recipientId,
+            'message' => $request->message
         ]);
         
         // Broadcast the message
@@ -110,7 +110,7 @@ class MessageController extends Controller
         }
         
         // Broadcast the message
-        broadcast(new MessageSent($message))->toOthers();
+        // broadcast(new MessageSent($message))->toOthers();
         
         // Return the message with sender information
         return response()->json($message->load('sender'));

@@ -290,11 +290,7 @@
                             <!-- Phone -->
                             <a href="tel:{{$profile->phone}}"
                                 class="flex items-center text-[#C2C2C2] hover:text-[#6340FF]">
-                                @php
-                                $phone = preg_replace('/\D/', '', $profile->phone);
-                                $formatted = '+7 (' . substr($phone, 1, 3) . ') ' . substr($phone, 4, 3) . '-' . substr($phone, 7, 2) . '-' . substr($phone, 9, 2);
-                            @endphp
-                            {{ $formatted }}                            
+                            {{ formatNumber($profile->phone) }}                            
                             </a>
 
                             @if ($profile->has_whatsapp)
@@ -435,11 +431,7 @@
                     <!-- Phone -->
                     <a href="tel:{{$profile->phone}}"
                         class="flex items-center text-[#C2C2C2] hover:text-[#6340FF]">
-                        @php
-                        $phone = preg_replace('/\D/', '', $profile->phone);
-                        $formatted = '+7 (' . substr($phone, 1, 3) . ') ' . substr($phone, 4, 3) . '-' . substr($phone, 7, 2) . '-' . substr($phone, 9, 2);
-                    @endphp
-                    {{ $formatted }}                            
+                    {{ formatNumber($profile->phone) }}                            
                     </a>
 
                     @if ($profile->has_whatsapp)
@@ -522,9 +514,11 @@
         {{-- services and map section --}}
         <div class="flex flex-col px-4 lg:flex-row">
             <!-- Services Section -->
-            <div class="flex lg:w-1/2 flex-col md:flex-row gap-8 mb-8">
+            <div class=" lg:w-1/2">
+                <h3 class="text-4xl font-semibold mb-8 capitalize">услуги</h3>
+            <div class="flex flex-col md:flex-row gap-8 mb-8">
                 <div class="md:w-1/2">
-                    <h3 class="text-2xl font-semibold mb-4">Базовые услуги</h3>
+                    <h3 class="text-lg font-semibold mb-4 capitalize">Базовые услуги</h3>
                     <div class="grid grid-cols-1 gap-2">
                         @foreach ($profile->services as $service)
                         <div class="flex justify-between">
@@ -535,7 +529,7 @@
                 </div>
 
                 <div class="md:w-1/2">
-                    <h3 class="text-2xl font-semibold mb-4">Дополнительные услуги</h3>
+                    <h3 class="text-lg font-semibold mb-4 capitalize">Дополнительные услуги</h3>
                     <div class="grid grid-cols-1 gap-2">
                         @foreach ($profile->paidServices as $service)
                         <div class="flex">
@@ -546,11 +540,12 @@
                     </div>
                 </div>
             </div>
+        </div>
 
             <!-- Map Location -->
             <div class="flex md:w-1/2 flex-col md:flex-row gap-8 mb-8">
                 <div class="w-full">
-                    <h3 class="text-2xl w-full font-semibold mb-4">Расположение на карте</h3>
+                    <h3 class="text-4xl w-full font-semibold mb-8  capitalize">Расположение на карте</h3>
                     <div class="rounded-xl overflow-hidden ">
                         <img src="{{asset('assets/images/map.png')}}" alt="Map Location" class="w-full h-full object-cover">
                     </div>
@@ -565,7 +560,7 @@
 
         <!-- Reviews Section -->
         <div class="mb-8 p-4">
-            <h3 class="text-2xl font-semibold mb-4">Отзывы и вопросы</h3>
+            <h3 class="text-4xl font-semibold mb-8">Отзывы и вопросы</h3>
 
             <!-- Tabs -->
             <div class="flex space-x-4 mb-6">
@@ -578,16 +573,6 @@
 
             <!-- Comments Tab Content -->
             <div id="tab-content-comments" class="tab-content">
-                <div class="mb-6">
-                    <button class="flex items-center text-white">
-                        Оставить свой вопрос
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-                </div>
-
                 <!-- Comments List -->
                 <div class="space-y-6">
                     @forelse($profile->comments as $comment)
@@ -599,26 +584,19 @@
                             <p class="text-gray-300">{{ $comment->content }}</p>
                         </div>
                     @empty
-                        <div class="bg-[#1A1A1A] rounded-xl p-6 text-center">
-                            <p class="text-gray-300">Пока нет комментариев. Будьте первым!</p>
-                        </div>
+
                     @endforelse
                 </div>
 
                 <!-- Comment Form -->
                 <div class="mt-8">
-                    <h3 class="text-xl font-semibold mb-4">Добавить свой вопрос/комментарий</h3>
-                    @if(session('success'))
-                        <div class="bg-green-500 text-white p-4 rounded-lg mb-4">
-                            {{ session('success') }}
-                        </div>
-                    @endif
+                    <h3 class="text-4xl font-semibold my-8">Добавить свой вопрос/комментарий</h3>
                     <form class="space-y-4" method="POST" action="{{ route('comments.store') }}">
                         @csrf
                         <input type="hidden" name="profile_id" value="{{ $profile->id }}">
                         <div>
                             <input type="text" name="name" placeholder="Введите имя" required
-                                class="w-full px-6 py-5 bg-[#191919] border-0 text-white placeholder-[#FFFFFF66] focus:ring-0 rounded-lg">
+                                class="w-full lg:w-[40%] px-6 py-5 bg-[#191919] border-0 text-white placeholder-[#FFFFFF66] focus:ring-0 rounded-lg">
                             @error('name')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -651,21 +629,21 @@
                             <p class="text-gray-300">{{ $review->comment }}</p>
                         </div>
                     @empty
-                        <div class="bg-[#1A1A1A] rounded-xl p-6 text-center">
+                        {{-- <div class="bg-[#1A1A1A] rounded-xl p-6 text-center">
                             <p class="text-gray-300">Пока нет отзывов. Будьте первым!</p>
-                        </div>
+                        </div> --}}
                     @endforelse
                 </div>
 
                 <!-- Review Form -->
                 <div class="mt-8">
-                    <h3 class="text-xl font-semibold mb-4">Оставить отзыв</h3>
+                    <h3 class="text-4xl font-semibold mb-4">Оставить отзыв</h3>
                     <form class="space-y-4" method="POST" action="{{ route('reviews.store') }}">
                         @csrf
                         <input type="hidden" name="profile_id" value="{{ $profile->id }}">
                         <div>
                             <input type="text" name="name" placeholder="Введите имя" required
-                                class="w-full px-6 py-5 bg-[#191919] border-0 text-white placeholder-[#FFFFFF66] focus:ring-0 rounded-lg">
+                                class="w-full lg:w-[40%] px-6 py-5 bg-[#191919] border-0 text-white placeholder-[#FFFFFF66] focus:ring-0 rounded-lg">
                             @error('name')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror

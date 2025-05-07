@@ -52,7 +52,7 @@ class Conversation extends Model
      */
     public function messages(): HasMany
     {
-        return $this->hasMany(Message::class)->orderBy('created_at', 'asc');
+        return $this->hasMany(ChatMessage::class)->orderBy('created_at', 'asc');
     }
 
     /**
@@ -60,7 +60,7 @@ class Conversation extends Model
      */
     public function latestMessage()
     {
-        return $this->hasOne(Message::class)->latest();
+        return $this->hasOne(ChatMessage::class)->latest();
     }
 
     /**

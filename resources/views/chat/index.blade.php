@@ -7,52 +7,7 @@
         <div class="max-w-7xl mx-auto">
             <div class="text-gray-900 dark:text-gray-100">
                 <div class="w-full flex flex-col md:flex-row gap-4">
-                    @if(auth()->user()->role === 'admin' && filled($conversations) && is_countable($conversations) && count($conversations) > 0)
-                    <!-- Conversations List (Admin Only) -->
-                    <div class="w-full md:w-1/4 bg-[#191919] border border-[#2B2B2B] rounded-lg overflow-hidden">
-                        <div class="p-4 border-b border-[#2B2B2B]">
-                            <h3 class="font-semibold">Пользователи</h3>
-                        </div>
-                        <div class="overflow-y-auto max-h-[70vh]">
-                            @foreach($conversations as $conversation)
-                            <div 
-                                class="conversation-item p-3 hover:bg-[#252525] cursor-pointer border-b border-[#2B2B2B] flex items-center"
-                                data-conversation-id="{{ $conversation->id }}"
-                                data-user-name="{{ $conversation->user->name }}"
-                            >
-                                <div class="flex items-center space-x-3 w-full">
-                                    <div class="flex-shrink-0 relative">
-                                        <!-- User avatar or placeholder -->
-                                        <div class="w-10 h-10 rounded-full bg-[#6340FF] flex items-center justify-center text-white font-bold">
-                                            {{ substr($conversation->user->name, 0, 1) }}
-                                        </div>
-                                        @if($conversation->unreadMessagesCount(auth()->id()) > 0)
-                                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                                            {{ $conversation->unreadMessagesCount(auth()->id()) }}
-                                        </span>
-                                        @endif
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-white font-medium truncate">{{ $conversation->user->name }}</p>
-                                        @if($conversation->latestMessage)
-                                        <p class="text-xs text-[#C2C2C2] truncate">{{ Str::limit($conversation->latestMessage->message, 30) }}</p>
-                                        @else
-                                        <p class="text-xs text-[#C2C2C2]">Нет сообщений</p>
-                                        @endif
-                                    </div>
-                                    @if($conversation->last_message_at)
-                                    <div class="text-xs text-[#C2C2C2]">
-                                        {{ $conversation->last_message_at->diffForHumans() }}
-                                    </div>
-                                    @endif
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
-
-                    <!-- Main Chat Area -->
+                     <!-- Main Chat Area -->
                     <div id="chat-container" class="w-full bg-[#191919] border border-[#2B2B2B] md:w-3/4 rounded-lg flex flex-col" style="height: 70vh;">
                         <!-- Chat header -->
                         <div class="p-4 border-b border-[#2B2B2B] dark:border-gray-700">
@@ -71,8 +26,8 @@
 
                         <!-- Message input -->
                         <div class="p-4 border-t border-[#2B2B2B] dark:border-gray-700">
-                            <form id="message-form" class="flex items-end gap-2">
-                                <input type="hidden" id="conversation_id" name="conversation_id" value="{{ $conversations[0]->id ?? '' }}">
+                            <form id="message-form" class="flex items-end gap-2" method="POST" action="javascript:void(0);">
+                                <input type="hidden" id="conversation_id" name="conversation_id" value="{{ $conversation->id ?? '' }}">
                                 <input
                                    id="message-input"
                                    name="message"
@@ -105,26 +60,26 @@
 
     <!-- Audio for notifications -->
     <audio id="notification-sound" class="hidden">
-        <source src="{{ asset('sounds/notification.mp3') }}" type="audio/mpeg">
+        <source src="{{ asset('sounds/notifications.mp3') }}" type="audio/mpeg">
     </audio>
-</x-app-layout>
 
-@push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const messagesContainer = document.getElementById('messages-container');
         const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
-        const conversationId = document.getElementById('conversation_id').value;
+        const conversationIdInput = document.getElementById('conversation_id');
         const notificationSound = document.getElementById('notification-sound');
-        const chatHeader = document.getElementById('chat-header');
         const userId = {{ auth()->id() }};
-        const isAdmin = {{ auth()->user()->role === 'admin' ? 'true' : 'false' }};
+        let activeConversationId = "{{ $conversation->id ?? '' }}";
         
         // Function to format date
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        function formatDateTime(dateTimeString) {
+            const options = {
+                hour: '2-digit',
+                minute: '2-digit'
+            }
+            return new Intl.DateTimeFormat('ru', options).format(new Date(dateTimeString));
         }
         
         // Function to scroll to bottom of messages
@@ -132,34 +87,24 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
         
-        // Function to add a message to the chat
-        function addMessage(message, isCurrentUser) {
-            const messageElement = document.createElement('div');
-            messageElement.className = isCurrentUser ? 
-                'flex items-start gap-2 justify-end' : 
-                'flex items-start gap-2';
-            
-            messageElement.innerHTML = `
-                <div class="max-w-[75%] ${isCurrentUser ? 'bg-[#6340FF]' : 'bg-[#272727]'} p-3 rounded-lg">
-                    <p class="text-sm">${message.message}</p>
-                    <div class="text-right text-xs text-gray-500 dark:text-gray-400 mt-1">${formatDate(message.created_at)}</div>
-                </div>
-            `;
-            
-            messagesContainer.appendChild(messageElement);
-            scrollToBottom();
-        }
-        
         // Load messages for the conversation
-        function loadMessages(convoId) {
-            fetch(`/chat/messages?conversation_id=${convoId}`, {
+        function loadMessages() {
+            if (!activeConversationId) return;
+            
+            fetch(`/user/chat/messages?conversation_id=${activeConversationId}`, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json',
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(messages => {
+                // Clear existing messages except the "conversation started" message
                 messagesContainer.innerHTML = `
                     <div class="flex justify-center">
                         <div class="bg-[#252525] text-[#C2C2C2] text-sm px-4 py-2 rounded-full">
@@ -168,18 +113,35 @@
                     </div>
                 `;
                 
+                // Add messages
                 messages.forEach(message => {
                     addMessage(message, message.sender_id === userId);
                 });
                 
                 scrollToBottom();
+                
+                // Set up Echo for this conversation
+                setupEcho(activeConversationId);
             })
             .catch(error => console.error('Error loading messages:', error));
         }
         
-        // If we have a conversation ID, load messages
-        if (conversationId) {
-            loadMessages(conversationId);
+        // Add a message to the chat
+        function addMessage(message, isCurrentUser) {
+            const alignClass = isCurrentUser ? 'justify-end' : '';
+            const bgClass = isCurrentUser ? 'bg-[#6340FF]' : 'bg-[#272727]';
+            
+            const messageHtml = `
+                <div class="flex items-start gap-2 ${alignClass}">
+                    <div class="max-w-[75%] ${bgClass} p-3 rounded-lg">
+                        <p class="text-sm">${message.message}</p>
+                        <div class="text-right text-xs text-gray-500 dark:text-gray-400 mt-1">${formatDateTime(message.created_at)}</div>
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
+            scrollToBottom();
         }
         
         // Handle form submission
@@ -187,23 +149,28 @@
             e.preventDefault();
             
             const message = messageInput.value.trim();
-            if (!message) return;
+            if (!message || !activeConversationId) return;
             
-            const currentConvoId = document.getElementById('conversation_id').value;
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             
-            fetch('/chat/send', {
+            fetch('/user/chat/send', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-CSRF-TOKEN': token,
                     'Accept': 'application/json',
                 },
                 body: JSON.stringify({
-                    conversation_id: currentConvoId,
+                    conversation_id: activeConversationId,
                     message: message
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 // Clear input
                 messageInput.value = '';
@@ -211,68 +178,61 @@
                 // Add message to chat
                 addMessage(data, true);
             })
-            .catch(error => console.error('Error sending message:', error));
+            .catch(error => {
+                console.error('Error sending message:', error);
+                alert('Не удалось отправить сообщение. Пожалуйста, попробуйте еще раз.');
+            });
         });
         
-        // Handle conversation selection (admin only)
-        if (isAdmin) {
-            const conversationItems = document.querySelectorAll('.conversation-item');
-            conversationItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const convoId = this.dataset.conversationId;
-                    const userName = this.dataset.userName;
-                    
-                    // Update active conversation
-                    conversationItems.forEach(i => i.classList.remove('bg-[#252525]'));
-                    this.classList.add('bg-[#252525]');
-                    
-                    // Update conversation ID in form
-                    document.getElementById('conversation_id').value = convoId;
-                    
-                    // Update chat header
-                    chatHeader.textContent = `Чат с ${userName}`;
-                    
-                    // Load messages
-                    loadMessages(convoId);
-                    
-                    // Remove unread indicator if present
-                    const unreadBadge = this.querySelector('.bg-red-500');
-                    if (unreadBadge) {
-                        unreadBadge.remove();
-                    }
-                });
-            });
+        // Set up Echo for real-time messaging
+        function setupEcho(conversationId) {
+            // First unsubscribe from any existing channels
+            if (window.Echo && window.currentChatChannel) {
+                window.Echo.leave(window.currentChatChannel);
+            }
             
-            // Set first conversation as active if available
-            if (conversationItems.length > 0) {
-                conversationItems[0].click();
+            // Set current channel name
+            window.currentChatChannel = `chat.${conversationId}`;
+            
+            // Subscribe to new channel
+            if (window.Echo) {
+                window.Echo.private(`chat.${conversationId}`)
+                    .listen('MessageSent', (e) => {
+                        console.log('Message received:', e);
+                        // Only add message if it's from someone else
+                        if (e.sender_id !== userId) {
+                            addMessage(e, false);
+                            
+                            // Play notification sound
+                            notificationSound.play().catch(err => console.error('Error playing sound:', err));
+                            
+                            // Show browser notification if supported and page is not visible
+                            if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
+                                new Notification('Новое сообщение', {
+                                    body: e.message,
+                                    icon: '/favicon.ico'
+                                });
+                            }
+                        }
+                    });
+            } else {
+                console.error('Echo is not initialized');
             }
         }
-        
-        // Set up Echo for real-time messaging
-        window.Echo.private(`chat.${conversationId}`)
-            .listen('.message.sent', (e) => {
-                // Only add message if it's from someone else
-                if (e.sender_id !== userId) {
-                    addMessage(e, false);
-                    
-                    // Play notification sound
-                    notificationSound.play();
-                    
-                    // Show browser notification if supported and page is not visible
-                    if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
-                        new Notification('Новое сообщение', {
-                            body: e.message,
-                            icon: '/favicon.ico'
-                        });
-                    }
-                }
-            });
         
         // Request notification permission
         if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
             Notification.requestPermission();
         }
+        
+        // Check if we have a valid conversation ID
+        if (activeConversationId) {
+            console.log('Loading messages for conversation:', activeConversationId);
+            // Load messages on page load
+            loadMessages();
+        } else {
+            console.error('No active conversation ID found');
+        }
     });
 </script>
-@endpush
+</x-app-layout>

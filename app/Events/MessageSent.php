@@ -44,17 +44,7 @@ class MessageSent implements ShouldBroadcast
     }
     
     /**
-     * The event's broadcast name.
-     *
-     * @return string
-     */
-    public function broadcastAs()
-    {
-        return 'message.sent';
-    }
-
-    /**
-     * The event's broadcast name.
+     * The event's broadcast data.
      *
      * @return string
      */

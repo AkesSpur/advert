@@ -23,3 +23,9 @@ function isActiveRoute($routeName, $slug = null) {
  
     return 'text-gray-400 hover:text-white transition';
  }
+
+ function formatNumber($number) {
+    $phone = preg_replace('/\D/', '', $number);
+    $formatted = '+7 (' . substr($phone, 1, 3) . ') ' . substr($phone, 4, 3) . '-' . substr($phone, 7, 2) . '-' . substr($phone, 9, 2);
+    return $formatted;
+ }

@@ -198,7 +198,9 @@
                 <path
                     d="M3.654 3.318a2.25 2.25 0 013.182.145l2.112 2.292a2.25 2.25 0 01-.168 3.22l-1.062.893a.75.75 0 00-.168.97 11.7 11.7 0 005.37 5.37.75.75 0 00.97-.168l.893-1.062a2.25 2.25 0 013.22-.168l2.292 2.112a2.25 2.25 0 01.145 3.182l-1.063 1.062a2.25 2.25 0 01-2.403.532c-3.175-1.206-6.373-3.559-9.271-6.457s-5.251-6.096-6.457-9.27a2.25 2.25 0 01.532-2.403l1.062-1.063z" />
             </svg>
-            <a href="tel:{{ $phone }}" class="text-[#FFFFFF] hover:underline transition duration-300">{{ $phone }}</a>
+            <a href="tel:{{ $phone }}" class="text-[#FFFFFF] hover:underline transition duration-300">
+                {{ formatNumber($phone) }}
+            </a>
         </div>
     </div>
 

@@ -138,7 +138,7 @@
 
   <!-- Audio for notifications -->
   <audio id="notification-sound" style="display: none;">
-    <source src="{{ asset('sounds/notification.mp3') }}" type="audio/mpeg">
+    <source src="{{ asset('sounds/notifications.mp3') }}" type="audio/mpeg">
   </audio>
 @endsection
 
@@ -299,15 +299,28 @@
       // Set current channel name
       window.currentChatChannel = `chat.${conversationId}`;
       
+      // Debug Echo connection
+      console.log('Setting up Echo for channel:', window.currentChatChannel);
+      
+      if (!window.Echo) {
+        console.error('Echo is not initialized. Check Pusher configuration.');
+        return;
+      }
+      
       // Subscribe to new channel
       window.Echo.private(`chat.${conversationId}`)
-        .listen('.message.sent', (e) => {
+        .listen('MessageSent', (e) => {
+          console.log('Received message event:', e);
           // Only add message if it's from someone else
           if (e.sender_id !== userId) {
             addMessage(e, false);
             
             // Play notification sound
-            notificationSound.play();
+            try {
+              notificationSound.play().catch(err => console.error('Error playing notification sound:', err));
+            } catch (error) {
+              console.error('Error playing notification sound:', error);
+            }
             
             // Show browser notification if supported and page is not visible
             if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
@@ -317,6 +330,9 @@
               });
             }
           }
+        })
+        .error((error) => {
+          console.error('Echo connection error:', error);
         });
     }
     

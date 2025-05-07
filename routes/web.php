@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ChatController;
 use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FormController;
@@ -24,7 +25,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 require __DIR__ . '/auth.php';
-require __DIR__ . '/chat.php';
 
 
 Route::get('/', [PageController::class, 'index'])->name('home');
@@ -57,7 +57,12 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], fu
     Route::get('/profiles/create', [FormController::class, 'index'])->name('form.index');
 });
 
-
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('messenger', [ChatController::class, 'index'])->name('messenger.index');
+    Route::post('chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+    Route::get('chat/messages', [ChatController::class, 'getMessages'])->name('chat.messages');
+    Route::post('chat/create-conversation', [ChatController::class, 'createConversation'])->name('chat.create-conversation');
+});
 
     // // Profile management (user settings)
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
