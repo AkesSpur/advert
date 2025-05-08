@@ -17,6 +17,32 @@
   .modal-backdrop {
     z-index: 1040 !important;
   }
+  .conversation-list {
+    overflow-y: auto;
+    max-height: calc(70vh - 60px);
+  }
+  .chat-container {
+    display: none;
+  }
+  .conversation-container {
+    display: block;
+  }
+  .back-button {
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  @media (max-width: 767.98px) {
+    .new-message-btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
+    .new-message-btn i {
+      margin-right: 0;
+    }
+    .new-message-text {
+      display: none;
+    }
+  }
 </style>
 <section class="section">
     <div class="section-header">
@@ -30,11 +56,11 @@
 
     <div class="section-body">
       <div class="row align-items-center justify-content-center">
-        <div class="col-md-3">
+        <div class="col-12 conversation-container" id="conversation-container">
           <div class="card" style="height: 70vh;">
             <div class="card-header d-flex justify-content-between align-items-center">
               <h4>Conversations</h4>
-              <button class="btn btn-sm btn-primary" id="show-all-users-btn">New Message</button>
+              <button class="btn btn-sm btn-primary new-message-btn" id="show-all-users-btn"><i class="fas fa-plus"></i> <span class="new-message-text">New Message</span></button>
             </div>
             <div class="card-body conversation-list">
               <ul class="list-unstyled list-unstyled-border">
@@ -72,53 +98,17 @@
                 @endforeach
               </ul>
             </div>
-          </div>
-          
-          <!-- All Users Modal -->
-          <div class="modal fade" id="allUsersModal" tabindex="-1" role="dialog" aria-labelledby="allUsersModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="allUsersModalLabel">Select User to Message</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  <div class="form-group">
-                    <input type="text" class="form-control" id="userSearchInput" placeholder="Search users...">
-                  </div>
-                  <ul class="list-unstyled list-unstyled-border" id="allUsersList">
-                    @foreach ($allUsers as $user)
-                      @if($user->id != auth()->id())
-                      <li class="media user-item" data-id="{{ $user->id }}" data-name="{{ $user->name }}" style="cursor: pointer;">
-                        <div class="mr-3">
-                          <div class="avatar-initial rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; color: white; font-weight: bold;">
-                            {{ substr($user->name, 0, 1) }}
-                          </div>
-                        </div>
-                        <div class="media-body">
-                          <div class="mt-0 mb-1 font-weight-bold">{{ $user->name }}</div>
-                          <div class="text-small text-muted">{{ $user->email }}</div>
-                        </div>
-                      </li>
-                      @endif
-                    @endforeach
-                  </ul>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-              </div>
-            </div>
-          </div>
+          </div>       
         </div>
-        <div class="col-md-9">
+        <div class="col-12 chat-container" id="chat-container">
           <div class="card chat-box" id="mychatbox" style="height: 70vh;">
-            <div class="card-header">
+            <div class="card-header d-flex align-items-center">
+              <div class="back-button" id="back-to-conversations">
+                <i class="fas fa-arrow-left"></i>
+              </div>
               <h4 id="chat-inbox-title">Select a conversation</h4>
             </div>
-            <div class="card-body chat-content" id="messages-container">
+            <div class="card-body chat-content w-max" id="messages-container">
               <!-- Messages will be loaded here -->
             </div>
             <div class="card-footer chat-form">
@@ -135,6 +125,46 @@
       </div>
     </div>
   </section>
+
+   <!-- All Users Modal -->
+   <div class="modal fade" id="allUsersModal" tabindex="-1" role="dialog" aria-labelledby="allUsersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="allUsersModalLabel">Select User to Message</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <input type="text" class="form-control" id="userSearchInput" placeholder="Search users...">
+          </div>
+          <ul class="list-unstyled list-unstyled-border" id="allUsersList">
+            @foreach ($allUsers as $user)
+              @if($user->id != auth()->id())
+              <li class="media user-item" data-id="{{ $user->id }}" data-name="{{ $user->name }}" style="cursor: pointer;">
+                <div class="mr-3">
+                  <div class="avatar-initial rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; color: white; font-weight: bold;">
+                    {{ substr($user->name, 0, 1) }}
+                  </div>
+                </div>
+                <div class="media-body">
+                  <div class="mt-0 mb-1 font-weight-bold">{{ $user->name }}</div>
+                  <div class="text-small text-muted">{{ $user->email }}</div>
+                </div>
+              </li>
+              @endif
+            @endforeach
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Audio for notifications -->
   <audio id="notification-sound" style="display: none;">
@@ -160,13 +190,13 @@
     // Function to format date
     function formatDateTime(dateTimeString) {
       const options = {
-        year: 'numeric',
-        month: 'short',
-        day: '2-digit',
+        // year: 'numeric',
+        // month: 'short',
+        // day: '2-digit',
         hour: '2-digit',
         minute: '2-digit'
       }
-      const formatedDateTime = new Intl.DateTimeFormat('en-Us', options).format(new Date(dateTimeString));
+      const formatedDateTime = new Intl.DateTimeFormat('ru-Ru', options).format(new Date(dateTimeString));
       return formatedDateTime;
     }
     
@@ -178,6 +208,15 @@
     // Load messages for a conversation
     function loadMessages(conversationId) {
       if (!conversationId) return;
+      
+      // Clear previous messages immediately when switching conversations
+      messagesContainer.innerHTML = `
+        <div class="text-center my-3">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+      `;
       
       activeConversationId = conversationId;
       conversationIdInput.value = conversationId;
@@ -203,7 +242,7 @@
         scrollToBottom();
         
         // Set up Echo for this conversation
-        setupEcho(conversationId);
+        setupEcho(conversationId, userId);
       })
       .catch(error => console.error('Error loading messages:', error));
     }
@@ -212,20 +251,14 @@
     function addMessage(message, isCurrentUser) {
       const messageHtml = isCurrentUser ? 
         `<div class="chat-item chat-right">
-          <div class="avatar-initial rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; color: white; font-weight: bold;">
-            ${message.sender ? message.sender.name.substr(0, 1) : 'A'}
-          </div>
           <div class="chat-details">
-            <div class="chat-text">${message.message}</div>
+            <div class="chat-text" style="max-width: 75%;">${message.message}</div>
             <div class="chat-time">${formatDateTime(message.created_at)}</div>
           </div>
         </div>` : 
         `<div class="chat-item chat-left">
-          <div class="avatar-initial rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; color: white; font-weight: bold;">
-            ${message.sender ? message.sender.name.substr(0, 1) : 'U'}
-          </div>
           <div class="chat-details">
-            <div class="chat-text">${message.message}</div>
+            <div class="chat-text" style="max-width: 75%;">${message.message}</div>
             <div class="chat-time">${formatDateTime(message.created_at)}</div>
           </div>
         </div>`;
@@ -236,6 +269,30 @@
     
     // Handle conversation selection
     const conversationItems = document.querySelectorAll('.conversation-item');
+    const conversationContainer = document.getElementById('conversation-container');
+    const chatContainer = document.getElementById('chat-container');
+    const backButton = document.getElementById('back-to-conversations');
+    
+    // Function to show chat and hide conversations
+    function showChat() {
+      conversationContainer.style.display = 'none';
+      chatContainer.style.display = 'block';
+    }
+    
+    // Function to show conversations and hide chat
+    function showConversations() {
+      conversationContainer.style.display = 'block';
+      chatContainer.style.display = 'none';
+    }
+    
+    // Initialize with conversations visible
+    showConversations();
+    
+    // Handle back button click
+    backButton.addEventListener('click', function() {
+      showConversations();
+    });
+    
     conversationItems.forEach(item => {
       item.addEventListener('click', function() {
         const conversationId = this.dataset.id;
@@ -256,15 +313,30 @@
         if (unreadBadge) {
           unreadBadge.remove();
         }
+        
+        // Show chat view
+        showChat();
       });
     });
     
-    // Handle form submission
+    // Handle form submission with debounce to prevent double submissions
+    let isSubmitting = false;
     messageForm.addEventListener('submit', function(e) {
       e.preventDefault();
       
+      // Prevent double submission
+      if (isSubmitting) return;
+      
       const message = messageInput.value.trim();
       if (!message || !activeConversationId) return;
+      
+      // Set submitting flag and disable input
+      isSubmitting = true;
+      messageInput.disabled = true;
+      
+      // Store message and clear input immediately for better UX
+      const messageToSend = message;
+      messageInput.value = '';
       
       fetch('/admin/chat/send', {
         method: 'POST',
@@ -275,22 +347,30 @@
         },
         body: JSON.stringify({
           conversation_id: activeConversationId,
-          message: message
+          message: messageToSend
         })
       })
       .then(response => response.json())
       .then(data => {
-        // Clear input
-        messageInput.value = '';
-        
         // Add message to chat
         addMessage(data, true);
       })
-      .catch(error => console.error('Error sending message:', error));
+      .catch(error => {
+        console.error('Error sending message:', error);
+        // Restore message to input if sending failed
+        messageInput.value = messageToSend;
+      })
+      .finally(() => {
+        // Reset submission state
+        isSubmitting = false;
+        messageInput.disabled = false;
+        messageInput.focus();
+      });
+    });
     });
     
     // Set up Echo for real-time messaging
-    function setupEcho(conversationId) {
+    function setupEcho(conversationId, userId) {
       // First unsubscribe from any existing channels
       if (window.Echo && window.currentChatChannel) {
         window.Echo.leave(window.currentChatChannel);
@@ -311,9 +391,14 @@
       window.Echo.private(`chat.${conversationId}`)
         .listen('MessageSent', (e) => {
           console.log('Received message event:', e);
+          // Extract the message data from the event
+          // The backend sends the message data in the root of the event
+          const messageData = e;
+          
+         
           // Only add message if it's from someone else
-          if (e.sender_id !== userId) {
-            addMessage(e, false);
+          if (messageData.sender_id !== userId) {
+            addMessage(messageData, false);
             
             // Play notification sound
             try {
@@ -325,7 +410,7 @@
             // Show browser notification if supported and page is not visible
             if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
               new Notification('New Message', {
-                body: e.message,
+                body: messageData.message,
                 icon: '/favicon.ico'
               });
             }
@@ -336,10 +421,8 @@
         });
     }
     
-    // Set first conversation as active if available
-    if (conversationItems.length > 0) {
-      conversationItems[0].click();
-    }
+    // Don't automatically select the first conversation
+    // User must explicitly select a conversation to start chatting
     
     // Request notification permission
     if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
@@ -347,13 +430,9 @@
     }
     
     // Show all users modal
-    showAllUsersBtn.addEventListener('click', function() {
-      $('#allUsersModal').modal({
-        backdrop: 'static',
-        keyboard: false
-      });
-      $('#allUsersModal').modal('show');
-    });
+    document.getElementById('show-all-users-btn').addEventListener('click', () => {
+  $('#allUsersModal').modal('show');
+});
     
     // Close modal when close button is clicked
     document.querySelector('.modal .close').addEventListener('click', function() {
@@ -454,11 +533,17 @@
             if (unreadBadge) {
               unreadBadge.remove();
             }
+            
+            // Show chat view
+            showChat();
           });
           
           // Load the conversation
           chatHeader.textContent = `Chat with ${data.user_name}`;
           loadMessages(data.conversation_id);
+          
+          // Show chat view
+          showChat();
         }
       })
       .catch(error => {
@@ -503,6 +588,8 @@
         $('#allUsersModal').modal('hide');
       }
     });
-  });
+  
+
+
 </script>
 @endpush

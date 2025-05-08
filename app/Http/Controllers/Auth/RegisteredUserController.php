@@ -42,13 +42,13 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $user->balance = 15000;
-        $user->save();
+        // $user->balance = 15000;
+        // $user->save();
 
-        $user->transactions()->create([
-            'amount' => +15000,
-            'status' => 'completed',
-        ]);
+        // $user->transactions()->create([
+        //     'amount' => +15000,
+        //     'status' => 'completed',
+        // ]);
 
         event(new Registered($user));
         

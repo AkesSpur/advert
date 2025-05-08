@@ -21,13 +21,8 @@
                         @csrf
 
                         <div class="form-group">
-                            <label>Name</label>
-                            <input type="text" class="form-control" name="name" value="">
-                        </div>
-
-                        <div class="form-group">
                             <label>Email</label>
-                            <input type="text" class="form-control" name="email" value="">
+                            <input type="text" class="form-control" name="email" value="{{ old('email') }}">
                         </div>
                         <div class="row">
                             <div class="col-md-6">
@@ -49,7 +44,6 @@
                             <select id="inputState" class="form-control" name="role">
                                 <option value="">Select</option>
                               <option value="user">User</option>
-                              <option value="vendor">Vendor</option>
                               <option value="admin">Admin</option>
 
                             </select>

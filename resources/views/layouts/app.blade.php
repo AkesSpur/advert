@@ -93,6 +93,20 @@
                     </a>
                     <a href="{{route('user.chat.index')}}" class="block w-full rounded-2xl mb-2 text-md font-semibold px-4 py-3 {{isActiveRoute('user.chat.index')}}">
                         Сообщения
+                        @php
+                        use App\Models\ChatMessage;
+                    
+                        $unreadUserMessages = ChatMessage::whereHas('conversation', function ($q) {
+                            $q->where('user_id', auth()->id());
+                        })
+                        ->unread() // uses whereNull('read_at')
+                        ->where('sender_id', '!=', auth()->id())
+                        ->count();
+                    @endphp
+                    
+                        @if($unreadUserMessages > 0)
+                            <span class="inline-flex items-center justify-center ml-2 w-5 h-5 text-xs font-semibold rounded-full bg-[#6340FF] text-white">{{ $unreadUserMessages }}</span>
+                        @endif
                     </a>
                     <a href="{{route('user.transaction.index')}}" class="block w-full rounded-2xl mb-2 text-md font-semibold px-4 py-3 {{isActiveRoute('user.transaction.index')}}">
                         Транзакции
@@ -137,9 +151,14 @@
                         <span class="text-xs mt-1">Анкеты</span>
                     </a>
                     <a href="{{route('user.chat.index')}}" class="flex flex-col items-center p-3 {{isActiveTab('user.chat.index')}}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                        </svg>
+                        <div class="relative">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                            </svg>
+                            @if($unreadUserMessages > 0)
+                                <span class="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 text-xs font-bold rounded-full bg-[#6340FF] text-white">{{ $unreadUserMessages }}</span>
+                            @endif
+                        </div>
                         <span class="text-xs mt-1">Сообщения</span>
                     </a>
                     <a href="{{route('user.transaction.index')}}" class="flex flex-col items-center p-3 {{isActiveTab('user.transaction.index')}}">

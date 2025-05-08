@@ -23,4 +23,18 @@ class CommentController extends Controller
 
         return redirect()->back()->with('success', 'Комментарий успешно добавлен!');
     }
+
+    public function index()
+    {
+        $comments = Comment::all();
+        return view('admin.comment.index', compact('comments'));
+    }
+
+    public function destroy(string $id)
+    {
+        $comment = Comment::findOrFail($id);
+        $comment->delete();
+
+        return response(['status' => 'success', 'message' => 'Comment deleted successfully!']);
+    }
 }

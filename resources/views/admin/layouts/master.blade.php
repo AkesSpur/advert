@@ -4,9 +4,11 @@
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
   <meta name="csrf-token" content="{{ csrf_token() }}" />
-  <title>General Dashboard &mdash; Stisla</title>
+  <title>Admin Dashboard</title>
 
   <!-- General CSS Files -->
+  <link rel="icon" type="image/png" href="">
+  
   <link rel="stylesheet" href="{{asset('backend/assets/modules/bootstrap/css/bootstrap.min.css')}}">
   <link rel="stylesheet" href="{{asset('backend/assets/modules/fontawesome/css/all.min.css')}}">
 
@@ -18,17 +20,18 @@
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
   <link rel="stylesheet" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="{{asset('backend/assets/css/bootstrap-iconpicker.min.css')}}">
   <link rel="stylesheet" href="{{asset('backend/assets/modules/bootstrap-daterangepicker/daterangepicker.css')}}">
   <link rel="stylesheet" href="{{asset('backend/assets/modules/select2/dist/css/select2.min.css')}}">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
   <!-- Template CSS -->
   <link rel="stylesheet" href="{{asset('backend/assets/css/style.css')}}">
   <link rel="stylesheet" href="{{asset('backend/assets/css/components.css')}}">
 
 
-    @vite(['resources/js/app.js', 'resources/js/admin.js'])
+    @vite('resources/js/app.js', 'resources/css/app.css')
 
 </head>
 
@@ -42,7 +45,7 @@
         <!-- Navbar Content End-->
 
         <!-- sidebar Content -->
-            {{-- @include('admin.layouts.sidebar') --}}
+            @include('admin.layouts.sidebar')
         <!-- sidebar Content -->
 
       <!-- Main Content -->
@@ -52,6 +55,8 @@
 
     </div>
   </div>
+
+  
 
   <!-- General JS Scripts -->
   <script src="{{asset('backend/assets/modules/jquery.min.js')}}"></script>
@@ -70,20 +75,30 @@
   <script src="{{asset('backend/assets/modules/summernote/summernote-bs4.js')}}"></script>
   <script src="{{asset('backend/assets/modules/chocolat/dist/js/jquery.chocolat.min.js')}}"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-  <script src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="{{asset('backend/assets/js/bootstrap-iconpicker.bundle.min.js')}}"></script>
   <script src="{{asset('backend/assets/modules/bootstrap-daterangepicker/daterangepicker.js')}}"></script>
   <script src="{{asset('backend/assets/modules/select2/dist/js/select2.full.min.js')}}"></script>
 
-  <!-- Page Specific JS File -->
-  {{-- <script src="{{asset('backend/assets/js/page/index-0.js')}}"></script> --}}
+
+  {{-- datatable --}}
+  <script src="{{asset('backend/assets/modules/datatables/datatables.min.js')}}"></script>
+  <script src="{{asset('backend/assets/modules/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js')}}"></script>
+  <script src="{{asset('backend/assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js')}}"></script>
+  <script src="{{asset('backend/assets/modules/jquery-ui/jquery-ui.min.js')}}"></script>
+
+  <script src="{{asset('backend/assets/js/page/modules-datatables.js')}}"></script>
+  
 
   <!-- Template JS File -->
   <script src="{{asset('backend/assets/js/scripts.js')}}"></script>
   <script src="{{asset('backend/assets/js/custom.js')}}"></script>
-  <script src="{{asset('backend/assets/js/modal-fix.js')}}"></script>
+
+  @stack('scripts')
+
 
   <script>
     @if ($errors->any())
@@ -95,7 +110,7 @@
 
   <!-- Dynamic Delete alart -->
 
-  {{-- <script>
+  <script>
     $(document).ready(function(){
 
         $.ajaxSetup({
@@ -111,13 +126,14 @@
             let deleteUrl = $(this).attr('href');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
+                title: 'Вы уверены?',
+                text: "Вы не сможете отменить это действие!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: 'Да, удалить!',
+                cancelButtonText: 'Отмена'
                 }).then((result) => {
                 if (result.isConfirmed) {
 
@@ -129,14 +145,14 @@
 
                             if(data.status == 'success'){
                                 Swal.fire(
-                                    'Deleted!',
+                                    'Удалено!',
                                     data.message,
                                     'success'
                                 )
                                 window.location.reload();
                             }else if (data.status == 'error'){
                                 Swal.fire(
-                                    'Cant Delete',
+                                    'Невозможно удалить',
                                     data.message,
                                     'error'
                                 )
@@ -151,9 +167,8 @@
         })
 
     })
-  </script> --}}
+  </script>
 
 
-  @stack('scripts')
 </body>
 </html>

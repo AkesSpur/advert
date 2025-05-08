@@ -48,25 +48,61 @@
             this.activeFilter = filter;
             this.showModal = true;
         },
+        slugifyText(text) {
+            // Simple transliteration map for Russian characters
+            const rusMap = {
+                'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh',
+                'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o',
+                'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'ts',
+                'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu',
+                'я': 'ya'
+            };
+            
+            // Convert to lowercase and replace spaces with hyphens
+            let slug = text.toLowerCase();
+            
+            // Transliterate Russian characters
+            slug = slug.split('').map(char => rusMap[char] || char).join('');
+            
+            // Replace spaces with hyphens
+            slug = slug.replace(/ /g, '-');
+            
+            // Remove any remaining non-alphanumeric characters except hyphens
+            slug = slug.replace(/[^\w\-]+/g, '');
+            
+            // Remove duplicate hyphens
+            slug = slug.replace(/-+/g, '-');
+            
+            // Trim hyphens from beginning and end
+            slug = slug.replace(/^-+|-+$/g, '');
+            
+            return slug;
+        },
         selectService(service) {
-            this.selectedService = service;
+            this.selectedService = service.name;
             this.showServices = false;
-            window.location.href = '{{ route("home") }}?service=' + encodeURIComponent(service);
+            // Use the provided slug directly
+            window.location.href = '{{ url("/service") }}/' + service.slug;
         },
         selectMetro(station) {
-            this.selectedMetro = station;
+            this.selectedMetro = station.name;
             this.showMetro = false;
-            window.location.href = '{{ route("home") }}?metro=' + encodeURIComponent(station);
+            // Use the provided slug directly
+            window.location.href = '{{ url("/metro") }}/' + station.slug;
         },
         selectPrice(price) {
             this.selectedPrice = price;
             this.showPrice = false;
-            window.location.href = '{{ route("home") }}?price=' + encodeURIComponent(price);
+            // Still need to slugify price ranges as they don't have predefined slugs
+            const slug = this.slugifyText(price);
+            window.location.href = '{{ url("/price") }}/' + slug;
         },
         selectAge(age) {
             this.selectedAge = age;
             this.showAge = false;
-            window.location.href = '{{ route("home") }}?age=' + encodeURIComponent(age);
+            // Still need to slugify age ranges as they don't have predefined slugs
+            const slug = this.slugifyText(age);
+            window.location.href = '{{ url("/age") }}/' + slug;
         },
         resetFilters() {
             this.selectedService = '';
@@ -104,7 +140,7 @@
                  style="display: none;">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-8">
                     <template x-for="service in services" :key="service.name">
-                        <div @click="selectService(service.name)" 
+                        <div @click="selectService(service)" 
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
                             <span x-text="service.name"></span>
                             <span x-text="'(' + service.count + ')'"></span>
@@ -143,7 +179,7 @@
                             <div class="text-xl font-bold mb-2" x-text="letter"></div>
                             <div class="space-y-2">
                                 <template x-for="station in stations" :key="station.name">
-                                    <div @click="selectMetro(station.name)" 
+                                    <div @click="selectMetro(station)" 
                                          class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
                                         <span x-text="station.name"></span>
                                         <span x-text="'(' + station.count + ')'"></span>
@@ -299,7 +335,7 @@
                             <div class="text-xl font-bold mb-2" x-text="letter"></div>
                             <div class="space-y-2">
                                 <template x-for="station in stations" :key="station.name">
-                                    <div @click="selectMetro(station.name); activeFilter = null" 
+                                    <div @click="selectMetro(station); activeFilter = null" 
                                          class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
                                         <span x-text="station.name"></span>
                                         <span x-text="'(' + station.count + ')'"></span>
@@ -373,17 +409,17 @@
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
                 <!-- Filter Buttons -->
                 <div class="flex overflow-x-auto hide-scrollbar justify-start gap-3 mb-4 lg:mb-0">
-                    <a href="{{ route('home', ['filter' => 'all', 'sort' => request('sort', 'popular')]) }}" 
+                    <a href="{{ Request::url() }}" 
                        class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'all' || !$filter ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">Все анкеты</a>
-                    <a href="{{ route('home', ['filter' => 'video', 'sort' => request('sort', 'popular')]) }}" 
+                    <a href="{{ Request::url() . '?filter=video' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
                        class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'video' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">Есть видео</a>
-                    <a href="{{ route('home', ['filter' => 'new', 'sort' => request('sort', 'popular')]) }}" 
+                    <a href="{{ Request::url() . '?filter=new' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
                        class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'new' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">Новые</a>
-                    <a href="{{ route('home', ['filter' => 'vip', 'sort' => request('sort', 'popular')]) }}" 
+                    <a href="{{ Request::url() . '?filter=vip' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
                        class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'vip' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">VIP</a>
-                    <a href="{{ route('home', ['filter' => 'cheap', 'sort' => request('sort', 'popular')]) }}" 
+                    <a href="{{ Request::url() . '?filter=cheap' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
                        class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'cheap' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">Дешевые</a>
-                    <a href="{{ route('home', ['filter' => 'verified', 'sort' => request('sort', 'popular')]) }}" 
+                    <a href="{{ Request::url() . '?filter=verified' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
                        class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'verified' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">Фото проверены</a>
                 </div>
                 
@@ -411,13 +447,13 @@
                          x-transition:leave-end="transform opacity-0 scale-95"
                          class="absolute left-0 md:left-auto md:right-0 lg:right-0 mt-2 w-full md:w-64 bg-[#191919] rounded-lg shadow-lg z-50">
                         <div class="py-1">
-                            <a href="{{ route('home', ['filter' => request('filter', 'all'), 'sort' => 'popular']) }}" 
+                            <a href="{{ Request::url() . '?sort=popular' . (request('filter') ? '&filter=' . request('filter') : '') }}" 
                                @click="selectedSort = 'Самые популярные'; showSortOptions = false" 
                                class="block px-4 py-2 text-white hover:bg-[#252525]">Самые популярные</a>
-                            <a href="{{ route('home', ['filter' => request('filter', 'all'), 'sort' => 'cheapest']) }}" 
+                            <a href="{{ Request::url() . '?sort=cheapest' . (request('filter') ? '&filter=' . request('filter') : '') }}" 
                                @click="selectedSort = 'Дешевые'; showSortOptions = false" 
                                class="block px-4 py-2 text-white hover:bg-[#252525]">Дешевые</a>
-                            <a href="{{ route('home', ['filter' => request('filter', 'all'), 'sort' => 'expensive']) }}" 
+                            <a href="{{ Request::url() . '?sort=expensive' . (request('filter') ? '&filter=' . request('filter') : '') }}" 
                                @click="selectedSort = 'Дорогие'; showSortOptions = false" 
                                class="block px-4 py-2 text-white hover:bg-[#252525]">Дорогие</a>
                         </div>
@@ -455,7 +491,7 @@
                 <div class="col-span-full py-10 text-center">
                     <div class="text-2xl font-bold text-white mb-4">Анкеты не найдены</div>
                     <p class="text-gray-400 mb-6">К сожалению, по вашему запросу не найдено ни одной анкеты.</p>
-                    <a href="{{ route('home') }}" class="px-6 py-3 bg-[#6340FF] text-white rounded-lg hover:bg-[#5030EF] transition-colors">
+                    <a href="{{ Request::url() }}" class="px-6 py-3 bg-[#6340FF] text-white rounded-lg hover:bg-[#5030EF] transition-colors">
                         Сбросить фильтры
                     </a>
                 </div>

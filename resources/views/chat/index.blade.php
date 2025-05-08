@@ -195,13 +195,18 @@
             window.currentChatChannel = `chat.${conversationId}`;
             
             // Subscribe to new channel
+            
             if (window.Echo) {
                 window.Echo.private(`chat.${conversationId}`)
                     .listen('MessageSent', (e) => {
                         console.log('Message received:', e);
+                        // Extract the message data from the event
+                        // The backend sends the message data in the root of the event
+                        const messageData = e;
+                        
                         // Only add message if it's from someone else
-                        if (e.sender_id !== userId) {
-                            addMessage(e, false);
+                        if (messageData.sender_id !== userId) {
+                            addMessage(messageData, false);
                             
                             // Play notification sound
                             notificationSound.play().catch(err => console.error('Error playing sound:', err));
@@ -209,7 +214,7 @@
                             // Show browser notification if supported and page is not visible
                             if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
                                 new Notification('Новое сообщение', {
-                                    body: e.message,
+                                    body: messageData.message,
                                     icon: '/favicon.ico'
                                 });
                             }

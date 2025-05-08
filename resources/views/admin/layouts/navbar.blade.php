@@ -2,20 +2,23 @@
     <form class="form-inline mr-auto">
         <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg"><i class="fas fa-bars"></i></a></li>
     </form>
-    {{-- <ul class="navbar-nav navbar-right">
+    <ul class="navbar-nav navbar-right">
 
-      <li class="dropdown"><a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-        <img alt="image" style="width: 40px;height: 40px;
-        object-fit: cover;" src="{{asset(auth()->user()->image)}}" class="rounded-circle mr-1">
-        <div class="d-sm-none d-lg-inline-block">Hi, {{auth()->user()->name}}</div></a>
+      <li class="dropdown">
+        <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+          <i class="p-2 far fa-user"></i>
+        <div class="d-sm-none d-lg-inline-block">
+          Hi, {{auth()->user()->name}}
+        </div>
+      </a>
         <div class="dropdown-menu dropdown-menu-right">
-          <a href="{{route('admin.profile')}}" class="dropdown-item has-icon">
+          <a href="" class="dropdown-item has-icon">
             <i class="far fa-user"></i> Profile
-          </a>
 
-          <a href="{{route('admin.settings.index')}}" class="dropdown-item has-icon">
+          {{-- <a href="{{route('admin.settings.index')}}" class="dropdown-item has-icon">
             <i class="fas fa-cog"></i> Settings
-          </a>
+          </a> --}}
+
           <div class="dropdown-divider"></div>
 
             <!-- Authentication -->
@@ -28,5 +31,5 @@
             </form>
         </div>
       </li>
-    </ul> --}}
+    </ul>
   </nav>

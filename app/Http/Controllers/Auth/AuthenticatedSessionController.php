@@ -28,6 +28,20 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        if($request->user()->status === 'inactive'){
+            Auth::guard('web')->logout();
+
+            $request->session()->regenerateToken();
+
+            toastr('Ваш аккаунт заблокирован. Свяжитесь с поддержкой.','error',[],'Аккаунт Заблокирован!');
+
+            return redirect()->back();
+        }
+
+        if($request->user()->role === 'admin'){
+            return redirect()->intended(route('admin.customer.index'));
+        }
+
         return redirect()->intended(route('user.profiles.index', absolute: false));
     }
 

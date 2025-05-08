@@ -1,6 +1,16 @@
 @extends('second-layout')
 
 @section('content')
+    <style>
+        /* Hide scrollbar but maintain functionality */
+        .hide-scrollbar {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
+        }
+    </style>
     <div class="max-w-screen-2xl mx-auto px-1 md:px-4 py-6">
         <!-- Breadcrumbs -->
         <div class="text-sm text-gray-400 mb-4 pl-4 flex justify-between">
@@ -75,31 +85,16 @@
                 <div class="w-full lg:w-1/2 p-4">
                     <div class="flex flex-row h-full gap-4">
                         <!-- Thumbnails on the left (visible on medium and large screens) -->
-                        <div class="hidden md:flex flex-col gap-2 w-1/4 h-full justify-between">
+                        <div class="hidden md:flex flex-col gap-2 w-1/4 h-[450px] overflow-y-auto hide-scrollbar">
                             @php
                                 $slide = 0;
                             @endphp
 
-                            @foreach ($profile->images as $image)
-                                <!-- Thumbnail  -->
-                                <div class="h-[33%] rounded-xl overflow-hidden cursor-pointer" onclick="showSlide({{$slide}})">
-                                    <img src="{{ asset('storage/' . $image->path) }}" alt="Thumbnail {{$slide}}"
-                                        class="w-full h-full object-cover">
-                                    @php
-                                        $slide++;                                      
-                                      @endphp
-                                </div>
-                                @if ($slide > 1)
-
-                                    @break
-                                @endif
-                            @endforeach
-
                             @if (isset($profile->video->path))
-                                <!-- Video Thumbnail -->
-                                <div class="h-[33%] rounded-xl overflow-hidden cursor-pointer" onclick="showVideo()">
+                                <!-- Video Thumbnail (shown first) -->
+                                <div class="h-[120px] rounded-xl overflow-hidden cursor-pointer mb-2" onclick="showVideo()">
                                     <div class="relative w-full h-full">
-                                        <img src="{{ asset('storage/', $profile->video->thumbnail_path) }}"
+                                        <img src="{{ asset('storage/' . $profile->video->thumbnail_path) }}"
                                             alt="Video Thumbnail" class="w-full h-full object-cover opacity-75">
                                         <div class="absolute inset-0 flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none"
@@ -112,10 +107,18 @@
                                         </div>
                                     </div>
                                 </div>
-                            @else
-
                             @endif
 
+                            @foreach ($profile->images as $image)
+                                <!-- Thumbnail  -->
+                                <div class="h-[120px] rounded-xl overflow-hidden cursor-pointer mb-2" onclick="showSlide({{$slide}})">
+                                    <img src="{{ asset('storage/' . $image->path) }}" alt="Thumbnail {{$slide}}"
+                                        class="w-full h-full object-cover">
+                                    @php
+                                        $slide++;                                      
+                                    @endphp
+                                </div>
+                            @endforeach
                         </div>
                         <!-- Main Image/Video Carousel on the right -->
                         <div class="relative rounded-xl flex-grow w-full md:w-3/4">
@@ -726,8 +729,12 @@
                 showSlide(currentSlide);
             } else if (currentSlide === totalSlides - 1) {
                @if (isset($profile->video->path))
- // If we're at the last image slide, show video
- showVideo();
+                // If we're at the last image slide and video exists, show video
+                showVideo();
+               @else
+                // If we're at the last image slide and no video, loop back to first slide
+                currentSlide = 0;
+                showSlide(currentSlide);
                @endif
             } else {
                 // Otherwise, go to next slide
@@ -745,8 +752,12 @@
                 showSlide(currentSlide);
             } else if (currentSlide === 0) {
                 @if (isset($profile->video->path))
-                // If we're at the first slide, show video
+                // If we're at the first slide and video exists, show video
                 showVideo();
+                @else
+                // If we're at the first slide and no video, loop to the last slide
+                currentSlide = totalSlides - 1;
+                showSlide(currentSlide);
                 @endif
             } else {
                 // Otherwise, go to previous slide
@@ -815,6 +826,14 @@
                 handleSwipe();
             }, false);
 
+            // Prevent default touch behavior to avoid page scrolling during swipe
+            carouselContainer.addEventListener('touchmove', function(e) {
+                // Only prevent default if swiping horizontally
+                if (Math.abs(e.touches[0].screenX - touchStartX) > 10) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
             // Add click event to open fullscreen when clicking on the main image or video
             carouselContainer.addEventListener('click', function (e) {
                 if (e.target.closest('button')) {
@@ -849,10 +868,12 @@
         function openFullscreen(imageSrc) {
             const fullscreenOverlay = document.createElement('div');
             fullscreenOverlay.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center';
+            fullscreenOverlay.id = 'fullscreen-overlay';
 
             const fullscreenImage = document.createElement('img');
             fullscreenImage.src = imageSrc;
             fullscreenImage.className = 'max-h-screen max-w-screen-lg object-contain';
+            fullscreenImage.id = 'fullscreen-image';
 
             const closeButton = document.createElement('button');
             closeButton.className = 'absolute top-4 right-4 text-white text-2xl';
@@ -861,15 +882,73 @@
                 document.body.removeChild(fullscreenOverlay);
             };
 
+            // Add navigation buttons
+            const prevButton = document.createElement('button');
+            prevButton.className = 'absolute left-4 top-1/2 transform -translate-y-1/2 text-white p-2 rounded-full bg-black bg-opacity-50';
+            prevButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>';
+            prevButton.onclick = function(e) {
+                e.stopPropagation();
+                navigateFullscreenImage('prev');
+            };
+
+            const nextButton = document.createElement('button');
+            nextButton.className = 'absolute right-4 top-1/2 transform -translate-y-1/2 text-white p-2 rounded-full bg-black bg-opacity-50';
+            nextButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>';
+            nextButton.onclick = function(e) {
+                e.stopPropagation();
+                navigateFullscreenImage('next');
+            };
+
             fullscreenOverlay.appendChild(fullscreenImage);
             fullscreenOverlay.appendChild(closeButton);
+            fullscreenOverlay.appendChild(prevButton);
+            fullscreenOverlay.appendChild(nextButton);
+            
             fullscreenOverlay.onclick = function (e) {
                 if (e.target === fullscreenOverlay) {
                     document.body.removeChild(fullscreenOverlay);
                 }
             };
 
+            // Add touch event listeners for swipe in fullscreen
+            let fsStartX, fsEndX;
+            fullscreenOverlay.addEventListener('touchstart', function(e) {
+                fsStartX = e.changedTouches[0].screenX;
+            }, false);
+
+            fullscreenOverlay.addEventListener('touchend', function(e) {
+                fsEndX = e.changedTouches[0].screenX;
+                if (fsEndX < fsStartX - 50) { // Swipe left (next)
+                    navigateFullscreenImage('next');
+                }
+                if (fsEndX > fsStartX + 50) { // Swipe right (previous)
+                    navigateFullscreenImage('prev');
+                }
+            }, false);
+
             document.body.appendChild(fullscreenOverlay);
+        }
+
+        // Navigate between images in fullscreen mode
+        function navigateFullscreenImage(direction) {
+            let newSlide;
+            if (direction === 'next') {
+                newSlide = (currentSlide + 1) % document.querySelectorAll('.carousel-slide').length;
+            } else {
+                newSlide = (currentSlide - 1 + document.querySelectorAll('.carousel-slide').length) % document.querySelectorAll('.carousel-slide').length;
+            }
+            
+            // Update the current slide index
+            currentSlide = newSlide;
+            
+            // Get the new image source
+            const newImageSrc = document.querySelectorAll('.carousel-slide')[newSlide].querySelector('img').src;
+            
+            // Update the fullscreen image
+            document.getElementById('fullscreen-image').src = newImageSrc;
+            
+            // Also update the main carousel
+            showSlide(newSlide);
         }
 
         // Open video in fullscreen

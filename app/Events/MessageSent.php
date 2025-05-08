@@ -10,6 +10,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class MessageSent implements ShouldBroadcast
 {
@@ -57,6 +58,9 @@ class MessageSent implements ShouldBroadcast
      */
     public function broadcastWith()
     {
+        
+        Log::info('Broadcasting message: ', $this->message->toArray());
+
         return [
             'id' => $this->message->id,
             'conversation_id' => $this->message->conversation_id,
