@@ -127,26 +127,30 @@
 </a>
 </li>
 
-<li class="{{ setActive(['admin.messenger.*']) }}"><a class="nav-link" href="{{ route('admin.messenger.index') }}">
-    <i class="fas fa-comment-dots"></i>
- <span>
-    Chats
-    @php
-    use App\Models\ChatMessage;
+<li class="{{ setActive(['admin.messenger.*']) }}">
+    <a class="nav-link d-flex align-items-center justify-content-between" href="{{ route('admin.messenger.index') }}">
+        <div>
+            <i class="fas fa-comment-dots"></i> <span>Chats</span>
+        </div>
 
-    $unreadAdminMessages = ChatMessage::whereHas('conversation', function ($q) {
-        $q->where('admin_id', auth()->id());
-    })
-    ->whereNull('read_at') // unread
-    ->where('receiver_id', auth()->id()) // admin must be the receiver
-    ->count();
-@endphp
+        @php
+            use App\Models\ChatMessage;
 
-    @if($unreadAdminMessages > 0)
-        <span class="badge badge-danger badge-pill ml-1">{{ $unreadAdminMessages }}</span>
-    @endif
-</span>   
-</a>
+            $unreadAdminMessages = ChatMessage::whereHas('conversation', function ($q) {
+                $q->where('admin_id', auth()->id());
+            })
+            ->whereNull('read_at') // unread
+            ->where('receiver_id', auth()->id()) // admin must be the receiver
+            ->count();
+        @endphp
+
+        @if($unreadAdminMessages > 0)
+            <span class="badge rounded-circle bg-danger text-white d-flex align-items-center justify-content-center"
+                  style="width: 24px; height: 24px;">
+                {{ $unreadAdminMessages }}
+            </span>
+        @endif
+    </a>
 </li>
 
 <li class="menu-header">Settings & More</li>

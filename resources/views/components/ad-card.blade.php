@@ -91,8 +91,14 @@
         </div>
 
         <!-- Like button -->
-        <button class="absolute top-3 right-3 p-1.5 hover:scale-105 transition z-20 bg-transparent">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2"
+        <button 
+            onclick="event.preventDefault(); event.stopPropagation();"
+            data-profile-id="{{ $id }}"
+            class="like-button absolute top-3 right-3 p-1.5 hover:scale-105 transition z-20 rounded-full 'bg-transparent'">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" 
+                fill="{{ Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $id)->exists() ? 'red' : 'none' }}" 
+                stroke="{{ Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $id)->exists() ? 'none' : 'white' }}"
+                 stroke-width="{{ Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $id)->exists() ? 'none' : '2' }}"
                 viewBox="0 0 24 24">
                 <path d="M12.1 21.35l-1.45-1.32C5.4 15.36 2 12.28
                      2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41

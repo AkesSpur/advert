@@ -462,6 +462,7 @@
             </div>
         </div>
         
+
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 px-6 max-w-screen-2xl mx-auto">
             @forelse ($profiles as $profile)
                 <div class="h-full">

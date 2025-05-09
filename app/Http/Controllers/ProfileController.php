@@ -139,9 +139,6 @@ class ProfileController extends Controller
             'viber' => 'nullable|string|max:100',
             'whatsapp' => 'nullable|string|max:100',
             'email' => 'nullable|email|max:255',
-            'payment_wmz' => 'nullable|boolean',
-            'payment_card' => 'nullable|boolean',
-            'payment_sbp' => 'nullable|boolean',
             'has_telegram' => 'nullable|boolean',
             'has_viber' => 'nullable|boolean',
             'has_whatsapp' => 'nullable|boolean',
@@ -162,8 +159,8 @@ class ProfileController extends Controller
             'paid_services' => 'nullable|array',
             'paid_services.*' => 'exists:paid_services,id',
             'paid_service_prices' => 'nullable|array',
-            'photos' => 'required|array|min:1|max:5',
-            'photos.*' => 'image|max:2048', // 2MB max
+            'photos' => 'required|array|min:1|max:30',
+            'photos.*' => 'image|max:5120', // 5MB max
             'video' => 'nullable|file|mimes:mp4,mov,avi|max:20480', // 20MB max
         ]);
 
@@ -187,9 +184,6 @@ class ProfileController extends Controller
         $profile->viber = $validated['viber'] ?? null;
         $profile->whatsapp = $validated['whatsapp'] ?? null;
         $profile->email = $validated['email'] ?? null;
-        $profile->payment_wmz = $validated['payment_wmz'] ?? false;
-        $profile->payment_card = $validated['payment_card'] ?? false;
-        $profile->payment_sbp = $validated['payment_sbp'] ?? false;
         $profile->has_telegram = $validated['has_telegram'] ?? false;
         $profile->has_viber = $validated['has_viber'] ?? false;
         $profile->has_whatsapp = $validated['has_whatsapp'] ?? false;
@@ -440,9 +434,6 @@ class ProfileController extends Controller
             'viber' => 'nullable|string|max:100',
             'whatsapp' => 'nullable|string|max:100',
             'email' => 'nullable|email|max:255',
-            'payment_wmz' => 'nullable|boolean',
-            'payment_card' => 'nullable|boolean',
-            'payment_sbp' => 'nullable|boolean',
             'has_telegram' => 'nullable|boolean',
             'has_viber' => 'nullable|boolean',
             'has_whatsapp' => 'nullable|boolean',
@@ -463,8 +454,8 @@ class ProfileController extends Controller
             'paid_services' => 'nullable|array',
             'paid_services.*' => 'exists:paid_services,id',
             'paid_service_prices' => 'nullable|array',
-            'photos' => 'nullable|array|max:5',
-            'photos.*' => 'image|max:2048', // 2MB max
+            'photos' => 'nullable|array|max:30',
+            'photos.*' => 'image|max:5120', // 5MB max
             'video' => 'nullable|file|mimes:mp4,mov,avi|max:20480', // 20MB max
             'delete_photos' => 'nullable|array',
             'delete_photos.*' => 'integer|exists:profile_images,id',
@@ -490,9 +481,6 @@ class ProfileController extends Controller
         $profile->viber = $validated['viber'] ?? null;
         $profile->whatsapp = $validated['whatsapp'] ?? null;
         $profile->email = $validated['email'] ?? null;
-        $profile->payment_wmz = $validated['payment_wmz'] ?? false;
-        $profile->payment_card = $validated['payment_card'] ?? false;
-        $profile->payment_sbp = $validated['payment_sbp'] ?? false;
         $profile->has_telegram = $validated['has_telegram'] ?? false;
         $profile->has_viber = $validated['has_viber'] ?? false;
         $profile->has_whatsapp = $validated['has_whatsapp'] ?? false;
@@ -512,7 +500,7 @@ class ProfileController extends Controller
         if ($request->hasFile('photos')) {
             $newPhotosUploaded = true;
             $currentPhotoCount = $profile->images()->count();
-            $allowedNewPhotos = 5 - $currentPhotoCount;
+            $allowedNewPhotos = 50 - $currentPhotoCount;
 
             if ($allowedNewPhotos > 0) {
                 $photosToProcess = array_slice($request->file('photos'), 0, $allowedNewPhotos);

@@ -97,5 +97,28 @@
                 {{ $slot }}
             </div>
         </div>
+
+        @if (session('success'))
+        <div 
+            x-data="{ show: true }" 
+            x-init="setTimeout(() => show = false, 4000)" 
+            x-show="show"
+            x-transition 
+            class="fixed bottom-5 right-5 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50"
+        >
+            {{ session('success') }}
+        </div>
+    @endif
+    @if (session('error'))
+    <div 
+        x-data="{ show: true }" 
+        x-init="setTimeout(() => show = false, 4000)" 
+        x-show="show"
+        x-transition 
+        class="fixed bottom-5 right-5 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50"
+    >
+        {{ session('error') }}
+    </div>
+    @endif
     </body>
 </html>

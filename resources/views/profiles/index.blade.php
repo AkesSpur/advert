@@ -117,35 +117,60 @@
       <td class="p-4 align-top">
         <div class="flex items-center justify-end space-x-3">
           @if ($profile->is_vip)
-          <span class="px-2 py-1 text-sm text-gray-400">
+          <a  href="{{route('profiles.view', $profile->id)}}" class="px-2 py-1 text-sm text-gray-400">
             Премиум
-          </span>
+          </a>
           @else          
-          <span class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs">
+          <a  href="{{route('profiles.view', $profile->id)}}" class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs">
             Рекламировать
-          </span>
+          </a>
           @endif
-        <form action="{{ route('user.profiles.destroy', $profile->id) }}" method="POST" class="inline"
-        x-data="{}"
-        @submit.prevent="if (confirm('Вы уверены, что хотите удалить этот профиль?')) $el.submit();">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="text-red-500 hover:text-red-900">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-        </svg>
-        </button>
-        </form>
-
-        <a href="{{route('user.profiles.edit', $profile->id)}}" class="text-[#C2C2C2] hover:text-white">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        </svg>
-        </a>
+          
+          <!-- Dropdown menu -->
+          <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open" class="text-[#C2C2C2] hover:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+              </svg>
+            </button>
+            <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-[#191919] rounded-md shadow-lg z-10">
+              <div class="py-1">
+                <a href="{{route('user.profiles.edit', $profile->id)}}" class="block px-4 py-2 text-sm text-[#C2C2C2] hover:bg-gray-800 hover:text-white">
+                  Редактировать
+                </a>
+                
+                @php
+                  $verification = \App\Models\VerificationPhoto::where('profile_id', $profile->id)->first();
+                @endphp
+                
+                @if (!$profile->is_verified)
+                  @if(isset($verification) && $verification->status === 'rejected')
+                  <a href="{{route('user.profiles.verification.reapply', $profile->id)}}" class="block px-4 py-2 text-sm text-red-500 hover:bg-gray-800 hover:text-white">
+                    Повторная верификация
+                  </a>
+                  @else
+                  <a href="{{route('user.profiles.verification.form', $profile->id)}}" class="block px-4 py-2 text-sm text-[#C2C2C2] hover:bg-gray-800 hover:text-white">
+                    Верифицировать фото
+                  </a>
+                  @endif
+                @else
+                <span class="block px-4 py-2 text-sm text-green-500">
+                  Фото верифицировано ✓
+                </span>
+                @endif
+                
+                <form action="{{ route('user.profiles.destroy', $profile->id) }}" method="POST" class="block"
+                  x-data="{}"
+                  @submit.prevent="if (confirm('Вы уверены, что хотите удалить этот профиль?')) $el.submit();">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-800 hover:text-red-400">
+                    Удалить
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
       </td>
       </tr>
@@ -230,13 +255,13 @@
       <div class="flex justify-between mb-2">
       <div class="text-white">Реклама</div>
       @if ($profile->is_vip)
-          <div class="text-sm text-gray-400">
+          <a href="{{route('profiles.view', $profile->id)}}" class="text-sm text-gray-400">
             Премиум
-          </div>
+          </a>
           @else          
-          <div class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs">
+          <a href="{{route('profiles.view', $profile->id)}}" class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs">
             Рекламировать
-          </div>
+          </a>
           @endif
       </div>
       </div>
@@ -244,18 +269,31 @@
 
       <!-- Actions -->
       <div class="">
+      <!-- Verification status/button -->
+      @if ($profile->is_verified)
+      <div class="w-full py-3 text-center text-green-500 mb-2">
+        <span>Фото верифицировано ✓</span>
+      </div>
+      @else
+      <a href="{{route('user.profiles.verification.form', $profile->id)}}"
+      class="block w-full py-3 bg-gray-700 hover:bg-gray-600 text-white mb-2 text-center">
+        Верифицировать фото
+      </a>
+      @endif
+      
+      <a href="{{route('user.profiles.edit', $profile->id)}}"
+      class="block w-full py-3 bg-[#6340FF] hover:bg-[#5737e7] rounded-xl text-white transition text-center mb-2">
+      Редактировать
+      </a>
+      
       <form action="{{ route('user.profiles.destroy', $profile->id) }}" method="POST" class="w-full" x-data="{}"
       @submit.prevent="if (confirm('Вы уверены, что хотите удалить этот профиль?')) $el.submit();">
       @csrf
       @method('DELETE')
-      <button type="submit" class="w-full py-3 text-red-900 mb-2">
+      <button type="submit" class="w-full py-3 text-red-500 hover:text-red-400">
         Удалить анкету
       </button>
       </form>
-      <a href="{{route('user.profiles.edit', $profile->id)}}"
-      class="block w-full py-3 bg-[#6340FF] hover:bg-[#5737e7] rounded-xl text-white transition text-center">
-      Редактировать
-      </a>
       </div>
       </div>
     </div>

@@ -128,24 +128,7 @@
                 <h2 class="text-xl font-semibold mb-4">Фото и видео</h2>
                 <p class="text-sm text-[#FFFFFF99] mb-2">* Требуется загрузить хотя бы одно фото</p>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    @for ($i = 0; $i < 5; $i++)
-                        <div class="photo-upload-container relative">
-                            <label
-                                class="cursor-pointer aspect-[64/100] sm:aspect-[64/100] md:aspect-[81/100] lg:aspect-[64/100] bg-neutral-900 rounded-xl flex items-center justify-center text-center text-sm text-[#FFFFFF66] hover:text-white hover:bg-neutral-800 transition photo-label">
-                                <div class="photo-placeholder">
-                                    <div class="text-3xl mb-1">+</div>
-                                    Добавить фото
-                                </div>
-                                <div class="photo-preview hidden relative">
-                                    <img src="#" alt="Preview" class="w-full h-full object-cover rounded-xl">
-                                    <button type="button"
-                                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center remove-photo">×</button>
-                                </div>
-                                <input type="file" name="photos[]" accept="image/*" class="hidden photo-input">
-                            </label>
-                        </div>
-                    @endfor
-
+                    
                     <div class="video-upload-container relative">
                         <label
                             class="cursor-pointer aspect-[64/100] sm:aspect-[64/100] md:aspect-[81/100] lg:aspect-[64/100] bg-neutral-900 rounded-xl flex items-center justify-center text-center text-sm text-[#FFFFFF66] hover:text-white hover:bg-neutral-800 transition video-label">
@@ -161,6 +144,26 @@
                             <input type="file" name="video" accept="video/*" class="hidden video-input">
                         </label>
                     </div>
+
+                    {{-- Добавляем возможность загрузки неограниченного количества фото --}}
+                    @for ($i = 0; $i < 10; $i++)
+                        <div class="photo-upload-container relative">
+                            <label
+                                class="cursor-pointer aspect-[64/100] sm:aspect-[64/100] md:aspect-[81/100] lg:aspect-[64/100] bg-neutral-900 rounded-xl flex items-center justify-center text-center text-sm text-[#FFFFFF66] hover:text-white hover:bg-neutral-800 transition photo-label">
+                                <div class="photo-placeholder">
+                                    <div class="text-3xl mb-1">+</div>
+                                    Добавить фото
+                                </div>
+                                <div class="photo-preview hidden relative">
+                                    <img src="#" alt="Preview" class="w-full h-full object-cover rounded-xl">
+                                    <button type="button"
+                                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center remove-photo">×</button>
+                                </div>
+                                <input type="file" name="photos[]" accept="image/*" multiple class="hidden photo-input">
+                            </label>
+                        </div>
+                    @endfor
+
                 </div>
             </div>
 
@@ -251,32 +254,7 @@
                 </div>
             </div>
             
-            {{-- form of payment --}}
-            <div class="bg-transparent p-6 rounded-xl mt-6">
-                <h3 class="text-lg font-semibold mb-4 text-white">Форма платежей</h3>
-
-                <div class="flex gap-4 flex-wrap">
-                    <label class="flex items-center gap-2 text-[#FFFFFFCC]">
-                        <input type="checkbox" name="payment_wmz" value="1"
-                            class="w-4 h-4 text-[#6340FF] bg-transparent focus:ring-[#6340FF]"
-                            {{ old('payment_wmz') ? 'checked' : '' }}>
-                        wmZ
-                    </label>
-                    <label class="flex items-center gap-2 text-[#FFFFFFCC]">
-                        <input type="checkbox" name="payment_card" value="1"
-                            class="w-4 h-4 text-[#6340FF] bg-transparent focus:ring-[#6340FF]"
-                            {{ old('payment_card') ? 'checked' : '' }}>
-                        карта
-                    </label>
-                    <label class="flex items-center gap-2 text-[#FFFFFFCC]">
-                        <input type="checkbox" name="payment_sbp" value="1"
-                            class="w-4 h-4 text-[#6340FF] bg-transparent focus:ring-[#6340FF]"
-                            {{ old('payment_sbp') ? 'checked' : '' }}>
-                        сбп
-                    </label>
-                </div>
-            </div>
-
+   
 
             {{-- price --}}
             <div x-data="{

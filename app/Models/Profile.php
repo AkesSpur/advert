@@ -35,9 +35,6 @@ class Profile extends Model
         'viber',
         'whatsapp',
         'email',
-        'payment_wmz',
-        'payment_card',
-        'payment_sbp',
         'profile_type',
         'has_telegram',
         'has_viber',
@@ -65,9 +62,6 @@ class Profile extends Model
         'age' => 'integer',
         'weight' => 'integer',
         'height' => 'integer',
-        'payment_wmz' => 'boolean',
-        'payment_card' => 'boolean',
-        'payment_sbp' => 'boolean',
         'has_telegram' => 'boolean',
         'has_viber' => 'boolean',
         'has_whatsapp' => 'boolean',
@@ -80,6 +74,14 @@ class Profile extends Model
         'appartamenti_2hours' => 'decimal:2',
         'appartamenti_night' => 'decimal:2',
     ];
+
+    /**
+     * Get the verification photo associated with the profile.
+     */
+    public function verificationPhoto()
+    {
+        return $this->hasOne(VerificationPhoto::class);
+    }
 
     /**
      * Get the user that owns the profile.
@@ -250,4 +252,10 @@ class Profile extends Model
     {
         return $query->where('is_verified', true);
     }
+
+    public function likedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'likes')->withTimestamps();
+    }
+
 }

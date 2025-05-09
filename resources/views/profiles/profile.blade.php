@@ -85,17 +85,23 @@
                 <div class="w-full lg:w-1/2 p-4">
                     <div class="flex flex-row h-full gap-4">
                         <!-- Thumbnails on the left (visible on medium and large screens) -->
-                        <div class="hidden md:flex flex-col gap-2 w-1/4 h-[450px] overflow-y-auto hide-scrollbar">
+                        <div class="hidden md:flex flex-col gap-2 w-1/4 h-[600px] overflow-y-auto hide-scrollbar">
                             @php
                                 $slide = 0;
                             @endphp
 
                             @if (isset($profile->video->path))
                                 <!-- Video Thumbnail (shown first) -->
-                                <div class="h-[120px] rounded-xl overflow-hidden cursor-pointer mb-2" onclick="showVideo()">
+                                <div class="h-full rounded-xl cursor-pointer mb-2" onclick="showVideo()">
                                     <div class="relative w-full h-full">
-                                        <img src="{{ asset('storage/' . $profile->video->thumbnail_path) }}"
-                                            alt="Video Thumbnail" class="w-full h-full object-cover opacity-75">
+                                        <video
+                                            src="{{ asset('storage/' . $profile->video->path) }}"
+                                            class="w-full h-[150px] object-cover opacity-75 rounded-xl"
+                                            muted
+                                            autoplay
+                                            loop
+                                            playsinline
+                                        ></video>
                                         <div class="absolute inset-0 flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -107,23 +113,24 @@
                                         </div>
                                     </div>
                                 </div>
+                                
                             @endif
 
                             @foreach ($profile->images as $image)
                                 <!-- Thumbnail  -->
-                                <div class="h-[120px] rounded-xl overflow-hidden cursor-pointer mb-2" onclick="showSlide({{$slide}})">
+                                <div class="h-[150px] rounded-xl cursor-pointer mb-2" onclick="showSlide({{$slide}})">
                                     <img src="{{ asset('storage/' . $image->path) }}" alt="Thumbnail {{$slide}}"
-                                        class="w-full h-full object-cover">
+                                        class="w-full h-[150px] object-cover rounded-xl">
                                     @php
                                         $slide++;                                      
                                     @endphp
-                                </div>
+                                </div>                        
                             @endforeach
                         </div>
                         <!-- Main Image/Video Carousel on the right -->
-                        <div class="relative rounded-xl flex-grow w-full md:w-3/4">
+                        <div class="relative rounded-xl flex-grow h-[600px] w-full md:w-3/4">
                             <!-- Fixed height container to match thumbnails -->
-                            <div class="w-full h-[450px] md:h-full relative">
+                            <div class="w-full h-[600px] md:h-full relative">
                                 <!-- Top badges -->
                                 <div class="absolute top-3 left-3 flex flex-col items-start gap-2 z-10">
                                     @if (isset($profile->video->path))
@@ -197,10 +204,15 @@
 
                                 <!-- Favorite button -->
                                 <div class="absolute top-4 right-4 z-10">
-                                    <button class="p-2 rounded-full">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    <button 
+                                        class="like-button p-2 rounded-full hover:scale-105 transition"
+                                        data-profile-id="{{ $profile->id }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" 
+                                            fill="{{ Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $profile->id)->exists() ? 'red' : 'none' }}" 
+                                            stroke="{{ Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $profile->id)->exists() ? 'none' : 'white' }}"
+                                            stroke-width="{{ Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $profile->id)->exists() ? '0' : '2' }}"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                         </svg>
                                     </button>

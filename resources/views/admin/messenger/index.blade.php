@@ -242,7 +242,7 @@
         scrollToBottom();
         
         // Set up Echo for this conversation
-        setupEcho(conversationId, userId);
+        setupEcho(conversationId);
       })
       .catch(error => console.error('Error loading messages:', error));
     }
@@ -367,10 +367,9 @@
         messageInput.focus();
       });
     });
-    });
     
     // Set up Echo for real-time messaging
-    function setupEcho(conversationId, userId) {
+    function setupEcho(conversationId) {
       // First unsubscribe from any existing channels
       if (window.Echo && window.currentChatChannel) {
         window.Echo.leave(window.currentChatChannel);
@@ -393,9 +392,8 @@
           console.log('Received message event:', e);
           // Extract the message data from the event
           // The backend sends the message data in the root of the event
-          const messageData = e;
-          
-         
+          const messageData = e;     
+
           // Only add message if it's from someone else
           if (messageData.sender_id !== userId) {
             addMessage(messageData, false);
@@ -431,8 +429,8 @@
     
     // Show all users modal
     document.getElementById('show-all-users-btn').addEventListener('click', () => {
-  $('#allUsersModal').modal('show');
-});
+    $('#allUsersModal').modal('show');
+    });
     
     // Close modal when close button is clicked
     document.querySelector('.modal .close').addEventListener('click', function() {
@@ -488,7 +486,8 @@
         if (existingConversation) {
           // If it exists, click on it
           existingConversation.click();
-        } else {
+        }
+         else {
           // If it's a new conversation, we need to add it to the list and select it
           const newConversationHtml = `
             <li class="media conversation-item active" data-id="${data.conversation_id}" data-user-name="${data.user_name}">
@@ -588,7 +587,7 @@
         $('#allUsersModal').modal('hide');
       }
     });
-  
+  });
 
 
 </script>

@@ -122,4 +122,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class);
     }
+    public function likedProfiles()
+    {
+        return $this->belongsToMany(Profile::class, 'likes')->withTimestamps();
+    }
+
 }

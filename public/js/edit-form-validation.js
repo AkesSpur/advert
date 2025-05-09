@@ -5,6 +5,206 @@ document.addEventListener("DOMContentLoaded", function () {
     const photoLabels = document.querySelectorAll(".photo-label");
     const videoLabel = document.querySelector(".video-label");
     
+    // // Add click handlers to photo labels to trigger file input
+    // if (photoLabels && photoLabels.length > 0) {
+    //     photoLabels.forEach((label, index) => {
+    //         // Make the entire label clickable, not just the placeholder
+    //         label.addEventListener("click", function (e) {
+    //             // Only trigger the file input click if the event target is the label itself or the placeholder
+    //             // This prevents double-opening of the file dialog
+    //             if (e.target === this || e.target.closest('.photo-placeholder')) {
+    //                 const input = this.querySelector(".photo-input");
+    //                 if (input) {
+    //                     input.click();
+    //                 }
+    //             }
+    //             e.stopPropagation();
+    //         });
+    //     });
+    // }
+    
+    // // Add click handler to video label
+    // if (videoLabel) {
+    //     const placeholder = videoLabel.querySelector(".video-placeholder");
+    //     if (placeholder) {
+    //         placeholder.addEventListener("click", function (e) {
+    //             // Only trigger the file input click if the event target is the placeholder itself
+    //             // This prevents double-opening of the file dialog
+    //             if (e.target === this || e.target.closest('.video-placeholder') === this) {
+    //                 const input = videoLabel.querySelector(".video-input");
+    //                 if (input) {
+    //                     input.click();
+    //                 }
+    //             }
+    //             e.stopPropagation();
+    //             e.preventDefault();
+    //         });
+    //     }
+    // }
+    
+    // Handle multiple photo selection and distribution across available labels
+    photoInputs.forEach((input) => {
+        input.addEventListener("change", function (e) {
+            // Check if this is a programmatically triggered event with a custom flag
+            if (e.detail && e.detail.programmatic) {
+                // This is a programmatic event, just process the single file
+                const file = this.files[0];
+                if (!file) return;
+                
+                // Process the file in this container directly
+                const container = this.closest('.photo-upload-container');
+                if (container) {
+                    const placeholder = container.querySelector(".photo-placeholder");
+                    const preview = container.querySelector(".photo-preview");
+                    const img = container.querySelector("img");
+
+                    // Create object URL for preview
+                    const objectUrl = URL.createObjectURL(file);
+                    if (img) {
+                        img.src = objectUrl;
+                    }
+
+                    // Show preview, hide placeholder if they exist
+                    if (placeholder) {
+                        placeholder.classList.add("hidden");
+                    }
+                    if (preview) {
+                        preview.classList.remove("hidden");
+                    }
+                }
+                return;
+            }
+            
+
+            if (this.files && this.files.length > 0) {
+                // If multiple files are selected, distribute them across available empty photo containers
+                if (this.files.length > 1) {
+                    // Get all empty photo containers
+                    const emptyPhotoLabels = Array.from(photoLabels).filter(label => {
+                        // Check if this label doesn't have an image preview yet
+                        const container = label.closest('.photo-upload-container');
+                        if (!container) return false;
+                        
+                        // Check if there's no image or the image is the default placeholder
+                        const img = container.querySelector('img');
+                        return !img || img.src.includes('placeholder');
+                    });
+                    
+                    // Distribute files across empty containers
+                    for (let i = 0; i < Math.min(this.files.length, emptyPhotoLabels.length); i++) {
+                        const file = this.files[i];
+                        const label = emptyPhotoLabels[i];
+                        
+                        // Validate file type
+                        const validImageTypes = [
+                            "image/jpeg",
+                            "image/png",
+                            "image/gif",
+                            "image/webp",
+                        ];
+                        if (!validImageTypes.includes(file.type)) {
+                            toastr.error(
+                                "Пожалуйста, загрузите изображение в формате JPEG, PNG, GIF или WEBP"
+                            );
+                            continue;
+                        }
+                        
+                        // Validate file size (max 5MB)
+                        if (file.size > 5 * 1024 * 1024) {
+                            toastr.error("Размер изображения не должен превышать 5MB");
+                            continue;
+                        }
+                        
+                        // Create a new file list with just this file
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(file);
+                        
+                        // Find the input in this label and set its files
+                        const labelInput = label.querySelector('.photo-input');
+                        if (labelInput) {
+                            labelInput.files = dataTransfer.files;
+                            
+                            // Process the file directly instead of triggering another change event
+                            const container = label.closest('.photo-upload-container');
+                            if (container) {
+                                const placeholder = container.querySelector(".photo-placeholder");
+                                const preview = container.querySelector(".photo-preview");
+                                const img = container.querySelector("img");
+
+                                // Create object URL for preview
+                                const objectUrl = URL.createObjectURL(file);
+                                if (img) {
+                                    img.src = objectUrl;
+                                }
+
+                                // Show preview, hide placeholder if they exist
+                                if (placeholder) {
+                                    placeholder.classList.add("hidden");
+                                }
+                                if (preview) {
+                                    preview.classList.remove("hidden");
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Clear the original input if we distributed files
+                    if (this.files.length > 0 && emptyPhotoLabels.length > 0) {
+                        this.value = '';
+                    }
+                    return;
+                }
+                
+                // Single file handling
+                const file = this.files[0];
+                if (!file) return;
+
+                // Validate file type
+                const validImageTypes = [
+                    "image/jpeg",
+                    "image/png",
+                    "image/gif",
+                    "image/webp",
+                ];
+                if (!validImageTypes.includes(file.type)) {
+                    toastr.error(
+                        "Пожалуйста, загрузите изображение в формате JPEG, PNG, GIF или WEBP"
+                    );
+                    this.value = "";
+                    return;
+                }
+
+                // Validate file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    toastr.error("Размер изображения не должен превышать 5MB");
+                    this.value = "";
+                    return;
+                }
+
+                const container = this.closest(".photo-upload-container");
+                if (container) {
+                    const placeholder = container.querySelector(".photo-placeholder");
+                    const preview = container.querySelector(".photo-preview");
+                    const img = container.querySelector("img");
+
+                    // Create object URL for preview
+                    const objectUrl = URL.createObjectURL(file);
+                    if (img) {
+                        img.src = objectUrl;
+                    }
+
+                    // Show preview, hide placeholder if they exist
+                    if (placeholder) {
+                        placeholder.classList.add("hidden");
+                    }
+                    if (preview) {
+                        preview.classList.remove("hidden");
+                    }
+                }
+            }
+        });
+    });
+    
     // Initialize pricing checkboxes based on input values
     function initializePricingCheckboxes() {
         const pricingCheckboxes = document.querySelectorAll(".pricing-checkbox");
@@ -632,16 +832,19 @@ document.addEventListener("DOMContentLoaded", function () {
     // Add click handlers to photo labels to trigger file input
     if (photoLabels && photoLabels.length > 0) {
         photoLabels.forEach((label, index) => {
-            const placeholder = label.querySelector(".photo-placeholder");
-            if (placeholder) {
-                placeholder.addEventListener("click", function (e) {
-                    const input = label.querySelector(".photo-input");
+            // Make the entire label clickable, not just the placeholder
+            label.addEventListener("click", function (e) {
+                // Only trigger the file input click if the event target is the label itself or the placeholder
+                // This prevents double-opening of the file dialog
+                if (e.target === this || e.target.closest('.photo-placeholder')) {
+                    const input = this.querySelector(".photo-input");
                     if (input) {
                         input.click();
                     }
-                    e.stopPropagation();
-                });
-            }
+                }
+                e.stopPropagation();
+                // e.preventDefault();
+            });
         });
     }
 
@@ -650,11 +853,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const placeholder = videoLabel.querySelector(".video-placeholder");
         if (placeholder) {
             placeholder.addEventListener("click", function (e) {
-                const input = videoLabel.querySelector(".video-input");
-                if (input) {
-                    input.click();
+                // Only trigger the file input click if the event target is the placeholder itself
+                // This prevents double-opening of the file dialog
+                if (e.target === this || e.target.closest('.video-placeholder') === this) {
+                    const input = videoLabel.querySelector(".video-input");
+                    if (input) {
+                        input.click();
+                    }
                 }
                 e.stopPropagation();
+                e.preventDefault();
             });
         }
     }
@@ -681,25 +889,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 errorMessage += "Пожалуйста, выберите цвет волос.\n";
             }
 
-            // Validate payment methods
-            const paymentMethods = [
-                document.querySelector('input[name="payment_wmz"]'),
-                document.querySelector('input[name="payment_card"]'),
-                document.querySelector('input[name="payment_sbp"]'),
-            ];
-
-            let paymentSelected = false;
-            paymentMethods.forEach((method) => {
-                if (method && method.checked) {
-                    paymentSelected = true;
-                }
-            });
-
-            if (!paymentSelected) {
-                isValid = false;
-                errorMessage +=
-                    "Пожалуйста, выберите хотя бы один способ оплаты.\n";
-            }
+          
 
             // Validate pricing
             const pricingCheckboxes =
@@ -869,59 +1059,125 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Photo preview functionality
     photoInputs.forEach((input) => {
+        // Add multiple attribute to ensure multiple file selection works
+        input.setAttribute("multiple", "multiple");
+        
         input.addEventListener("change", function (e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Validate file type
+            // Stop event propagation to prevent reopening file explorer
+            e.stopPropagation();
+            e.preventDefault();
+            
+            // Get all selected files
+            const files = Array.from(e.target.files);
+            if (!files.length) return;
+            
+            // Validate all files first
             const validImageTypes = [
                 "image/jpeg",
                 "image/png",
                 "image/gif",
                 "image/webp",
             ];
-            if (!validImageTypes.includes(file.type)) {
+            
+            // Check if any file is invalid
+            const invalidFile = files.find(file => !validImageTypes.includes(file.type));
+            if (invalidFile) {
                 toastr.error(
                     "Пожалуйста, загрузите изображение в формате JPEG, PNG, GIF или WEBP"
                 );
                 input.value = "";
                 return;
             }
-
-            // Validate file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
+            
+            // Check if any file is too large
+            const largeFile = files.find(file => file.size > 5 * 1024 * 1024);
+            if (largeFile) {
                 toastr.error("Размер изображения не должен превышать 5MB");
                 input.value = "";
                 return;
             }
-
-            const container = this.closest(".photo-upload-container");
-            const placeholder = container.querySelector(".photo-placeholder");
-            const preview = container.querySelector(".photo-preview");
-            const previewImg = preview.querySelector("img");
-
-            // Create object URL for preview
-            const objectUrl = URL.createObjectURL(file);
-            previewImg.src = objectUrl;
-
-            // Show preview, hide placeholder
-            placeholder.classList.add("hidden");
-            preview.classList.remove("hidden");
-
-            // Setup remove button
-            const removeBtn = preview.querySelector(".remove-photo");
-            removeBtn.addEventListener("click", function (event) {
-                event.preventDefault();
-                // Clear the file input
-                input.value = "";
-                // Hide preview, show placeholder
-                preview.classList.add("hidden");
-                placeholder.classList.remove("hidden");
-                // Release object URL
-                URL.revokeObjectURL(objectUrl);
-            });
+            
+            // Get the current container
+            const currentContainer = this.closest(".photo-upload-container");
+            
+            // Process the first file in the current container
+            const firstFile = files[0];
+            processFileInContainer(firstFile, currentContainer, input);
+            
+            // If there are more files, find empty containers and process them
+            if (files.length > 1) {
+                // Get all empty containers (those with visible placeholders)
+                const allContainers = document.querySelectorAll(".photo-upload-container");
+                const emptyContainers = Array.from(allContainers).filter(container => {
+                    // Container is empty if placeholder is visible
+                    const placeholder = container.querySelector(".photo-placeholder");
+                    return placeholder && !placeholder.classList.contains("hidden");
+                });
+                
+                // Process remaining files in empty containers
+                for (let i = 1; i < files.length && i-1 < emptyContainers.length; i++) {
+                    const container = emptyContainers[i - 1];
+                    const containerInput = container.querySelector(".photo-input");
+                    
+                    // Just use the file directly without setting containerInput.files
+                    processFileInContainer(files[i], container, containerInput);
+                    
+                }
+            }
         });
     });
+    
+    // Helper function to process a file in a container
+    function processFileInContainer(file, container, input) {
+        const placeholder = container.querySelector(".photo-placeholder");
+        const preview = container.querySelector(".photo-preview");
+        const previewImg = preview.querySelector("img");
+
+        // Create object URL for preview
+        const objectUrl = URL.createObjectURL(file);
+        previewImg.src = objectUrl;
+
+        // Show preview, hide placeholder
+        placeholder.classList.add("hidden");
+        preview.classList.remove("hidden");
+
+        // Setup remove button
+        const removeBtn = preview.querySelector(".remove-photo");
+        removeBtn.addEventListener("click", function (event) {
+            event.preventDefault();
+            // Clear the file input
+            input.value = "";
+            // Hide preview, show placeholder
+            preview.classList.add("hidden");
+            placeholder.classList.remove("hidden");
+            // Release object URL
+                URL.revokeObjectURL(objectUrl);
+            });
+        }
+    
+
+    // Initialize the remove buttons for existing photos
+    document.querySelectorAll('.remove-photo').forEach(button => {
+        // Remove existing event listeners to prevent duplicates
+        const newButton = button.cloneNode(true);
+        button.parentNode.replaceChild(newButton, button);
+        
+        newButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            const preview = this.closest('.photo-preview');
+            const container = preview.closest('.photo-upload-container');
+            const placeholder = container.querySelector('.photo-placeholder');
+            const input = container.querySelector('.photo-input');
+            
+            // Clear the file input
+            if (input) input.value = '';
+            
+            // Hide preview, show placeholder
+            preview.classList.add('hidden');
+            placeholder.classList.remove('hidden');
+        });
+    });
+   
 
     // Video preview functionality
     if (videoInput) {

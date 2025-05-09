@@ -3,11 +3,13 @@
 
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FormController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\TariffController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
@@ -47,6 +49,11 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], fu
 
     // Public profiles
     Route::resource('profiles', ProfileController::class);
+    
+    // Profile verification routes
+    Route::get('profiles/{id}/verification', [VerificationController::class, 'showVerificationForm'])->name('profiles.verification.form');
+    Route::post('profiles/{id}/verification', [VerificationController::class, 'submitVerification'])->name('profiles.verification.submit');
+    Route::get('profiles/{id}/verification/reapply', [VerificationController::class, 'reapplyVerification'])->name('profiles.verification.reapply');
 
     Route::get('chat', [MessageController::class, 'index'])->name('chat.index');
     Route::post('chat/send', [MessageController::class, 'sendMessage'])->name('chat.send');
@@ -60,14 +67,25 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], fu
     Route::post('/ads/{id}/cancel', [TariffController::class, 'cancel'])->name('advert.cancel');
 
     Route::get('/profiles/create', [FormController::class, 'index'])->name('form.index');
+
+    Route::post('/profile/{id}/toggle-like', [LikeController::class, 'toggle'])->name('profile.toggleLike');
+    Route::get('/my-likes', [LikeController::class, 'likedProfiles'])->name('profile.likedProfiles');
+
 });
 
-// Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-//     Route::get('messenger', [ChatController::class, 'index'])->name('messenger.index');
-//     Route::post('chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
-//     Route::get('chat/messages', [ChatController::class, 'getMessages'])->name('chat.messages');
-//     Route::post('chat/create-conversation', [ChatController::class, 'createConversation'])->name('chat.create-conversation');
-// });
+// Admin routes
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    // Verification management
+    Route::get('verifications', [VerificationController::class, 'adminVerificationList'])->name('verifications.index');
+    Route::get('verifications/{id}', [VerificationController::class, 'adminViewVerification'])->name('verifications.show');
+    Route::post('verifications/{id}/process', [VerificationController::class, 'adminProcessVerification'])->name('verifications.process');
+    
+    // Other admin routes
+    // Route::get('messenger', [ChatController::class, 'index'])->name('messenger.index');
+    // Route::post('chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+    // Route::get('chat/messages', [ChatController::class, 'getMessages'])->name('chat.messages');
+    // Route::post('chat/create-conversation', [ChatController::class, 'createConversation'])->name('chat.create-conversation');
+});
 
     // // Profile management (user settings)
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

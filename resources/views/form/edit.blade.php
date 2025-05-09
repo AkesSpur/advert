@@ -133,6 +133,36 @@
                 
                 {{-- Фотографии профиля --}}
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">
+                                        {{-- Видео --}}
+                                        @if($profile->video)
+                                        <div class="relative">
+                                            <video src="{{ asset('storage/' . $profile->video->path) }}" 
+                                                class="aspect-[64/100] object-cover rounded-xl" controls></video>
+                                            <div class="absolute top-2 right-2">
+                                                <label class="flex items-center justify-center w-6 h-6 bg-red-500 rounded-full cursor-pointer">
+                                                    <input type="checkbox" name="delete_video" value="1" class="hidden">
+                                                    <span class="text-white text-sm">×</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="video-upload-container">
+                                            <label
+                                                class="cursor-pointer aspect-[64/100] sm:aspect-[64/100] md:aspect-[81/100] lg:aspect-[64/100] bg-neutral-900 rounded-xl flex items-center justify-center text-center text-sm text-[#FFFFFF66] hover:text-white hover:bg-neutral-800 transition video-label">
+                                                <div class="video-placeholder">
+                                                    <div class="text-3xl mb-1">+</div>
+                                                    Добавить видео
+                                                </div>
+                                                <div class="video-preview hidden relative">
+                                                    <video class="w-full h-full object-cover rounded-xl" controls></video>
+                                                    <button type="button"
+                                                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center remove-video">×</button>
+                                                </div>
+                                                <input type="file" name="video" accept="video/*" class="hidden video-input">
+                                            </label>
+                                        </div>
+                                    @endif
+
                     {{-- Текущие фото --}}
                     @foreach($profile->images as $image)
                         <div class="photo-upload-container">
@@ -150,7 +180,7 @@
                     @endforeach
                     
                     {{-- Добавить новые фото --}}
-                    @for ($i = 0; $i < max(0, 5 - $profile->images->count()); $i++)
+                    @for ($i = 0; $i < max(0, 10 - $profile->images->count()); $i++)
                         <div class="photo-upload-container">
                             <label
                                 class="cursor-pointer aspect-[64/100] sm:aspect-[64/100] md:aspect-[81/100] lg:aspect-[64/100] bg-neutral-900 rounded-xl flex items-center justify-center text-center text-sm text-[#FFFFFF66] hover:text-white hover:bg-neutral-800 transition photo-label">
@@ -163,40 +193,10 @@
                                     <button type="button"
                                         class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center remove-photo">×</button>
                                 </div>
-                                <input type="file" name="photos[]" accept="image/*" class="hidden photo-input">
+                                <input type="file" name="photos[]" accept="image/*" multiple class="hidden photo-input">
                             </label>
                         </div>
                     @endfor
-
-                    {{-- Видео --}}
-                    @if($profile->video)
-                        <div class="relative">
-                            <video src="{{ asset('storage/' . $profile->video->path) }}" 
-                                class="aspect-[64/100] object-cover rounded-xl" controls></video>
-                            <div class="absolute top-2 right-2">
-                                <label class="flex items-center justify-center w-6 h-6 bg-red-500 rounded-full cursor-pointer">
-                                    <input type="checkbox" name="delete_video" value="1" class="hidden">
-                                    <span class="text-white text-sm">×</span>
-                                </label>
-                            </div>
-                        </div>
-                    @else
-                        <div class="video-upload-container">
-                            <label
-                                class="cursor-pointer aspect-[64/100] sm:aspect-[64/100] md:aspect-[81/100] lg:aspect-[64/100] bg-neutral-900 rounded-xl flex items-center justify-center text-center text-sm text-[#FFFFFF66] hover:text-white hover:bg-neutral-800 transition video-label">
-                                <div class="video-placeholder">
-                                    <div class="text-3xl mb-1">+</div>
-                                    Добавить видео
-                                </div>
-                                <div class="video-preview hidden relative">
-                                    <video class="w-full h-full object-cover rounded-xl" controls></video>
-                                    <button type="button"
-                                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center remove-video">×</button>
-                                </div>
-                                <input type="file" name="video" accept="video/*" class="hidden video-input">
-                            </label>
-                        </div>
-                    @endif
                 </div>
             </div>
 
@@ -300,32 +300,7 @@
                     </div>
                 </div>
             </div>
-            {{-- form of payment --}}
-            <div class="bg-transparent p-6 rounded-xl mt-6">
-                <h3 class="text-lg font-semibold mb-4 text-white">Форма платежей</h3>
-
-                <div class="flex gap-4 flex-wrap">
-                    <label class="flex items-center gap-2 text-[#FFFFFFCC]">
-                        <input type="checkbox" name="payment_wmz" value="1"
-                            class="w-4 h-4 text-[#6340FF] bg-transparent focus:ring-[#6340FF]"
-                            {{ old('payment_wmz', $profile->payment_wmz) ? 'checked' : '' }}>
-                        wmZ
-                    </label>
-                    <label class="flex items-center gap-2 text-[#FFFFFFCC]">
-                        <input type="checkbox" name="payment_card" value="1"
-                            class="w-4 h-4 text-[#6340FF] bg-transparent focus:ring-[#6340FF]"
-                            {{ old('payment_card', $profile->payment_card) ? 'checked' : '' }}>
-                        карта
-                    </label>
-                    <label class="flex items-center gap-2 text-[#FFFFFFCC]">
-                        <input type="checkbox" name="payment_sbp" value="1"
-                            class="w-4 h-4 text-[#6340FF] bg-transparent focus:ring-[#6340FF]"
-                            {{ old('payment_sbp', $profile->payment_sbp) ? 'checked' : '' }}>
-                        сбп
-                    </label>
-                </div>
-            </div>
-
+          
             {{-- price --}}
             <div x-data="{
                 rentalOptions: ['Выезд', 'Апартаменты'],
@@ -445,28 +420,9 @@
     
        <script>
            document.addEventListener('DOMContentLoaded', function() {
-               // Photo upload preview
-               const photoInputs = document.querySelectorAll('.photo-input');
-               photoInputs.forEach(input => {
-                   input.addEventListener('change', function() {
-                       const container = this.closest('.photo-upload-container');
-                       const preview = container.querySelector('.photo-preview img');
-                       const placeholder = container.querySelector('.photo-placeholder');
-                       const previewContainer = container.querySelector('.photo-preview');
-                       
-                       if (this.files && this.files[0]) {
-                           const reader = new FileReader();
-                           
-                           reader.onload = function(e) {
-                               preview.src = e.target.result;
-                               placeholder.classList.add('hidden');
-                               previewContainer.classList.remove('hidden');
-                           }
-                           
-                           reader.readAsDataURL(this.files[0]);
-                       }
-                   });
-               });
+               // Photo upload preview is handled in edit-form-validation.js
+               // We're removing this code to prevent duplicate event handlers
+               // that could cause the file explorer to reopen automatically
                
                // Add event listeners for remove photo buttons
                const removePhotoButtons = document.querySelectorAll('.remove-photo');
