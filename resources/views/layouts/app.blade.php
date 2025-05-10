@@ -142,7 +142,7 @@
 
             
             <!-- Mobile Menu -->
-            <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-[#191919] border-t border-gray-800 z-50">
+            <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-[#191919] border-t border-[#363636] z-50">
                 <div class="flex justify-around">
                     <a href="{{route('user.profiles.index')}}" class="flex flex-col items-center p-3 {{isActiveTab('user.profiles.index')}}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -201,9 +201,9 @@
             </div>
             
             <!-- Footer -->
-            <footer class="pb-6">
+            <footer class="pb-6 mb-16" >
                 <div class="max-w-screen-2xl mx-auto px-6">
-                    <div class="flex flex-col sm:flex-row border-t border-[#363636] pt-6 justify-between items-center ">
+                    <div class="flex border-t border-[#363636] pt-6 justify-between items-center ">
                         <div class="mb-4 sm:mb-0">
                             <a href="/" class="text-xl font-bold">Logo</a>
                         </div>

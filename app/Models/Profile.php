@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Profile extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -49,6 +50,7 @@ class Profile extends Model
         'appartamenti_night',
         'view_count',
         'click_count',
+        'last_active',
     ];
 
     /**
@@ -73,6 +75,7 @@ class Profile extends Model
         'appartamenti_1hour' => 'decimal:2',
         'appartamenti_2hours' => 'decimal:2',
         'appartamenti_night' => 'decimal:2',
+        'last_active' => 'datetime',
     ];
 
     /**
@@ -177,6 +180,12 @@ class Profile extends Model
         return $this->hasOne(ProfileVideo::class);
     }
     
+
+    // all profile tariffs
+    public function tariffs()
+    {
+        return $this->hasMany(ProfileAdTariff::class);
+    }
     /**
      * Get the active advertisement tariffs for this profile
      */

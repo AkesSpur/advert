@@ -442,7 +442,7 @@
                             </form>
                             @else
                             <!-- Pause button (⏸️) -->
-                            <form action="{{ route('user.advert.pause', $activeTariff->id) }}" method="POST">
+                            <form x-data @submit.prevent="if (confirm('Вы уверены, что хотите приостановить показ рекламы?')) $el.submit()" action="{{ route('user.advert.pause', $activeTariff->id) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="p-2 bg-[#323232] hover:bg-[#3d3d3d] text-white rounded-full transition" title="Приостановить">
                                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -452,9 +452,63 @@
                                 </button>
                             </form>
                             @endif
+                            
+                            @if($activeTariff->isPriority())
+                            <!-- Change Priority button -->
+                            <button @click="$dispatch('open-modal', 'change-priority-{{ $activeTariff->id }}')" class="p-2 bg-[#323232] hover:bg-[#3d3d3d] text-white rounded-full transition" title="Изменить приоритет">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                                </svg>
+                            </button>
+                            
+                            <!-- Priority Change Modal -->
+                            <div
+                                x-data="{ isOpen: false, priority: {{ $activeTariff->priority_level ?? 17 }} }"
+                                x-show="isOpen"
+                                x-on:open-modal.window="if ($event.detail === 'change-priority-{{ $activeTariff->id }}') { isOpen = true }"
+                                x-on:keydown.escape.window="isOpen = false"
+                                x-transition:enter="transition ease-out duration-300"
+                                x-transition:enter-start="opacity-0 transform scale-90"
+                                x-transition:enter-end="opacity-100 transform scale-100"
+                                x-transition:leave="transition ease-in duration-300"
+                                x-transition:leave-start="opacity-100 transform scale-100"
+                                x-transition:leave-end="opacity-0 transform scale-90"
+                                class="fixed inset-0 z-50 overflow-y-auto" 
+                                style="display: none;"
+                            >
+                                <div class="flex items-center justify-center min-h-screen px-4">
+                                    <div class="fixed inset-0 bg-black opacity-50" x-on:click="isOpen = false"></div>
+                                    <div class="relative bg-[#191919] rounded-lg max-w-md w-full mx-auto p-6 shadow-xl">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3 class="text-xl font-bold">Изменить приоритет</h3>
+                                            <button @click="isOpen = false" class="text-white text-2xl">&times;</button>
+                                        </div>
+                                        
+                                        <form action="{{ route('user.advert.update-priority', $activeTariff->id) }}" method="POST">
+                                            @csrf
+                                            <div class="mb-4">
+                                                <label class="block text-sm font-medium mb-2">Уровень приоритета</label>
+                                                <input 
+                                                    type="number" 
+                                                    name="priority_level" 
+                                                    x-model="priority"
+                                                    min="1" 
+                                                    class="w-full bg-[#121212] border border-gray-700 rounded-lg px-4 py-2 text-white"
+                                                >
+                                                <p class="text-sm text-gray-400 mt-2">Стоимость: <span x-text="priority"></span> руб./день</p>
+                                            </div>
+                                            <div class="flex justify-end space-x-3">
+                                                <button type="button" @click="isOpen = false" class="px-4 py-2 border border-gray-600 rounded-lg text-white">Отмена</button>
+                                                <button type="submit" class="px-4 py-2 bg-[#6340FF] hover:bg-[#5737e7] rounded-lg text-white">Сохранить</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
                         
                             <!-- Deactivate button (⏹️) -->
-                            <form action="{{ route('user.advert.cancel', $activeTariff->id) }}" method="POST">
+                            <form x-data @submit.prevent="if (confirm('Вы уверены, что хотите остановить рекламу?')) $el.submit()" action="{{ route('user.advert.cancel', $activeTariff->id) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="p-2 bg-red-700 hover:bg-red-900 text-white rounded-full transition" title="Отменить">
                                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -472,5 +526,7 @@
         </div>
     </div>
     @endif
+
+    
 
 </x-app-layout>

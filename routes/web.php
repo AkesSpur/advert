@@ -49,6 +49,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], fu
 
     // Public profiles
     Route::resource('profiles', ProfileController::class);
+
+// Profile archive routes
+Route::get('profiles/{id}/archive', [ProfileController::class, 'archive'])->name('profiles.archive');
+Route::post('profiles/{id}/restore', [ProfileController::class, 'restore'])->name('profiles.restore');
     
     // Profile verification routes
     Route::get('profiles/{id}/verification', [VerificationController::class, 'showVerificationForm'])->name('profiles.verification.form');
@@ -73,19 +77,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], fu
 
 });
 
-// Admin routes
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    // Verification management
-    Route::get('verifications', [VerificationController::class, 'adminVerificationList'])->name('verifications.index');
-    Route::get('verifications/{id}', [VerificationController::class, 'adminViewVerification'])->name('verifications.show');
-    Route::post('verifications/{id}/process', [VerificationController::class, 'adminProcessVerification'])->name('verifications.process');
-    
-    // Other admin routes
-    // Route::get('messenger', [ChatController::class, 'index'])->name('messenger.index');
-    // Route::post('chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
-    // Route::get('chat/messages', [ChatController::class, 'getMessages'])->name('chat.messages');
-    // Route::post('chat/create-conversation', [ChatController::class, 'createConversation'])->name('chat.create-conversation');
-});
+
 
     // // Profile management (user settings)
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -12,7 +12,7 @@
                     <th class="px-4 py-3 text-sm font-medium">Услуга</th>
                     <th class="px-4 py-3 text-sm font-medium">Статус</th>
                     <th class="px-4 py-3 text-sm font-medium">Стоимость</th>
-                    <th class="px-4 py-3 text-sm font-medium">Чек</th>
+                    {{-- <th class="px-4 py-3 text-sm font-medium">Чек</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -20,7 +20,17 @@
                 <tr class="border-b border-gray-800 text-[#C2C2C2]">
                     <td class="px-4 py-3 text-sm">№{{ $transaction->id }}</td>
                     <td class="px-4 py-3 text-sm">{{ $transaction->created_at->format('d.m.Y') }}</td>
-                    <td class="px-4 py-3 text-sm">{{ $transaction->type == 'purchase' ? 'Оплата рекламы' : 'Пополнение' }}</td>
+                    <td class="px-4 py-3 text-sm">
+                        @if($transaction->type == 'purchase')
+                            @if(isset($transaction->description))
+                                {{ $transaction->description }}
+                            @else
+                                Оплата рекламы
+                            @endif
+                        @else
+                            Пополнение
+                        @endif
+                    </td>
                     <td class="px-4 py-3 text-sm">
                         @if($transaction->status == 'completed')
                         <span class="inline-flex px-4 py-2 text-xs rounded-lg bg-[#A6FF6A99] text-black">
@@ -37,7 +47,7 @@
                         @endif
                     </td>
                     <td class="px-4 py-3 text-sm">{{ number_format($transaction->amount, 0, '.', ' ') }} р.</td>
-                    <td class="px-4 py-3 text-sm">
+                    {{-- <td class="px-4 py-3 text-sm">
                         @if($transaction->status == 'completed')
                         <a href="#" class="text-gray-400 hover:text-white">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -49,7 +59,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         @endif
-                    </td>
+                    </td> --}}
                 </tr>
                 @empty
                 <tr class="border-b border-gray-800">
@@ -75,12 +85,22 @@
             <hr class="border-gray-700 my-4">
             <div class="text-sm text-[#C2C2C2]">№{{ $transaction->id }}</div>
             <div class="text-sm text-[#C2C2C2]">{{ $transaction->created_at->format('d.m.Y') }}</div>
-            <div class="text-sm text-[#C2C2C2] mb-4">{{ $transaction->type == 'purchase' ? 'Оплата рекламы' : 'Пополнение' }}</div>
-            @if($transaction->status == 'completed')
+            <div class="text-sm text-[#C2C2C2] mb-4">
+                @if($transaction->type == 'purchase')
+                    @if(isset($transaction->description))
+                        {{ $transaction->description }}
+                    @else
+                        Оплата рекламы
+                    @endif
+                @else
+                    Пополнение
+                @endif
+            </div>
+            {{-- @if($transaction->status == 'completed')
             <a href="#" class="block w-full bg-[#7A5FFF] hover:bg-[#6a52e6] text-white py-2 rounded-xl text-sm font-medium text-center">Получить чек</a>
             @else
             <button disabled class="w-full bg-gray-700 text-gray-400 py-2 rounded-xl text-sm font-medium cursor-not-allowed">Получить чек</button>
-            @endif
+            @endif --}}
         </div>
         @empty
         <div class="bg-[#1C1C1C] rounded-xl p-6 text-center text-gray-400">

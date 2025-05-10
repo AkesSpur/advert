@@ -34,10 +34,10 @@ class PageController extends Controller
                     $metro = $slug; // Use slug directly instead of deslugifying
                     break;
                 case 'home.price':
-                    $price = \App\Helpers\UrlHelper::deslugify($slug); // Still deslugify for price
+                    $price = deslugify($slug); // Still deslugify for price
                     break;
                 case 'home.age':
-                    $age = \App\Helpers\UrlHelper::deslugify($slug); // Still deslugify for age
+                    $age = deslugify($slug); // Still deslugify for age
                     break;
             }
         } else {
@@ -272,7 +272,7 @@ class PageController extends Controller
             ->get()
             ->map(function($s) {
                 // Generate slug if it doesn't exist in the database
-                $slug = isset($s->slug) ? $s->slug : \App\Helpers\UrlHelper::slugify($s->name);
+                $slug = isset($s->slug) ? $s->slug : slugify($s->name);
                 return [
                     'name' => $s->name, 
                     'slug' => $slug,

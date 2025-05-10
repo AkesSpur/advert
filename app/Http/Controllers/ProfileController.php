@@ -19,6 +19,42 @@ use Illuminate\Validation\Rule;
 class ProfileController extends Controller
 {
     /**
+     * Archive the specified profile.
+     */
+    public function archive($id)
+    {
+        $profile = Profile::where("user_id", Auth::id())->findOrFail($id);
+        
+        // Only inactive profiles can be archived
+        if ($profile->is_active) {
+            return redirect()->route('user.profiles.index')
+                ->with('error', 'Только неактивные анкеты могут быть архивированы.');
+        }        
+        
+        $profile->is_archived = true;
+        $profile->save();
+        
+        
+        return redirect()->route('user.profiles.index')
+            ->with('success', 'Анкета успешно архивирована.');
+    }
+    
+    /**
+     * Restore the archived profile.
+     */
+    public function restore($id)
+    {
+        $profile = Profile::where("user_id", Auth::id())
+            ->where("is_archived", true)
+            ->findOrFail($id);
+            
+        $profile->is_archived = false;
+        $profile->save();
+        
+        return redirect()->route('user.profiles.index')
+            ->with('success', 'Анкета успешно восстановлена.');
+    }
+    /**
      * Create a fallback thumbnail when FFMpeg is not available or fails
      * 
      * @param string $thumbnailPath The path where the thumbnail should be stored
@@ -81,17 +117,21 @@ class ProfileController extends Controller
      */
     public function index(Request $request)
     {
-
         $profiles = Profile::where("user_id", Auth::id())
+            ->where("is_archived", false)
             ->with(['primaryImage', 'services', 'metroStations', 'neighborhoods'])
             ->orderBY('created_at', 'desc')
             ->get();
+            
+        $archivedProfiles = Profile::where("user_id", Auth::id())
+            ->where("is_archived", true)
+            ->with(['primaryImage', 'services', 'metroStations', 'neighborhoods'])
+            ->orderBY('created_at', 'desc')
+            ->get();
+            
+        $archivedCount = $archivedProfiles->count();
 
-        //     echo '<pre>';
-        //  var_dump($profiles);
-        //  die;
-
-        return view('profiles.index', compact('profiles'));
+        return view('profiles.index', compact('profiles', 'archivedProfiles', 'archivedCount'));
     }
 
     /**

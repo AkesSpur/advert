@@ -7,11 +7,11 @@
     </a>
   </div>
 
-  <div class="bg-[#191919] rounded-2xl p-8 max-w-2xl mx-auto">
+  <div class="rounded-2xl p-8">
     <div class="mb-6">
       <h2 class="text-xl font-semibold mb-2">Верификация анкеты #{{ $profile->id }}</h2>
-      <p class="text-gray-400 mb-4">Для верификации вашей анкеты, пожалуйста, загрузите фото, на котором вы держите лист бумаги с ID вашей анкеты.</p>
-      <div class="bg-gray-800 p-4 rounded-lg mb-4">
+      <p class="text-gray-300 mb-4">Для верификации вашей анкеты, пожалуйста, загрузите фото, на котором вы держите лист бумаги с ID вашей анкеты.</p>
+      <div class="bg-[#191919] p-4 rounded-lg mb-4">
         <p class="text-white">Ваш ID: <span class="font-bold">{{ $profile->id }}</span></p>
       </div>
       
@@ -34,15 +34,15 @@
       <div class="mb-6">
         <label for="verification_photo" class="block text-white mb-2">Загрузите фото для верификации</label>
         <input type="file" id="verification_photo" name="verification_photo" accept="image/*"
-          class="w-full bg-gray-800 text-white p-3 rounded-lg @error('verification_photo') border border-red-500 @enderror">
+          class="w-full bg-[#191919] text-white p-3 rounded-lg @error('verification_photo') border border-red-500 @enderror">
         @error('verification_photo')
         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
         @enderror
       </div>
 
-      <div class="bg-gray-800 p-4 rounded-lg mb-6">
+      <div class="bg-[#191919] p-4 rounded-lg mb-6">
         <h3 class="font-semibold mb-2">Требования к фото:</h3>
-        <ul class="list-disc pl-5 text-gray-400">
+        <ul class="list-disc pl-5 text-gray-300">
           <li>Вы должны быть четко видны на фото</li>
           <li>Лист бумаги с вашим ID должен быть хорошо читаем</li>
           <li>Фото должно быть хорошего качества и при хорошем освещении</li>

@@ -2,8 +2,16 @@
 
 @section('content')
 <div class="py-8">
-    <div class="max-w-screen-2xl px-6  mb-8 mx-auto">
-        <h1 class="text-3xl font-bold ">Избранные анкеты</h1>
+    <div class="max-w-screen-2xl px-6  mb-4 mx-auto">
+        <nav class="text-sm text-[#A0A0A0] mb-4" aria-label="Breadcrumb">
+            <ol class="list-reset flex items-center space-x-1">
+                <li>
+                    <a href="/" class="hover:text-[#A0A0A0] text-[#636363]">Главная</a>
+                </li>
+                <li><span>/</span></li>
+                <li class="text-[#6340FF] font-medium" aria-current="page">Избранные анкеты</li>
+            </ol>
+        </nav>
     </div>
     
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 px-6 max-w-screen-2xl mx-auto">
@@ -32,7 +40,7 @@
             />
         </div>
             @empty
-                <div class=" rounded-lg p-8 text-center">
+                <div class="col-span-full rounded-lg p-8 text-center">
                     <p class="text-xl">У вас пока нет избранных анкет</p>
                     <a href="{{ route('home') }}" class="mt-4 inline-block px-6 py-3 bg-[#6340FF] text-white rounded-lg hover:bg-[#5030EF] transition">Перейти к анкетам</a>
                 </div>

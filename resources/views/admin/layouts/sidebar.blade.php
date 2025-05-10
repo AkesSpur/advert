@@ -98,6 +98,28 @@
         </li>
     </ul>
 </li>
+
+<li class="dropdown {{ setActive(['admin.profiles.*']) }}">
+    <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-user-circle"></i>
+        <span>Profiles</span></a>
+    <ul class="dropdown-menu">
+        <li class="{{ setActive(['admin.profiles.index']) }}"><a class="nav-link"
+                href="{{ route('admin.profiles.index') }}">All Profiles</a>
+        </li>
+        <li class="{{ setActive(['admin.profiles.index', ['filter' => 'verified']]) }}"><a class="nav-link"
+                href="{{ route('admin.profiles.index', ['filter' => 'verified']) }}">Verified Profiles</a>
+        </li>
+        <li class="{{ setActive(['admin.profiles.index', ['filter' => 'active']]) }}"><a class="nav-link"
+                href="{{ route('admin.profiles.index', ['filter' => 'active']) }}">Active Profiles</a>
+        </li>
+        <li class="{{ setActive(['admin.profiles.index', ['filter' => 'disabled']]) }}"><a class="nav-link"
+                href="{{ route('admin.profiles.index', ['filter' => 'disabled']) }}">Disabled Profiles</a>
+        </li>
+        <li class="{{ setActive(['admin.profiles.index', ['filter' => 'deleted']]) }}"><a class="nav-link"
+                href="{{ route('admin.profiles.index', ['filter' => 'deleted']) }}">Deleted Profiles</a>
+        </li>
+    </ul>
+</li>
 <li class="dropdown {{ setActive(['admin.paid-services.*']) }}">
     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-dollar-sign"></i>
         <span>Paid Services</span></a>
@@ -117,8 +139,8 @@
     Comments
 </span>   
 </a>
-
 </li>
+
 <li class="{{ setActive(['admin.reviews.*']) }}"><a class="nav-link" href="{{ route('admin.reviews.index') }}">
     <i class="fas fa-star"></i>
  <span>
@@ -127,12 +149,19 @@
 </a>
 </li>
 
+<li class="{{ setActive(['admin.verifications.*']) }}"><a class="nav-link" href="{{ route('admin.verifications.index') }}">
+    <i class="fas fa-check-circle"></i>
+ <span>
+    Verification
+</span>   
+</a>
+</li>
+
 <li class="{{ setActive(['admin.messenger.*']) }}">
     <a class="nav-link d-flex align-items-center justify-content-between" href="{{ route('admin.messenger.index') }}">
-        <div>
+      
             <i class="fas fa-comment-dots"></i> <span>Chats</span>
-        </div>
-
+      
         @php
             use App\Models\ChatMessage;
 

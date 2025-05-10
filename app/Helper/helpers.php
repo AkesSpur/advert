@@ -1,5 +1,6 @@
-<?php 
+<?php
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 function setActive(array $route){
@@ -39,7 +40,72 @@ function isActiveRoute($routeName, $slug = null) {
     return $formatted;
  }
 
- function text2Slug($string)
+
+
+ function slugify($text)
     {
-        return Str::slug($string);
+        // Transliterate non-Latin characters to Latin
+        $text = transliterator_transliterate('Any-Latin; Latin-ASCII; [^\\w\\s-] remove; Lower()', $text);
+        
+        // Replace spaces with hyphens
+        $text = str_replace(' ', '-', $text);
+        
+        // Remove any remaining non-alphanumeric characters except hyphens
+        $text = preg_replace('/[^\w\-]+/', '', $text);
+        
+        // Remove duplicate hyphens
+        $text = preg_replace('/-+/', '-', $text);
+        
+        // Trim hyphens from beginning and end
+        return trim($text, '-');
+    }
+    
+    /**
+     * Convert a slug back to its original form (approximate)
+     *
+     * @param string $slug
+     * @return string
+     */
+ function deslugify($slug)
+    {
+        // Replace hyphens with spaces
+        return str_replace('-', ' ', $slug);
+    }
+
+     /**
+     * Format the last active time in a user-friendly way
+     * 
+     * @param Carbon|null $lastActive
+     * @return string
+     */
+     function formatLastActive($lastActive)
+    {
+        if (!$lastActive) {
+            return 'недавно';
+        }
+        
+        $now = Carbon::now();
+        
+        // If active within the last 5 minutes
+        if ($lastActive->diffInMinutes($now) < 5) {
+            return 'онлайн';
+        }
+        
+        // If active today
+        if ($lastActive->isToday()) {
+            return 'сегодня, ' . $lastActive->format('H:i');
+        }
+        
+        // If active yesterday
+        if ($lastActive->isYesterday()) {
+            return 'вчера, ' . $lastActive->format('H:i');
+        }
+        
+        // If active within the last week
+        if ($lastActive->diffInDays($now) < 7) {
+            return $lastActive->locale('ru')->dayName . ', ' . $lastActive->format('H:i');
+        }
+        
+        // Otherwise return the date
+        return $lastActive->format('d.m.Y');
     }

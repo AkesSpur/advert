@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Backend\AdminListController;
 use App\Http\Controllers\Backend\ChatController;
 use App\Http\Controllers\Backend\CustomerListController;
@@ -11,8 +12,25 @@ use App\Http\Controllers\Backend\ServiceController;
 use App\Http\Controllers\Backend\PaidServiceController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 
+
+/* profile management routes */
+Route::prefix('profiles')->name('profiles.')->group(function () {
+    Route::get('/', [ProfileController::class, 'index'])->name('index');
+    Route::get('/{id}', [ProfileController::class, 'show'])->name('show');
+    Route::post('/{id}/disable', [ProfileController::class, 'disable'])->name('disable');
+    Route::post('/{id}/restore', [ProfileController::class, 'restore'])->name('restore');
+    Route::delete('/{id}', [ProfileController::class, 'destroy'])->name('destroy');
+});
+
+/* verification routes */
+Route::get('verifications', [VerificationController::class, 'adminVerificationList'])->name('verifications.index');
+Route::get('verifications/{id}', [VerificationController::class, 'adminViewVerification'])->name('verifications.show');
+Route::post('verifications/{id}/process', [VerificationController::class, 'adminProcessVerification'])->name('verifications.process');
+
+/* messenger routes */
 Route::get('messenger', [ChatController::class, 'index'])->name('messenger.index');
 Route::post('chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
 Route::get('chat/messages', [ChatController::class, 'getMessages'])->name('chat.messages');

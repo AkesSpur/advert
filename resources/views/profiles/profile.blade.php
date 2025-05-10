@@ -55,7 +55,7 @@
                     </h1>
                 </div>
                 <div class="mb-2 hidden md:block lg:hidden">
-                    <span class="text-[#636363] text-sm">Была активна 01.02.2025</span>
+                    <span class="text-[#636363] text-sm">Была активна {{formatLastActive($profile->last_active) }}</span>
                 </div>
 
                 <!-- Attributes for small and medium screens -->
@@ -245,7 +245,7 @@
                             @endif
                         </h1>
                     </div>
-                    <p class="text-[#636363] mb-4">Была активна 01.02.2023</p>
+                    <p class="text-[#636363] mb-4">Была активна {{formatLastActive($profile->last_active) }}</p>
 
                     <!-- Location -->
                     <div class="flex items-center mb-2">
@@ -377,7 +377,7 @@
                         </div>
                     </div>
                 </div>
-                <span class="text-[#636363] px-4 text-sm md:hidden">Была активна 01.02.2023</span>
+                <span class="text-[#636363] px-4 text-sm md:hidden">Была активна {{formatLastActive($profile->last_active) }}</span>
             </div>
         </div>
 

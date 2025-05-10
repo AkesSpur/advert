@@ -23,6 +23,7 @@
                                         <tr>
                                             <th>Id</th>
                                             <th>Name</th>
+                                            <th>Profiles Count</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -31,6 +32,7 @@
                                         <tr>
                                             <td>{{$metroStation->id}}</td>
                                             <td>{{$metroStation->name}}</td>
+                                            <td>{{ $metroStation->profiles_count }}</td>
                                             <td>
                                                 <a href="{{route('admin.metro-stations.edit', $metroStation->id)}}" class="btn btn-primary"><i class="fas fa-edit"></i></a>
                                                 <a href="{{route('admin.metro-stations.destroy', $metroStation->id)}}" class="btn btn-danger delete-item"><i class="fas fa-trash"></i></a>
