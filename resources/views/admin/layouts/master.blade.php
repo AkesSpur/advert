@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
   <meta name="csrf-token" content="{{ csrf_token() }}" />
-  <title>Admin Dashboard</title>
+  <title>Панель администратора</title>
 
   <!-- General CSS Files -->
   <link rel="icon" type="image/png" href="">
@@ -31,7 +31,7 @@
   <link rel="stylesheet" href="{{asset('backend/assets/css/components.css')}}">
 
 
-    @vite('resources/js/app.js', 'resources/css/app.css')
+    @vite('resources/js/app.js')
 
 </head>
 

@@ -73,10 +73,7 @@ function isActiveRoute($routeName, $slug = null) {
     }
 
      /**
-     * Format the last active time in a user-friendly way
-     * 
-     * @param Carbon|null $lastActive
-     * @return string
+
      */
      function formatLastActive($lastActive)
     {
@@ -86,6 +83,11 @@ function isActiveRoute($routeName, $slug = null) {
         
         $now = Carbon::now();
         
+         // Convert string to Carbon instance if necessary
+    if (!($lastActive instanceof Carbon)) {
+        $lastActive = Carbon::parse($lastActive);
+    }
+
         // If active within the last 5 minutes
         if ($lastActive->diffInMinutes($now) < 5) {
             return 'онлайн';

@@ -3,7 +3,7 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h1>Reviews</h1>
+            <h1>Отзывы</h1>
         </div>
 
         <div class="section-body">
@@ -11,7 +11,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4>All Reviews</h4>
+                            <h4>Все отзывы</h4>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -19,10 +19,10 @@
                                     <thead>
                                         <tr>
                                             {{-- <th>Id</th> --}}
-                                            <th>Profile_id</th>
-                                            <th>Name</th>
-                                            <th>Comment</th>
-                                            <th>Action</th>
+                                            <th>Профиль_id</th>
+                                            <th>Имя</th>
+                                            <th>Как</th>
+                                            <th>Действие</th>
                                         </tr>
                                     </thead>
                                     <tbody>

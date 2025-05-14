@@ -18,8 +18,14 @@ class Service extends Model
     protected $fillable = [
         'name',
         'slug',
-        'description',
         'icon',
+        'description',
+        'category_id',
+        'is_active',
+        'title', // Added
+        'meta_description', // Added
+        'h1_header', // Added
+        'sort_order', // Added
     ];
 
     /**

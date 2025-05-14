@@ -15,22 +15,23 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'role' => 'admin'
-        ]);
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'role' => 'client'
-        ]);
+        // User::factory()->create([
+        //     'name' => 'Admin User',
+        //     'email' => 'admin@example.com',
+        //     'role' => 'admin'
+        // ]);
+        // User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@example.com',
+        //     'role' => 'client'
+        // ]);
         
         $this->call([
-            LocationsAndServicesSeeder::class,
-            TariffSeeder::class,
-            ProfileSeeder::class,
-            ContentSeeder::class,
+            // LocationsAndServicesSeeder::class,
+            // TariffSeeder::class,
+            // ProfileSeeder::class,
+            // ContentSeeder::class,
+            MenuSeeder::class,
         ]);
     }
 }

@@ -28,7 +28,8 @@ class LikeController extends Controller
     public function likedProfiles()
     {
         $user = User::findOrFail(Auth::id());
-        $likedProfiles = $user->likedProfiles()->latest()->get();
+        $likedProfiles = $user->likedProfiles()->where('is_archived', false)->latest()->get();
+        
     
         return view('user.liked_profiles', compact('likedProfiles'));
     }

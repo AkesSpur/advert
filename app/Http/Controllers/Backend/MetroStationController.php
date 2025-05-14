@@ -14,7 +14,9 @@ class MetroStationController extends Controller
      */
     public function index()
     {
-        $metroStations = MetroStation::withCount('profiles')->get();
+        $metroStations = MetroStation::withCount('profiles')
+        ->orderBy('name', 'asc')
+        ->paginate(25);
         return view('admin.metro-stations.index', compact('metroStations'));
     }
 

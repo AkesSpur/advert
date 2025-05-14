@@ -18,14 +18,15 @@ class MetroStation extends Model
     protected $fillable = [
         'name',
         'slug',
-        'line',
-        'city',
+        'city_id',
+        'is_active',
+        'title',
+        'meta_description',
+        'h1_header',
+        'sort_order',
     ];
 
-    /**
-     * The profiles that belong to the metro station.
-     */
-    public function profiles(): BelongsToMany
+    public function city()
     {
         return $this->belongsToMany(Profile::class);
     }

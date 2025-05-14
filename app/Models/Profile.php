@@ -51,6 +51,8 @@ class Profile extends Model
         'view_count',
         'click_count',
         'last_active',
+        'latitude',
+        'longitude',
     ];
 
     /**
@@ -76,6 +78,8 @@ class Profile extends Model
         'appartamenti_2hours' => 'decimal:2',
         'appartamenti_night' => 'decimal:2',
         'last_active' => 'datetime',
+        'latitude' => 'decimal:8',
+        'longitude' => 'decimal:8',
     ];
 
     /**

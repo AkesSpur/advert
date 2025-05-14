@@ -124,7 +124,12 @@
                               @endif
                             </div>
                             <div>
-                              <div>{{ $profile->name }}, {{ $profile->age }}</div>
+                              <div class="text-capitalize">
+                                {{ $profile->name }}, {{ $profile->age }}
+                                @if ($profile->is_verified)
+                                  <span class="text-success"><i class="fas fa-check-circle fa-2x"></i></span>
+                                @endif
+                              </div>
                               <div class="text-muted small">{{formatNumber( $profile->phone) }}</div>
                             </div>
                           </div>
@@ -136,10 +141,6 @@
                             <div class="badge badge-warning mb-1"> Неактивный</div>
                           @else
                             <div class="badge badge-success mb-1">Активна</div>
-                          @endif
-                          
-                          @if($profile->is_verified)
-                            <div class="badge badge-info">Верифицирована</div>
                           @endif
                         </td>
                         <td>
@@ -213,10 +214,17 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="adStatsModalLabel-{{ $profile->id }}">Статистика расходов на рекламу - {{ $profile->name }}</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <h5 class="modal-title" id="adStatsModalLabel-{{ $profile->id }}">Статистика расходов на рекламу - {{ $profile->name }} </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
+      </div>
+      <div class="">
+        <h6 class="text-muted"> 
+          Пользователь: 
+              <a href="mailto:{{ $profile->user->email }}">{{ $profile->user->email }}</a>
+               (ID: {{ $profile->user->id }})
+        </h6>
       </div>
       <div class="modal-body">
         @php
@@ -307,7 +315,7 @@
         <!-- Detailed Tariff History -->
         <h6 class="section-title mt-0">История рекламных тарифов</h6>
         <div class="table-responsive">
-          <table class="table table-striped">
+          <table class="table table-striped dataTable">
             <thead>
               <tr>
                 <th>Тип</th>
@@ -322,7 +330,7 @@
               @foreach($profile->tariffs->sortByDesc('created_at') as $tariff)
                 @php
                   $tariffCharges = $tariff->charges->sum('amount');
-                  $duration = $tariff->expires_at ? $tariff->created_at->diffInDays($tariff->expires_at) : $tariff->created_at->diffInDays(now());
+                  $duration = $tariff->charges->count();
                   if ($tariff->is_active) {
                     $status = 'Активен';
                     $statusClass = 'success';

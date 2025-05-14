@@ -105,7 +105,10 @@
             </h5>
             <div class="text-muted">ID анкеты: {{ $profile->id }}</div>
             <div class="text-muted">Дата создания: {{ $profile->created_at->format('d.m.Y') }}</div>
-            <div class="text-muted">Пользователь: {{ $profile->user->name }} (ID: {{ $profile->user->id }})</div>
+            <div class="text-muted ">Пользователь: 
+              <a href="mailto:{{ $profile->user->email }}">{{ $profile->user->email }}</a>
+               (ID: {{ $profile->user->id }})
+            </div>
           </div>
           </div>
         </div>
@@ -343,7 +346,7 @@
         @foreach($profile->tariffs->sortByDesc('created_at') as $tariff)
       @php
       $tariffCharges = $tariff->charges->sum('amount');
-      $duration = $tariff->expires_at ? $tariff->created_at->diffInDays($tariff->expires_at) : $tariff->created_at->diffInDays(now());
+      $duration = $tariff->charges->count();
       if ($tariff->is_active) {
       $status = 'Активен';
       $statusClass = 'success';

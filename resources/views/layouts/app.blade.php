@@ -19,7 +19,7 @@
             body {
                 background-color: #121212;
             }
-        
+            [x-cloak] { display: none !important; }
             .custom-scrollbar::-webkit-scrollbar {
         width: 10px;
     }
@@ -78,6 +78,13 @@
                             <span class="font-medium">{{Auth::user()->balance}} ₽</span>
                             <a href="#" class="text-white underline ml-2 text-sm">Пополнить</a>
                         </div>
+                        @if(Auth::user()->role == 'admin')
+                        <a href="{{ route('admin.dashboard') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </a>
+                        @endif
                     </div>
                 </div>
             </header>
@@ -122,11 +129,8 @@
                             Выйти
                         </button>
                         </form>
-                        <a href="#" class="block w-full rounded-2xl mb-2 text-md font-semibold px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white transition">
+                        <a href="{{ route('user.settings.edit') }}" class="block w-full rounded-2xl mb-2 text-md font-semibold px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white transition {{ isActiveRoute('user.settings.edit')  }}">
                             Настройки
-                        </a>
-                        <a href="/" class="block w-full rounded-2xl mb-2 text-md font-semibold px-4 py-3 text-gray-400 hover:bg-red-800  hover:text-white transition">
-                            Удалить аккаунт
                         </a>
                     </div>
                 </div>
@@ -183,7 +187,7 @@
                         </button>
                         <!-- Dropdown Menu -->
                         <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="absolute bottom-full mb-2 w-48 rounded-lg bg-[#191919] shadow-lg border border-[#2B2B2B] py-2 right-0">
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-800 hover:text-white transition">
+                            <a href="{{ route('user.settings.edit') }}" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-800 hover:text-white transition {{ isActiveTab('user.settings.edit')}}">
                                 Настройки
                             </a>
                             <form method="POST" action="{{ route('logout') }}">
@@ -192,16 +196,13 @@
                                     Выйти
                                 </button>
                             </form>            
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-400 hover:bg-red-800 hover:text-white transition">
-                                Удалить аккаунт
-                            </a>
                         </div>
                     </div>
                 </div>
             </div>
             
             <!-- Footer -->
-            <footer class="pb-6 mb-16" >
+            <footer class="pb-6 mb-16 lg:mb-4" >
                 <div class="max-w-screen-2xl mx-auto px-6">
                     <div class="flex border-t border-[#363636] pt-6 justify-between items-center ">
                         <div class="mb-4 sm:mb-0">
@@ -260,6 +261,8 @@
         {{ session('error') }}
     </div>
 @endif
+
+
          @stack('scripts')
          <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     </body>

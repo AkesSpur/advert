@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ $seoTitle ?? config('app.name', 'Laravel') }}</title>
+    <meta name="description" content="{{ $seoMetaDescription ?? '' }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -82,6 +83,13 @@
                                 {{ Auth::user()->likedProfiles()->count() }}
                             </span>
                         </a>
+                        @if(Auth::user()->role == 'admin')
+                        <a href="{{ route('admin.dashboard') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </a>
+                        @endif
                         <a href="{{ route('user.profiles.index') }}"
                            class="px-4 py-2 bg-transparent text-white border border-white-700 rounded-lg text-sm">
                             Мой кабинет
@@ -126,6 +134,13 @@
                                 {{ Auth::user()->likedProfiles()->count() }}
                             </span>
                         </a>
+                        @if(Auth::user()->is_admin)
+                        <a href="{{ route('admin') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </a>
+                        @endif
                         <a href="{{ route('user.profiles.index') }}"
                            class="px-4 py-2 bg-transparent text-white border border-white-700 rounded-lg text-sm">
                             Мой кабинет
@@ -162,6 +177,7 @@
     @stack('styles')
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @stack('scripts')
     <script>
         $(document).ready(function() {
             $('.like-button').click(function() {
@@ -202,7 +218,7 @@
                 @else
     // User is not logged in, redirect to login
     window.location.href = '{{ route("login") }}';
-@endauth
+        @endauth
             });
         });
     </script>

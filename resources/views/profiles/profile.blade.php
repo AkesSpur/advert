@@ -30,7 +30,7 @@
                         </a>
                     </li>
                     <li><span>/</span></li>
-                    <li class="text-[#6340FF] font-medium" aria-current="page">{{$profile->name}}</li>
+                    <li class="text-[#6340FF] font-medium capitalize" aria-current="page">{{$profile->name}}</li>
                 </ol>
             </nav>
 
@@ -45,8 +45,8 @@
             <!-- Profile Info for small and medium screens (shown above gallery) -->
             <div class="block md:block lg:hidden py-2 px-4">
                 <div class="flex items-center mb-1 md:mb-none">
-                    <h1 class="text-3xl font-semibold text-white mr-2 relative">
-                        {{$profile->name . ', ' . $profile->age}}
+                    <h1 class="text-3xl capitalize font-semibold text-white mr-2 relative">
+                        {{ $seoH1 ?? ($profile->name . ', ' . $profile->age) }}
                         @if ($profile->is_verified)
                             <span class="absolute -top-1 -right-5">
                                 <img src="{{ asset('assets/svg/verified.png') }}" class="w-4 h-4">
@@ -55,7 +55,7 @@
                     </h1>
                 </div>
                 <div class="mb-2 hidden md:block lg:hidden">
-                    <span class="text-[#636363] text-sm">Была активна {{formatLastActive($profile->last_active) }}</span>
+                    <span class="text-[#636363] text-sm">Была активна {{formatLastActive($profile->user->last_active) }}</span>
                 </div>
 
                 <!-- Attributes for small and medium screens -->
@@ -70,7 +70,7 @@
                         class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{$profile->hair_color}}</span>
                     {{-- <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">Славянка</span>
                     --}}
-                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{$profile->tattoo}}
+                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white capitalize">{{$profile->tattoo}}
                         тату</span>
                     {{-- <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">Интимная
                         стрижка</span> --}}
@@ -236,8 +236,8 @@
                 <!-- Profile Info (shown on large screens inline, shown below gallery on small/medium) -->
                 <div class="lg:block lg:w-1/2 p-4 hidden">
                     <div class="flex items-center ">
-                        <h1 class="text-4xl font-semibold text-white mr-2 relative">
-                            {{$profile->name . ', ' . $profile->age}}
+                        <h1 class="text-3xl capitalize font-semibold text-white mr-2 relative">
+                            {{ $seoH1 ?? ($profile->name . ', ' . $profile->age) }}
                             @if ($profile->is_verified)
                                 <span class="absolute -top-1 -right-5">
                                     <img src="{{ asset('assets/svg/verified.png') }}" class="w-4 h-4">
@@ -245,7 +245,7 @@
                             @endif
                         </h1>
                     </div>
-                    <p class="text-[#636363] mb-4">Была активна {{formatLastActive($profile->last_active) }}</p>
+                    <p class="text-[#636363] mb-4">Была активна {{formatLastActive($profile->user->last_active) }}</p>
 
                     <!-- Location -->
                     <div class="flex items-center mb-2">
@@ -289,7 +289,7 @@
                             размер</span>
                         <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-sm text-white">{{$profile->hair_color}}</span>
                         {{-- <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-sm text-white">Славянка</span> --}}
-                        <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-sm text-white">{{$profile->tattoo}} тату</span>
+                        <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-sm text-white capitalize">{{$profile->tattoo}} тату</span>
                         {{-- <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-sm text-white">Интимная стрижка</span> --}}
                     </div>
 
@@ -377,7 +377,7 @@
                         </div>
                     </div>
                 </div>
-                <span class="text-[#636363] px-4 text-sm md:hidden">Была активна {{formatLastActive($profile->last_active) }}</span>
+                <span class="text-[#636363] px-4 text-sm md:hidden">Была активна {{formatLastActive($profile->user->last_active) }}</span>
             </div>
         </div>
 
@@ -393,7 +393,7 @@
                 размер</span>
             <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-sm text-white">{{$profile->hair_color}}</span>
             {{-- <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-sm text-white">Славянка</span> --}}
-            <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-sm text-white">{{$profile->tattoo}} тату</span>
+            <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-sm text-white capitalize">{{$profile->tattoo}} тату</span>
             {{-- <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-sm text-white">Интимная стрижка</span> --}}
         </div>
 
@@ -560,16 +560,56 @@
             <!-- Map Location -->
             <div class="flex md:w-1/2 flex-col md:flex-row gap-8 mb-8">
                 <div class="w-full">
-                    <h3 class="text-4xl w-full font-semibold mb-8  capitalize">Расположение на карте</h3>
-                    <div class="rounded-xl overflow-hidden ">
-                        <img src="{{asset('assets/images/map.png')}}" alt="Map Location" class="w-full h-full object-cover">
-                    </div>
-                </div>
-                {{-- <div class="md:w-1/2">
+                    <h3 class="text-4xl w-full font-semibold mb-8 capitalize">Расположение на карте</h3>
+                    @if ($profile->latitude && $profile->longitude)
+                        <div id="map" class="rounded-xl overflow-hidden" style="width: 100%; height: 400px;"></div>
+                        <p id="map-address" class="text-[#A0A0A0] mt-2 mb-2"></p>
+                        {{-- IMPORTANT: Replace YOUR_API_KEY_HERE with your actual Yandex Maps API key --}}
+                        <script src="https://api-maps.yandex.ru/2.1/?apikey=ef000210-ee4f-45fe-a5a1-2f89cddce2cc&lang=ru_RU" type="text/javascript"></script>
+                        <script type="text/javascript">
+                            ymaps.ready(init);
+                            function init(){
+                                var myMap = new ymaps.Map("map", {
+                                    center: [{{ $profile->latitude }}, {{ $profile->longitude }}],
+                                    zoom: 15
+                                });
 
-                    <!-- This div is intentionally left empty to maintain the half-half layout -->
-                    <!-- You can add additional information or content related to the location here -->
-                </div> --}}
+                                var myPlacemark = new ymaps.Placemark([{{ $profile->latitude }}, {{ $profile->longitude }}], {
+                                    hintContent: '{{ addslashes($profile->name) }}',
+                                    balloonContent: '{{ addslashes($profile->name) }} находится здесь'
+                                });
+
+                                myMap.geoObjects.add(myPlacemark);
+                                myMap.behaviors.disable('scrollZoom'); // Optional: disable scroll zoom
+
+                                // Reverse geocode to get the address
+                                ymaps.geocode([{{ $profile->latitude }}, {{ $profile->longitude }}]).then(function (res) {
+                                    var firstGeoObject = res.geoObjects.get(0);
+                                    if (firstGeoObject) {
+                                        var addressLine = firstGeoObject.getAddressLine();
+                                        var addressElement = document.getElementById('map-address');
+                                        if (addressElement) {
+                                            addressElement.textContent = addressLine;
+                                        }
+                                    } else {
+                                        var addressElement = document.getElementById('map-address');
+                                        if (addressElement) {
+                                            addressElement.textContent = 'Адрес не определен.'; 
+                                        }
+                                    }
+                                }).catch(function (err) {
+                                    console.warn('Ошибка геокодирования:', err.message);
+                                    var addressElement = document.getElementById('map-address');
+                                    if (addressElement) {
+                                        addressElement.textContent = 'Ошибка при определении адреса.';
+                                    }
+                                });
+                            }
+                        </script>                
+                    @else
+                        <p class="text-white">Информация о местоположении не указана.</p>
+                    @endif
+                </div>
             </div>
         </div>
 

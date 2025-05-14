@@ -46,11 +46,10 @@
 </style>
 <section class="section">
     <div class="section-header">
-      <h1>Messages</h1>
+      <h1>Сообщения</h1>
       <div class="section-header-breadcrumb">
-        <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
-        <div class="breadcrumb-item"><a href="#">Components</a></div>
-        <div class="breadcrumb-item">Chat Box</div>
+        <div class="breadcrumb-item active"><a href="#">Приборная панель</a></div>
+        <div class="breadcrumb-item">Чат-бокс</div>
       </div>
     </div>
 
@@ -59,8 +58,8 @@
         <div class="col-12 conversation-container" id="conversation-container">
           <div class="card" style="height: 70vh;">
             <div class="card-header d-flex justify-content-between align-items-center">
-              <h4>Conversations</h4>
-              <button class="btn btn-sm btn-primary new-message-btn" id="show-all-users-btn"><i class="fas fa-plus"></i> <span class="new-message-text">New Message</span></button>
+              <h4>Разговоры</h4>
+              <button class="btn btn-sm btn-primary new-message-btn" id="show-all-users-btn"><i class="fas fa-plus"></i> <span class="new-message-text">Новое сообщение</span></button>
             </div>
             <div class="card-body conversation-list">
               <ul class="list-unstyled list-unstyled-border">
@@ -91,7 +90,7 @@
                       {{ $conversation->last_message_at->diffForHumans() }}
                     </div>
                     @else
-                    <div class="text-small text-muted">No messages yet</div>
+                    <div class="text-small text-muted">Пока нет сообщений</div>
                     @endif
                   </div>
                 </li>
@@ -106,7 +105,7 @@
               <div class="back-button" id="back-to-conversations">
                 <i class="fas fa-arrow-left"></i>
               </div>
-              <h4 id="chat-inbox-title">Select a conversation</h4>
+              <h4 id="chat-inbox-title">Выберите разговор</h4>
             </div>
             <div class="card-body chat-content w-max" id="messages-container">
               <!-- Messages will be loaded here -->
@@ -131,7 +130,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="allUsersModalLabel">Select User to Message</h5>
+          <h5 class="modal-title" id="allUsersModalLabel">Выберите пользователя для сообщения</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>

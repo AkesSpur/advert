@@ -2,6 +2,18 @@
 
 @section('content')
     <div class="p-6 space-y-8 mx-auto text-white max-w-screen-2xl">
+        <div class="text-sm text-gray-400 mb-4 pl-4 flex justify-between">
+            <nav class="text-sm text-[#A0A0A0] mb-4" aria-label="Breadcrumb">
+                <ol class="list-reset flex items-center space-x-1">
+                    <li>
+                        <a href="/" class="hover:text-[#A0A0A0] text-[#636363]">Главная</a>
+                    </li>
+                    <li><span>/</span></li>
+                    <li class="text-[#6340FF] font-medium" aria-current="page">Добавить анкету</li>
+                </ol>
+            </nav>
+        </div>
+        
         <form method="POST" action="{{ route('user.profiles.store') }}" enctype="multipart/form-data" class="space-y-8"
             id="profileForm">
             @csrf
@@ -51,9 +63,12 @@
                     <input type="text" name="size" placeholder="Грудь/размер"
                         class="block w-full px-4 py-3 rounded-xl bg-[#191919]  border-0 text-white placeholder-[#FFFFFF66] focus:ring-0"
                         value="{{ old('size') }}" required>
-                    <input type="text" name="tattoo" placeholder="Тату/есть или нет"
-                        class="block w-full px-4 py-3 rounded-xl bg-[#191919]  border-0 text-white placeholder-[#FFFFFF66] focus:ring-0"
-                        value="{{ old('tattoo') }}" required>
+                    <select name="tattoo" required
+                        class="block w-full px-4 py-3 rounded-xl bg-[#191919]  border-0 text-[#FFFFFF66] placeholder-[#FFFFFF66] focus:ring-0">
+                        <option class="text-[#FFFFFF66]" value="" disabled {{ old('tattoo') ? '' : 'selected' }}>Тату/есть или нет</option>
+                        <option value="есть" {{ old('tattoo') == 'есть' ? 'selected' : '' }}>Есть</option>
+                        <option value="нет" {{ old('tattoo') == 'нет' ? 'selected' : '' }}>Нет</option>
+                    </select>
                 </div>
 
             </div>
@@ -167,7 +182,6 @@
                 </div>
             </div>
 
-
             {{-- Локация --}}
             <div x-data="{
                 showDistricts: false,
@@ -253,9 +267,18 @@
                     </div>
                 </div>
             </div>
-            
-   
 
+            {{-- Карта для выбора местоположения --}}
+            <div>
+                <h2 class="text-xl font-semibold mb-4">Выберите ваше местоположение на карте</h2>
+                <div id="map-select" style="width: 100%; height: 400px;" class="rounded-xl"></div>
+                                <p id="map-address-form" class="text-white mt-2 mb-2"></p>
+                <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude') }}">
+                <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude') }}">
+                <p class="text-sm text-[#FFFFFF99] mt-2">Кликните на карту, чтобы указать ваше точное местоположение. Вы можете перетаскивать маркер.</p>
+            </div>
+
+        
             {{-- price --}}
             <div x-data="{
                 rentalOptions: ['Выезд', 'Апартаменты'],
@@ -385,3 +408,129 @@
     {{-- Include form validation script --}}
     <script src="{{ asset('js/form-validation.js') }}"></script>
     @endsection
+
+@push('scripts')
+{{-- IMPORTANT: Replace YOUR_API_KEY_HERE with your actual Yandex Maps API key if not using the one below --}}
+<script src="https://api-maps.yandex.ru/2.1/?apikey=ef000210-ee4f-45fe-a5a1-2f89cddce2cc&lang=ru_RU" type="text/javascript"></script>
+<script type="text/javascript">
+    ymaps.ready(initCreateFormMap);
+    function initCreateFormMap() {
+        var latitudeInput = document.getElementById('latitude');
+        var longitudeInput = document.getElementById('longitude');
+        var initialCoords = [59.9343, 30.3351]; // Default to Saint Petersburg 
+
+        if (latitudeInput.value && longitudeInput.value) {
+            initialCoords = [parseFloat(latitudeInput.value), parseFloat(longitudeInput.value)];
+        }
+
+        var myMap = new ymaps.Map('map-select', {
+            center: initialCoords,
+            zoom: 10
+        });
+
+        var myPlacemark;
+
+        if (latitudeInput.value && longitudeInput.value) {
+            myPlacemark = createPlacemark(initialCoords);
+            myMap.geoObjects.add(myPlacemark);
+            myPlacemark.events.add('dragend', function () {
+                var coords = myPlacemark.geometry.getCoordinates();
+                latitudeInput.value = coords[0];
+                longitudeInput.value = coords[1];
+                // Reverse geocode on dragend
+                ymaps.geocode(coords).then(function (res) {
+                    var firstGeoObject = res.geoObjects.get(0);
+                    var addressElement = document.getElementById('map-address-form');
+                    if (firstGeoObject) {
+                        var addressLine = firstGeoObject.getAddressLine();
+                        if (addressElement) {
+                            addressElement.textContent = addressLine;
+                        }
+                    } else {
+                        if (addressElement) {
+                            addressElement.textContent = 'Адрес не определен.';
+                        }
+                    }
+                }).catch(function(err) {
+                    console.warn('Ошибка геокодирования:', err.message);
+                    var addressElement = document.getElementById('map-address-form');
+                    if (addressElement) {
+                        addressElement.textContent = 'Ошибка при определении адреса.';
+                    }
+                });
+            });
+        }
+
+        myMap.events.add('click', function (e) {
+            var coords = e.get('coords');
+            latitudeInput.value = coords[0];
+            longitudeInput.value = coords[1];
+
+            if (myPlacemark) {
+                myPlacemark.geometry.setCoordinates(coords);
+            } else {
+                myPlacemark = createPlacemark(coords);
+                myMap.geoObjects.add(myPlacemark);
+                myPlacemark.events.add('dragend', function () {
+                    var newCoords = myPlacemark.geometry.getCoordinates();
+                    latitudeInput.value = newCoords[0];
+                    longitudeInput.value = newCoords[1];
+                    // Reverse geocode on dragend after creating placemark
+                    ymaps.geocode(newCoords).then(function (res) {
+                        var firstGeoObject = res.geoObjects.get(0);
+                        var addressElement = document.getElementById('map-address-form');
+                        if (firstGeoObject) {
+                            var addressLine = firstGeoObject.getAddressLine();
+                            if (addressElement) {
+                                addressElement.textContent = addressLine;
+                            }
+                        } else {
+                            if (addressElement) {
+                                addressElement.textContent = 'Адрес не определен.';
+                            }
+                        }
+                    }).catch(function(err) {
+                        console.warn('Ошибка геокодирования:', err.message);
+                        var addressElement = document.getElementById('map-address-form');
+                        if (addressElement) {
+                            addressElement.textContent = 'Ошибка при определении адреса.';
+                        }
+                    });
+                });
+            }
+            // Reverse geocode on click
+            ymaps.geocode(coords).then(function (res) {
+                var firstGeoObject = res.geoObjects.get(0);
+                var addressElement = document.getElementById('map-address-form');
+                if (firstGeoObject) {
+                    var addressLine = firstGeoObject.getAddressLine();
+                    if (addressElement) {
+                        addressElement.textContent = addressLine;
+                    }
+                } else {
+                    if (addressElement) {
+                        addressElement.textContent = 'Адрес не определен.';
+                    }
+                }
+            }).catch(function(err) {
+                console.warn('Ошибка геокодирования:', err.message);
+                var addressElement = document.getElementById('map-address-form');
+                if (addressElement) {
+                    addressElement.textContent = 'Ошибка при определении адреса.';
+                }
+            });
+        });
+
+        function createPlacemark(coords) {
+            return new ymaps.Placemark(coords, {
+                hintContent: 'Ваше выбранное местоположение',
+                balloonContent: 'Перетащите, чтобы изменить'
+            }, {
+                preset: 'islands#violetDotIconWithCaption',
+                draggable: true
+            });
+        }
+        myMap.behaviors.disable('scrollZoom');
+    }
+</script>
+@endpush

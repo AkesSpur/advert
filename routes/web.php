@@ -9,6 +9,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\TariffController;
 use App\Http\Controllers\TransactionController;
@@ -35,6 +36,12 @@ Route::get('/service/{slug}', [PageController::class, 'index'])->name('home.serv
 Route::get('/metro/{slug}', [PageController::class, 'index'])->name('home.metro');
 Route::get('/price/{slug}', [PageController::class, 'index'])->name('home.price');
 Route::get('/age/{slug}', [PageController::class, 'index'])->name('home.age');
+Route::get('/hair-color/{slug}', [PageController::class, 'index'])->name('home.hair_color');
+Route::get('/height/{slug}', [PageController::class, 'index'])->name('home.height');
+Route::get('/weight/{slug}', [PageController::class, 'index'])->name('home.weight');
+Route::get('/breast-size/{slug}', [PageController::class, 'index'])->name('home.breast-size');
+Route::get('/category/{slug}', [PageController::class, 'filterByCustomCategory'])->name('filter.custom-category');
+Route::get('/neighborhood/{slug}', [PageController::class, 'index'])->name('home.neighborhood');
 
 Route::get('/profiles/click/{id}', [PageController::class, 'profileClick'])->name('profiles.clicks');
 Route::get('/profiles/{id}', [PageController::class, 'show'])->name('profiles.view');
@@ -43,7 +50,7 @@ Route::get('/profiles/{id}', [PageController::class, 'show'])->name('profiles.vi
 Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
-Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.'], function () {
+Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'user', 'as' => 'user.'], function () {
 
     // Route::get('profiles', [ProfileController::class, 'index'])->name('profiles.index');
 
@@ -69,20 +76,19 @@ Route::post('profiles/{id}/restore', [ProfileController::class, 'restore'])->nam
     Route::post('/ads/{id}/pause', [TariffController::class, 'pause'])->name('advert.pause');
     Route::post('/ads/{id}/resume', [TariffController::class, 'resume'])->name('advert.resume');
     Route::post('/ads/{id}/cancel', [TariffController::class, 'cancel'])->name('advert.cancel');
-
+    Route::post('/ads/update-priority', [TariffController::class, 'updatePriority'])->name('advert.update-priority');
     Route::get('/profiles/create', [FormController::class, 'index'])->name('form.index');
 
     Route::post('/profile/{id}/toggle-like', [LikeController::class, 'toggle'])->name('profile.toggleLike');
     Route::get('/my-likes', [LikeController::class, 'likedProfiles'])->name('profile.likedProfiles');
 
+    // Profile management (user settings)
+    Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.edit');
+    Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
+    Route::delete('/settings', [SettingsController::class, 'destroy'])->name('settings.destroy');
+
 });
 
-
-
-    // // Profile management (user settings)
-    // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
     
     // // Service routes (admin only)
@@ -100,3 +106,4 @@ Route::post('profiles/{id}/restore', [ProfileController::class, 'restore'])->nam
     
     // // Reviews
     // Route::resource('reviews', ReviewController::class)->except(['index', 'show']);
+

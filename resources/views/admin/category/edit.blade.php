@@ -4,7 +4,7 @@
       <!-- Main Content -->
         <section class="section">
           <div class="section-header">
-            <h1>Category</h1>
+            <h1>Категория</h1>
           </div>
 
           <div class="section-body">
@@ -13,7 +13,7 @@
               <div class="col-12">
                 <div class="card">
                   <div class="card-header">
-                    <h4>Edit Category</h4>
+                    <h4>Редактировать категорию</h4>
 
                   </div>
                   <div class="card-body">
@@ -21,22 +21,22 @@
                         @csrf
                         @method('PUT')
                         <div class="form-group">
-                          <label>Preview</label>
+                          <label>Предварительный просмотр</label>
                           <br>
                           <img src="{{ asset($category->thumb_image) }}" style="width:200px" alt="">
                       </div>
                       <div class="form-group">
-                          <label>Image</label>
+                          <label>Изображение</label>
                           <input type="file" class="form-control" name="image">
                       </div>
 
                         <div class="form-group">
-                            <label>Name</label>
+                            <label>Имя</label>
                             <input type="text" class="form-control" name="name" value="{{$category->name}}">
                         </div>
 
                         <div class="form-group">
-                            <label for="inputState">Section</label>
+                            <label for="inputState">Раздел</label>
                             <select id="inputState" class="form-control" name="section_id">
                               @foreach ($sections as $section)
                                   <option {{$category->section_id == $section->id?'selected': ''}} value="{{$section->id}}">{{$section->name}}</option>
@@ -45,18 +45,18 @@
                         </div>
 
                         <div class="form-group">
-                          <label> Description</label>
+                          <label> Описание</label>
                           <textarea name="description" class="form-control summernote">{!! $category->description !!}</textarea>
                       </div>
 
                         <div class="form-group">
-                            <label for="inputState">Status</label>
+                            <label for="inputState">Статус</label>
                             <select id="inputState" class="form-control" name="status">
-                              <option {{$category->status == 1 ? 'selected': ''}} value="1">Active</option>
-                              <option {{$category->status == 0 ? 'selected': ''}} value="0">Inactive</option>
+                              <option {{$category->status == 1 ? 'selected': ''}} value="1">Активный</option>
+                              <option {{$category->status == 0 ? 'selected': ''}} value="0">Неактивный</option>
                             </select>
                         </div>
-                        <button type="submmit" class="btn btn-primary">Update</button>
+                        <button type="submmit" class="btn btn-primary">Обновить</button>
                     </form>
                   </div>
 

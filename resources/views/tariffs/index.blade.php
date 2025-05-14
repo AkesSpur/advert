@@ -14,7 +14,7 @@
        <!-- Tariffs Grid -->
        <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 mb-6">
         @php
-            $userProfiles = auth()->user()?->profiles()->with(['metroStations', 'primaryImage'])->get() ?? collect();
+            $userProfiles = auth()->user()?->profiles()->where('is_archived', false)->with(['metroStations', 'primaryImage'])->get() ?? collect();
         @endphp
         
         <!-- Базовый тариф -->
@@ -455,7 +455,7 @@
                             
                             @if($activeTariff->isPriority())
                             <!-- Change Priority button -->
-                            <button @click="$dispatch('open-modal', 'change-priority-{{ $activeTariff->id }}')" class="p-2 bg-[#323232] hover:bg-[#3d3d3d] text-white rounded-full transition" title="Изменить приоритет">
+                            <button onclick="document.getElementById('priorityChangeModal-{{ $activeTariff->id }}').classList.remove('hidden')" class="p-2 bg-[#323232] hover:bg-[#3d3d3d] text-white rounded-full transition" title="Изменить приоритет">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
                                 </svg>
@@ -463,42 +463,46 @@
                             
                             <!-- Priority Change Modal -->
                             <div
-                                x-data="{ isOpen: false, priority: {{ $activeTariff->priority_level ?? 17 }} }"
-                                x-show="isOpen"
-                                x-on:open-modal.window="if ($event.detail === 'change-priority-{{ $activeTariff->id }}') { isOpen = true }"
-                                x-on:keydown.escape.window="isOpen = false"
-                                x-transition:enter="transition ease-out duration-300"
-                                x-transition:enter-start="opacity-0 transform scale-90"
-                                x-transition:enter-end="opacity-100 transform scale-100"
-                                x-transition:leave="transition ease-in duration-300"
-                                x-transition:leave-start="opacity-100 transform scale-100"
-                                x-transition:leave-end="opacity-0 transform scale-90"
-                                class="fixed inset-0 z-50 overflow-y-auto" 
-                                style="display: none;"
+                                id="priorityChangeModal-{{ $activeTariff->id }}"
+                                class="fixed inset-0 z-50 overflow-y-auto hidden transition duration-300"
                             >
                                 <div class="flex items-center justify-center min-h-screen px-4">
-                                    <div class="fixed inset-0 bg-black opacity-50" x-on:click="isOpen = false"></div>
+                                    <div class="fixed inset-0 bg-black opacity-50" onclick="document.getElementById('priorityChangeModal-{{ $activeTariff->id }}').classList.add('hidden')"></div>
                                     <div class="relative bg-[#191919] rounded-lg max-w-md w-full mx-auto p-6 shadow-xl">
                                         <div class="flex justify-between items-center mb-4">
                                             <h3 class="text-xl font-bold">Изменить приоритет</h3>
-                                            <button @click="isOpen = false" class="text-white text-2xl">&times;</button>
+                                            <button onclick="document.getElementById('priorityChangeModal-{{ $activeTariff->id }}').classList.add('hidden')" class="text-white text-2xl">&times;</button>
                                         </div>
                                         
-                                        <form action="{{ route('user.advert.update-priority', $activeTariff->id) }}" method="POST">
+                                        <form action="{{ route('user.advert.activate', $activeTariff->id) }}" method="POST">
                                             @csrf
-                                            <div class="mb-4">
-                                                <label class="block text-sm font-medium mb-2">Уровень приоритета</label>
-                                                <input 
-                                                    type="number" 
-                                                    name="priority_level" 
-                                                    x-model="priority"
-                                                    min="1" 
-                                                    class="w-full bg-[#121212] border border-gray-700 rounded-lg px-4 py-2 text-white"
-                                                >
-                                                <p class="text-sm text-gray-400 mt-2">Стоимость: <span x-text="priority"></span> руб./день</p>
+                                            <input type="hidden" name="tariff_type" value="priority">
+                                            <input hidden name="profile_id" value="{{ $activeTariff->profile_id }}">                                            
+                                            <div x-data="{ priorityLevel: {{ $activeTariff->priority_level ?? 17 }} }">
+                                                <label class="block text-sm text-white mb-1">
+                                                    Уровень приоритета: <span x-text="priorityLevel" class="font-bold"></span>
+                                                </label>
+                                                
+                                                <div class="flex items-center space-x-2">
+                                                    <input 
+                                                        type="range" 
+                                                        name="priority_level" 
+                                                        min="1" 
+                                                        max="20" 
+                                                        x-model="priorityLevel"
+                                                        class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gradient-to-r from-[#6340FF] to-[#1f1f1f]"
+                                                        :style="`background: linear-gradient(to right, #6340FF 0%, #6340FF ${(priorityLevel - 1) * 5}%, #1f1f1f ${(priorityLevel - 1) * 5}%, #1f1f1f 100%)`"
+                                                    >
+                                                    <span x-text="priorityLevel" class="text-white font-bold text-lg min-w-[30px] text-center"></span>
+                                                </div>
+                                            
+                                                <p class="text-xs text-[#C2C2C2] mt-1">
+                                                    Стоимость: <span x-text="1 + parseInt(priorityLevel) + ' ₽/день'"></span>
+                                                </p>
                                             </div>
+                                            
                                             <div class="flex justify-end space-x-3">
-                                                <button type="button" @click="isOpen = false" class="px-4 py-2 border border-gray-600 rounded-lg text-white">Отмена</button>
+                                                <button type="button" onclick="document.getElementById('priorityChangeModal-{{ $activeTariff->id }}').classList.add('hidden')" class="px-4 py-2 border border-gray-600 rounded-lg text-white">Отмена</button>
                                                 <button type="submit" class="px-4 py-2 bg-[#6340FF] hover:bg-[#5737e7] rounded-lg text-white">Сохранить</button>
                                             </div>
                                         </form>

@@ -18,9 +18,15 @@ class Neighborhood extends Model
     protected $fillable = [
         'name',
         'slug',
-        'city',
+        'city_id',
+        'is_active',
+        'title',
+        'meta_description',
+        'h1_header',
+        'sort_order',
     ];
 
+    
     /**
      * The profiles that belong to the neighborhood.
      */

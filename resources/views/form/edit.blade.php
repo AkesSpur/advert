@@ -2,6 +2,20 @@
 
 @section('content')
     <div class="p-6 space-y-8 mx-auto text-white max-w-screen-2xl">
+
+        <div class="text-sm text-gray-400 mb-4 pl-4 flex justify-between">
+            <nav class="text-sm text-[#A0A0A0] mb-4" aria-label="Breadcrumb">
+                <ol class="list-reset flex items-center space-x-1">
+                    <li>
+                        <a href="/" class="hover:text-[#A0A0A0] text-[#636363]">Главная</a>
+                    </li>
+                    <li><span>/</span></li>
+                    <li class="text-[#6340FF] font-medium" aria-current="page">Добавить анкету</li>
+                </ol>
+            </nav>
+
+        </div>
+
         <form method="POST" action="{{ route('user.profiles.update', $profile) }}" enctype="multipart/form-data" class="space-y-8"
             id="profileForm">
             @csrf
@@ -54,9 +68,12 @@
                     <input type="text" name="size" placeholder="Грудь/размер"
                         class="block w-full px-4 py-3 rounded-xl bg-[#191919]  border-0 text-white placeholder-[#FFFFFF66] focus:ring-0"
                         value="{{ old('size', $profile->size) }}">
-                    <input type="text" name="tattoo" placeholder="Тату/есть или нет"
-                        class="block w-full px-4 py-3 rounded-xl bg-[#191919]  border-0 text-white placeholder-[#FFFFFF66] focus:ring-0"
-                        value="{{ old('tattoo', $profile->tattoo) }}">
+                    <select name="tattoo" required
+                        class="block w-full px-4 py-3 rounded-xl bg-[#191919]  border-0 text-[#FFFFFF66] placeholder-[#FFFFFF66] focus:ring-0">
+                        <option class=" text-[#FFFFFF66]" value="" disabled {{ old('tattoo', $profile->tattoo) ? '' : 'selected' }}>Тату/есть или нет</option>
+                        <option value="есть" {{ old('tattoo', $profile->tattoo) == 'есть' ? 'selected' : '' }}>Есть</option>
+                        <option value="нет" {{ old('tattoo', $profile->tattoo) == 'нет' ? 'selected' : '' }}>Нет</option>
+                    </select>
                 </div>
 
             </div>
@@ -199,7 +216,7 @@
                     @endfor
                 </div>
             </div>
-
+            
             {{-- Локация --}}
             <div x-data="{
                 showDistricts: false,
@@ -301,6 +318,16 @@
                 </div>
             </div>
           
+            {{-- Карта для выбора местоположения --}}
+            <div>
+                <h2 class="text-xl font-semibold mb-4">Выберите ваше местоположение на карте</h2>
+                <div id="map-edit" style="width: 100%; height: 400px;" class="rounded-xl"></div>
+                <p id="map-address-edit-form" class="text-white mt-2 mb-2"></p>
+                <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude', $profile->latitude) }}">
+                <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', $profile->longitude) }}">
+                <p class="text-sm text-[#FFFFFF99] mt-2">Кликните на карту, чтобы указать ваше точное местоположение. Вы можете перетаскивать маркер.</p>
+            </div>
+
             {{-- price --}}
             <div x-data="{
                 rentalOptions: ['Выезд', 'Апартаменты'],
@@ -413,6 +440,94 @@
         </form>
     </div>
 @endsection
+
+@push('scripts')
+<script src="https://api-maps.yandex.ru/2.1/?apikey=ef000210-ee4f-45fe-a5a1-2f89cddce2cc&lang=ru_RU" type="text/javascript"></script>
+<script type="text/javascript">
+    ymaps.ready(initEditFormMap);
+    function initEditFormMap() {
+        var latitudeInput = document.getElementById('latitude');
+        var longitudeInput = document.getElementById('longitude');
+        var initialCoords = [{{ old('latitude', $profile->latitude) ?: 59.9343 }}, {{ old('longitude', $profile->longitude) ?: 30.3351 }}]; // Default to Saint Petersburg or existing
+
+
+        var myMap = new ymaps.Map('map-edit', {
+            center: initialCoords,
+            zoom: 10
+        });
+
+        var myPlacemark;
+
+        function geocodeAndSetAddress(coords) {
+            ymaps.geocode(coords).then(function (res) {
+                var firstGeoObject = res.geoObjects.get(0);
+                var addressElement = document.getElementById('map-address-edit-form');
+                if (firstGeoObject) {
+                    var addressLine = firstGeoObject.getAddressLine();
+                    if (addressElement) {
+                        addressElement.textContent = addressLine;
+                    }
+                } else {
+                    if (addressElement) {
+                        addressElement.textContent = 'Адрес не определен.';
+                    }
+                }
+            }).catch(function(err) {
+                console.warn('Ошибка геокодирования:', err.message);
+                var addressElement = document.getElementById('map-address-edit-form');
+                if (addressElement) {
+                    addressElement.textContent = 'Ошибка при определении адреса.';
+                }
+            });
+        }
+
+        // If coordinates are present, create a placemark and geocode
+        if (parseFloat(latitudeInput.value) && parseFloat(longitudeInput.value)) {
+            var currentCoords = [parseFloat(latitudeInput.value), parseFloat(longitudeInput.value)];
+            myPlacemark = createPlacemark(currentCoords);
+            myMap.geoObjects.add(myPlacemark);
+            geocodeAndSetAddress(currentCoords); // Geocode initial position
+            myPlacemark.events.add('dragend', function () {
+                var coords = myPlacemark.geometry.getCoordinates();
+                latitudeInput.value = coords[0];
+                longitudeInput.value = coords[1];
+                geocodeAndSetAddress(coords);
+            });
+        }
+
+        myMap.events.add('click', function (e) {
+            var coords = e.get('coords');
+            latitudeInput.value = coords[0];
+            longitudeInput.value = coords[1];
+            geocodeAndSetAddress(coords);
+
+            if (myPlacemark) {
+                myPlacemark.geometry.setCoordinates(coords);
+            } else {
+                myPlacemark = createPlacemark(coords);
+                myMap.geoObjects.add(myPlacemark);
+                myPlacemark.events.add('dragend', function () {
+                    var newCoords = myPlacemark.geometry.getCoordinates();
+                    latitudeInput.value = newCoords[0];
+                    longitudeInput.value = newCoords[1];
+                    geocodeAndSetAddress(newCoords);
+                });
+            }
+        });
+
+        function createPlacemark(coords) {
+            return new ymaps.Placemark(coords, {
+                hintContent: 'Ваше выбранное местоположение',
+                balloonContent: 'Перетащите, чтобы изменить'
+            }, {
+                preset: 'islands#violetDotIconWithCaption',
+                draggable: true
+            });
+        }
+        myMap.behaviors.disable('scrollZoom');
+    }
+</script>
+@endpush
 
 @push('scripts')
        {{-- Include edit form validation script --}}

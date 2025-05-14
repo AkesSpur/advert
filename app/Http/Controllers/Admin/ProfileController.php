@@ -88,23 +88,15 @@ class ProfileController extends Controller
         
         // Disable the profile
         $profile->is_active = false;
+        $profile->is_vip = false;
         $profile->save();
-
-        $tariffs = ProfileAdTariff::where('profile_id', $id)
-        ->where('is_active', true)
-        ->get();
-        if ($tariffs) {
-            foreach ($tariffs as $tariff) {
-                $tariff->is_active = false;
-                $tariff->save();
-            }
-        }
         
         // Soft delete the profile
         $profile->delete();
         
         // Disable all associated tariffs
         foreach ($profile->tariffs as $ad) {
+            $ad->is_paused = false;
             $ad->is_active = false;
             $ad->save();
         }

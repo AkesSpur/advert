@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('type', ['topup', 'purchase'])->default('topup');
             $table->enum('status', ['pending', 'completed', 'failed'])->default('pending');
             $table->string('reference_id')->nullable();
+
             $table->timestamps();
         });
     }

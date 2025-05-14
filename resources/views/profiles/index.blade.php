@@ -22,17 +22,8 @@
       Создать анкету
     </a>
     </div>
+
   @else
-
-    <!-- Tabs for desktop - now with pill-like edges -->
-    {{-- <div class="bg-[#191919] rounded-2xl mb-6 hidden sm:flex px-2 py-1">
-    <a href="#" class="px-8 py-3 text-white bg-[#6340FF] rounded-full mx-1">Основные данные</a>
-    <a href="#" class="px-8 py-3 text-[#C2C2C2] hover:bg-gray-800 rounded-full mx-1 transition">Локация</a>
-    <a href="#" class="px-8 py-3 text-[#C2C2C2] hover:bg-gray-800 rounded-full mx-1 transition">Просмотры</a>
-    <a href="#" class="px-8 py-3 text-[#C2C2C2] hover:bg-gray-800 rounded-full mx-1 transition">Клики</a>
-    <a href="#" class="px-8 py-3 text-[#C2C2C2] hover:bg-gray-800 rounded-full mx-1 transition">Реклама</a>
-    </div> --}}
-
 
     <!-- Profiles list - Desktop -->
     <div class="p-3 hidden lg:block">
@@ -61,7 +52,7 @@
         </div>
         <div>
         <div class="flex items-center gap-2">
-        <span class="font-medium text-white">{{$profile->name}}, {{$profile->age}}</span>
+        <span class="font-medium text-white capitalize">{{$profile->name}}, {{$profile->age}}</span>
         @if ($profile->is_active)
       <span class="text-xs bg-[#5FD013] text-black px-2 py-0.5 rounded-md">Активна</span>
     @else
@@ -111,104 +102,8 @@
       <!-- Clicks cell -->
       <td class="p-4 text-sm text-[#C2C2C2] text-center align-top">
         {{$profile->clicks_count}}
-        
-        <!-- Ad Statistics Button -->
-        <button type="button" class="text-xs text-white bg-[#121212] p-2 rounded hover:bg-gray-800" onclick="document.getElementById('adStatsModal-{{ $profile->id }}').classList.remove('hidden')">
-          <div class="font-medium text-white">Расходы на рекламу</div>
-          @php
-            $activationTotal = $profile->is_active ? ($profile->active_days ?? 0) : 0;
-            $priorityTotal = ($profile->priority_level ?? 0) > 0 ? (($profile->priority_level ?? 0) * ($profile->priority_days ?? 0)) : 0;
-            $vipTotal = $profile->is_vip ? (500 * ($profile->vip_days ?? 0)) : 0;
-            $totalSpent = $activationTotal + $priorityTotal + $vipTotal;
-          @endphp
-          <div class="mt-1 pt-1 border-t border-gray-700 flex justify-between font-medium">
-            <span>Всего:</span> <span>{{$totalSpent}} руб.</span>
-          </div>
-        </button>
-        
-        <!-- Ad Stats Modal for this profile -->
-        <div class="modal fade" id="adStatsModal-{{ $profile->id }}" tabindex="-1" role="dialog" aria-labelledby="adStatsModalLabel-{{ $profile->id }}" aria-hidden="true">
-          <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content bg-[#191919] text-white">
-              <div class="modal-header border-gray-700">
-                <h5 class="modal-title" id="adStatsModalLabel-{{ $profile->id }}">Статистика расходов на рекламу - {{ $profile->name }}</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                @php
-                  $activationCost = $profile->is_active ? '1 руб./день' : '0 руб.';
-                  $activationDays = $profile->is_active ? $profile->active_days ?? 0 : 0;
-                  $activationTotal = $profile->is_active ? $activationDays : 0;
-                  
-                  $priorityLevel = $profile->priority_level ?? 0;
-                  $priorityCost = $priorityLevel > 0 ? $priorityLevel . ' руб./день' : 'не подключено';
-                  $priorityDays = $priorityLevel > 0 ? $profile->priority_days ?? 0 : 0;
-                  $priorityTotal = $priorityLevel > 0 ? ($priorityLevel * $priorityDays) : 0;
-                  
-                  $vipCost = $profile->is_vip ? '500 руб./день' : 'не подключено';
-                  $vipDays = $profile->is_vip ? $profile->vip_days ?? 0 : 0;
-                  $vipTotal = $profile->is_vip ? (500 * $vipDays) : 0;
-                  
-                  $totalSpent = $activationTotal + $priorityTotal + $vipTotal;
-                @endphp
-                
-                <div class="grid grid-cols-3 gap-4 mb-4">
-                  <div class="bg-[#121212] p-3 rounded">
-                    <div class="text-center mb-2">Активация</div>
-                    <div class="text-center text-lg font-bold">{{ number_format($activationTotal, 0, '.', ' ') }} ₽</div>
-                    <div class="text-center text-xs text-gray-400">{{ $activationCost }}</div>
-                  </div>
-                  <div class="bg-[#121212] p-3 rounded">
-                    <div class="text-center mb-2">Приоритет</div>
-                    <div class="text-center text-lg font-bold">{{ number_format($priorityTotal, 0, '.', ' ') }} ₽</div>
-                    <div class="text-center text-xs text-gray-400">{{ $priorityCost }}</div>
-                  </div>
-                  <div class="bg-[#121212] p-3 rounded">
-                    <div class="text-center mb-2">VIP</div>
-                    <div class="text-center text-lg font-bold">{{ number_format($vipTotal, 0, '.', ' ') }} ₽</div>
-                    <div class="text-center text-xs text-gray-400">{{ $vipCost }}</div>
-                  </div>
-                </div>
-                
-                <div class="mt-4 p-3 bg-[#121212] rounded">
-                  <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-2">
-                    <span class="font-medium">Детали расходов</span>
-                    <span class="font-medium">{{ number_format($totalSpent, 0, '.', ' ') }} ₽</span>
-                  </div>
-                  
-                  <div class="space-y-2">
-                    <div class="flex justify-between">
-                      <span>Активация:</span> <span>{{$activationCost}}</span>
-                    </div>
-                    @if($profile->is_active && $activationDays > 0)
-                      <div class="text-gray-500 text-right">({{$activationDays}} дн./{{$activationTotal}} руб.)</div>
-                    @endif
-                    
-                    <div class="flex justify-between">
-                      <span>Приоритет:</span> <span>{{$priorityCost}}</span>
-                    </div>
-                    @if($priorityLevel > 0 && $priorityDays > 0)
-                      <div class="text-gray-500 text-right">({{$priorityDays}} дн./{{$priorityTotal}} руб.)</div>
-                    @endif
-                    
-                    <div class="flex justify-between">
-                      <span>VIP профиль:</span> <span>{{$vipCost}}</span>
-                    </div>
-                    @if($profile->is_vip && $vipDays > 0)
-                      <div class="text-gray-500 text-right">({{$vipDays}} дн./{{$vipTotal}} руб.)</div>
-                    @endif
-                  </div>
-                </div>
-              </div>
-              <div class="modal-footer border-gray-700">
-                <button type="button" class="px-4 py-2 bg-gray-800 text-white rounded" data-dismiss="modal">Закрыть</button>
-              </div>
-            </div>
-          </div>
-        </div>
       </td>
+      
 
       <!-- Actions cell -->
       <td class="p-4 align-top">
@@ -223,6 +118,14 @@
           </a>
           @endif
           
+          @if($profile->tariffs_count > 0)
+          <button onclick="document.getElementById('adStatsModal-{{ $profile->id }}').classList.remove('hidden')" class="text-[#C2C2C2] hover:text-white p-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </button>
+          
+          @endif
           <!-- Dropdown menu -->
           <div x-data="{ open: false }">
             <button @click="open = !open" class="text-[#C2C2C2] hover:text-white">
@@ -320,7 +223,7 @@
                     </div>
                     <div>
                       <div class="flex items-center gap-2">
-                        <span class="font-medium text-white">{{$profile->name}}, {{$profile->age}}</span>
+                        <span class="font-medium text-white capitalize">{{$profile->name}}, {{$profile->age}}</span>
                         <span class="text-xs bg-gray-700 text-white px-2 py-0.5 rounded-md">Архив</span>
                       </div>
                     </div>
@@ -385,6 +288,161 @@
       @endif
     </div>
     </div>
+    
+  <!-- Ad Stats Modals -->
+  @if(count($profiles) > 0)
+    @foreach ($profiles as $profile)
+      @if($profile->tariffs_count > 0)
+        <div id="adStatsModal-{{ $profile->id }}" class="fixed inset-0 z-50 overflow-y-auto hidden">
+          <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="fixed inset-0 bg-black bg-opacity-75 transition-opacity"></div>
+            <div class="relative bg-[#191919] rounded-lg max-w-3xl w-full mx-auto shadow-xl overflow-hidden">
+              <div class="px-4 py-5 sm:px-6 flex justify-between items-center border-b border-gray-700">
+                <h3 class="text-lg font-medium text-white capitalize">Статистика расходов на рекламу - {{ $profile->name }}</h3>
+                <button onclick="document.getElementById('adStatsModal-{{ $profile->id }}').classList.add('hidden')" class="text-gray-400 hover:text-white">
+                  <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div class="p-6">
+                @php
+                  // Group tariffs by type
+                  $basicTariffs = $profile->tariffs->filter(function($tariff) {
+                    return $tariff->adTariff && $tariff->adTariff->slug === 'basic';
+                  });
+                  
+                  $priorityTariffs = $profile->tariffs->filter(function($tariff) {
+                    return $tariff->adTariff && $tariff->adTariff->slug === 'priority';
+                  });
+                  
+                  $vipTariffs = $profile->tariffs->filter(function($tariff) {
+                    return $tariff->adTariff && $tariff->adTariff->slug === 'vip';
+                  });
+                  
+                  // Calculate spending by type
+                  $basicSpent = $basicTariffs->flatMap->charges->sum('amount');
+                  $prioritySpent = $priorityTariffs->flatMap->charges->sum('amount');
+                  $vipSpent = $vipTariffs->flatMap->charges->sum('amount');
+                  $totalSpent = $basicSpent + $prioritySpent + $vipSpent;
+                @endphp
+                
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div class="bg-[#222222] p-4 rounded-lg">
+                    <div class="flex items-center">
+                      <div class="bg-[#6340FF] p-3 rounded-lg mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div class="text-sm text-gray-400">Всего потрачено</div>
+                        <div class="text-xl font-bold text-white">{{ number_format($totalSpent, 0, '.', ' ') }} ₽</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bg-[#222222] p-4 rounded-lg">
+                    <div class="flex items-center">
+                      <div class="bg-green-500 p-3 rounded-lg mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div class="text-sm text-gray-400">Базовая реклама</div>
+                        <div class="text-xl font-bold text-white">{{ number_format($basicSpent, 0, '.', ' ') }} ₽</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bg-[#222222] p-4 rounded-lg">
+                    <div class="flex items-center">
+                      <div class="bg-yellow-500 p-3 rounded-lg mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div class="text-sm text-gray-400">Приоритет</div>
+                        <div class="text-xl font-bold text-white">{{ number_format($prioritySpent, 0, '.', ' ') }} ₽</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bg-[#222222] p-4 rounded-lg">
+                    <div class="flex items-center">
+                      <div class="bg-red-500 p-3 rounded-lg mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div class="text-sm text-gray-400">VIP</div>
+                        <div class="text-xl font-bold text-white">{{ number_format($vipSpent, 0, '.', ' ') }} ₽</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Detailed Tariff History -->
+                <h4 class="text-lg font-medium text-white mb-4">История рекламных тарифов</h4>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full divide-y divide-gray-700">
+                    <thead>
+                      <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Тип</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Дата активации</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Дата окончания</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Длительность</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Статус</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Сумма</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-700">
+                      @foreach($profile->tariffs->sortByDesc('created_at') as $tariff)
+                        @php
+                          $tariffCharges = $tariff->charges->sum('amount');
+                          $duration = $tariff->charges->count();
+                          if ($tariff->is_active) {
+                            $status = 'Активен';
+                            $statusClass = 'bg-green-500';
+                          } elseif ($tariff->is_paused) {
+                            $status = 'Приостановлен';
+                            $statusClass = 'bg-yellow-500';
+                          } else {
+                            $status = 'Завершен';
+                            $statusClass = 'bg-gray-500';
+                          }
+                        @endphp
+                        <tr>
+                          <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="text-sm font-medium text-white">{{ $tariff->adTariff->name }}</div>
+                            @if($tariff->isPriority() && $tariff->priority_level)
+                              <div class="text-xs text-gray-400">Уровень: {{ $tariff->priority_level }}</div>
+                            @endif
+                          </td>
+                          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{{ $tariff->created_at->format('d.m.Y') }}</td>
+                          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{{ $tariff->expires_at ? $tariff->expires_at->format('d.m.Y') : 'Бессрочно' }}</td>
+                          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{{ $duration }} дней</td>
+                          <td class="px-4 py-3 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }} text-white">
+                              {{ $status }}
+                            </span>
+                          </td>
+                          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{{ number_format($tariffCharges, 0, '.', ' ') }} ₽</td>
+                        </tr>
+                      @endforeach
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      @endif
+    @endforeach
+  @endif
+
+<!-- JavaScript for Modal Functionality -->
 
 
     <!-- Profiles list - Mobile -->
@@ -402,7 +460,7 @@
       </div>
       <div>
         <div class="flex items-center gap-2">
-        <span class="font-medium text-lg">{{$profile->name}}, {{$profile->age}}</span>
+        <span class="font-medium text-lg capitalize">{{$profile->name}}, {{$profile->age}}</span>
         @if ($profile->is_active)
       <span class="text-xs bg-[#5FD013] text-black px-2 py-0.5 rounded-md">Активна</span>
     @else
@@ -412,6 +470,14 @@
         <div class="text-xs text-gray-400">Анкета добавлена {{$profile->created_at->format('d.m.Y')}}</div>
       </div>
       </div>
+      <!-- Ad Stats Button -->
+      @if($profile->tariffs_count > 0)
+      <button onclick="document.getElementById('adStatsModal-{{ $profile->id }}').classList.remove('hidden')" class="text-[#C2C2C2] hover:text-white p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      </button>
+      @endif
       </div>
 
       <div class="mt-4 space-y-2 text-sm">
@@ -454,72 +520,15 @@
       </div>
       <div class="flex justify-between mb-2">
       <div class="text-white">Реклама</div>
-      <div class="flex items-center">
-        @if ($profile->is_vip)
-          <a href="{{route('profiles.view', $profile->id)}}" class="text-sm text-gray-400 mr-2">
+      @if ($profile->is_vip)
+          <a href="{{route('profiles.view', $profile->id)}}" class="text-sm text-gray-400">
             Премиум
           </a>
-        @else          
-          <a href="{{route('profiles.view', $profile->id)}}" class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs mr-2">
+          @else          
+          <a href="{{route('profiles.view', $profile->id)}}" class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs">
             Рекламировать
           </a>
-        @endif
-        
-        <!-- Ad Stats Icon with Tooltip -->
-        <div x-data="{showTooltip: false}" class="relative">
-          <button @mouseenter="showTooltip = true" @mouseleave="showTooltip = false" class="text-gray-400 hover:text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </button>
-          
-          <div x-show="showTooltip" 
-               x-transition:enter="transition ease-out duration-200" 
-               x-transition:enter-start="opacity-0 scale-95" 
-               x-transition:enter-end="opacity-100 scale-100" 
-               x-transition:leave="transition ease-in duration-150" 
-               x-transition:leave-start="opacity-100 scale-100" 
-               x-transition:leave-end="opacity-0 scale-95"
-               class="absolute right-0 bottom-full mb-2 w-64 bg-[#191919] shadow-lg rounded-md p-3 text-xs z-50">
-            @php
-              $activationCost = $profile->is_active ? '1 руб./день' : '0 руб.';
-              $activationDays = $profile->is_active ? $profile->active_days ?? 0 : 0;
-              $activationTotal = $profile->is_active ? $activationDays : 0;
-              
-              $priorityLevel = $profile->priority_level ?? 0;
-              $priorityCost = $priorityLevel > 0 ? $priorityLevel . ' руб./день' : 'не подключено';
-              $priorityDays = $priorityLevel > 0 ? $profile->priority_days ?? 0 : 0;
-              $priorityTotal = $priorityLevel > 0 ? ($priorityLevel * $priorityDays) : 0;
-              
-              $vipCost = $profile->is_vip ? '500 руб./день' : 'не подключено';
-              $vipDays = $profile->is_vip ? $profile->vip_days ?? 0 : 0;
-              $vipTotal = $profile->is_vip ? (500 * $vipDays) : 0;
-              
-              $totalSpent = $activationTotal + $priorityTotal + $vipTotal;
-            @endphp
-            
-            <div class="font-medium text-white mb-2">Расходы на рекламу:</div>
-            <div class="flex justify-between"><span>Активация:</span> <span>{{$activationCost}}</span></div>
-            @if($profile->is_active && $activationDays > 0)
-              <div class="text-gray-500 text-right">({{$activationDays}} дн./{{$activationTotal}} руб.)</div>
-            @endif
-            
-            <div class="flex justify-between"><span>Приоритет:</span> <span>{{$priorityCost}}</span></div>
-            @if($priorityLevel > 0 && $priorityDays > 0)
-              <div class="text-gray-500 text-right">({{$priorityDays}} дн./{{$priorityTotal}} руб.)</div>
-            @endif
-            
-            <div class="flex justify-between"><span>VIP профиль:</span> <span>{{$vipCost}}</span></div>
-            @if($profile->is_vip && $vipDays > 0)
-              <div class="text-gray-500 text-right">({{$vipDays}} дн./{{$vipTotal}} руб.)</div>
-            @endif
-            
-            <div class="mt-1 pt-1 border-t border-gray-700 flex justify-between font-medium">
-              <span>Всего:</span> <span>{{$totalSpent}} руб.</span>
-            </div>
-          </div>
-        </div>
-      </div>
+          @endif
       </div>
       </div>
 
@@ -570,7 +579,7 @@
       </div>
     </div>
 
-  @endforeach
+    @endforeach
 
     </div>
 
@@ -662,6 +671,36 @@ class="mt-8 lg:hidden">
       </div>
     </div>
     @endif
+    
   @endif
+
+<script>
+  // Close modal when clicking outside
+  document.addEventListener('click', function(event) {
+    const modals = document.querySelectorAll('[id^="adStatsModal-"]');
+    
+    modals.forEach(modal => {
+      const modalContent = modal.querySelector('.relative');
+      if (modal.classList.contains('hidden') === false && !modalContent.contains(event.target) && event.target !== modalContent) {
+        // Check if the click is outside the modal content and not on a button that opens the modal
+        if (!event.target.closest('button[onclick*="adStatsModal"]')) {
+          modal.classList.add('hidden');
+        }
+      }
+    });
+  });
+
+  // Close modal with Escape key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      const modals = document.querySelectorAll('[id^="adStatsModal-"]');
+      modals.forEach(modal => {
+        if (modal.classList.contains('hidden') === false) {
+          modal.classList.add('hidden');
+        }
+      });
+    }
+  });
+</script>
 
 </x-app-layout>

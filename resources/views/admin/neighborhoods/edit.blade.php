@@ -3,7 +3,7 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h1>Neighborhoods</h1>
+            <h1>Соседние районы</h1>
         </div>
 
         <div class="section-body">
@@ -11,18 +11,18 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4>Edit Neighborhood</h4>
+                            <h4>Редактировать район</h4>
                         </div>
                         <div class="card-body">
                             <form action="{{route('admin.neighborhoods.update', $neighborhood->id)}}" method="POST">
                                 @csrf
                                 @method('PUT')
                                 <div class="form-group">
-                                    <label>Name</label>
+                                    <label>Имя</label>
                                     <input type="text" class="form-control" name="name" value="{{$neighborhood->name}}">
                                 </div>
                                 
-                                <button type="submit" class="btn btn-primary">Update</button>
+                                <button type="submit" class="btn btn-primary">Обновление</button>
                             </form>
                         </div>
                     </div>

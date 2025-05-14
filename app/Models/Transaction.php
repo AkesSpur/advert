@@ -21,6 +21,7 @@ class Transaction extends Model
         'type',
         'status',
         'reference_id',
+        'description',
     ];
 
     /**

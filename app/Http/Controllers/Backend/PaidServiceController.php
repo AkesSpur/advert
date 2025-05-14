@@ -14,7 +14,9 @@ class PaidServiceController extends Controller
      */
     public function index()
     {
-        $paidServices = PaidService::all();
+        $paidServices = PaidService::withCount('profiles')
+        ->orderBy('name', 'asc')
+        ->paginate(25);
         return view('admin.paid-services.index', compact('paidServices'));
     }
 

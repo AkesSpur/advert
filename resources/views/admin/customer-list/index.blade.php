@@ -4,7 +4,7 @@
       <!-- Main Content -->
         <section class="section">
           <div class="section-header">
-            <h1>Customer list</h1>
+            <h1>Список клиентов</h1>
           </div>
 
           <div class="section-body">
@@ -13,7 +13,7 @@
               <div class="col-12">
                 <div class="card">
                   <div class="card-header">
-                    <h4>All customer</h4>
+                    <h4>Все клиенты</h4>
                   </div>
                   <div class="card-body">
                     <div class="table-responsive">
@@ -35,25 +35,25 @@
                                             <th class="sorting" tabindex="0" aria-controls="table-2"
                                                 rowspan="1" colspan="1"
                                                 aria-label="Task Name: activate to sort column ascending">
-                                                Name
+                                                Имя
                                               </th>
                                             <th class="sorting_disabled" rowspan="1" colspan="1"
                                                 aria-label="Progress" >
-                                                Email
+                                                почта
                                             </th>
                                             <th class="sorting_disabled" rowspan="1" colspan="1"
                                               aria-label="Progress" >
-                                              Acct. Bal
+                                              Сальдо
                                             </th>    
                                             <th class="sorting_disabled" tabindex="0" aria-controls="table-2"
                                                 rowspan="1" colspan="1"
                                                 aria-label="Due Date: activate to sort column ascending">
-                                                Stauts
+                                                Стаутс
                                             </th>
                                             <th class="sorting_disabled" tabindex="0" aria-controls="table-2"
                                                 rowspan="1" colspan="1"
                                                 aria-label="Due Date: activate to sort column ascending">
-                                                Action
+                                                Действие
                                             </th>
                                         </tr>
                                     </thead>
@@ -66,7 +66,9 @@
 
                                             <td>{{$customer->name}}</td>
 
-                                            <td>{{$customer->email}}</td>
+                                            <td>
+                                              <a href="mailto:{{$customer->email}}">{{$customer->email}}</a>
+                                            </td>
 
                                             <td>{{$customer->balance}}</td>
 

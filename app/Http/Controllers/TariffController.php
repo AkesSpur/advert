@@ -288,40 +288,48 @@ class TariffController extends Controller
                 'daily_charge' => $dailyCharge,
             ]);
 
-            // Для VIP тарифа списываем всю сумму сразу
-            if ($tariff->slug === 'vip') {
-                // Получаем свежий экземпляр модели User и списываем средства с баланса
-                $freshUser = User::find($user->id);
-                $freshUser->balance -= $totalCost;
-                $freshUser->save();
-
-                //set profile is_vip active 
-                if ($queuePosition === 0) {
-                    $profile->is_vip = true;
-                    $profile->save();   
-                }
-
-                // Получаем свежий экземпляр модели User и списываем средства с баланса
-                $freshUser = User::find($user->id);
-                $freshUser->balance -= $totalCost;
-
-                // Создаем запись о списании
-                AdTariffCharge::create([
-                    'profile_ad_tariff_id' => $profileTariff->id,
-                    'user_id' => $freshUser->id,
-                    'amount' => $totalCost,
-                    'charged_at' => $now,
-                ]);
-
-                // Создаем транзакцию
-                $freshUser->transactions()->create([
-                    'amount' => -$totalCost,
-                    'type' => 'purchase',
-                    'status' => 'completed',
-                    'reference_id' => 'vip_tariff_' . $profileTariff->id,
-                ]);
+            // Получаем свежий экземпляр модели User для списания средств с баланса
+            $freshUser = User::find($user->id);
+            $freshUser->balance -= $totalCost;
+            $freshUser->save();
+            
+            // Для VIP тарифа устанавливаем статус VIP
+            if ($tariff->slug === 'vip' && isset($queuePosition) && $queuePosition === 0) {
+                $profile->is_vip = true;
+                $profile->save();   
             }
 
+            // Создаем запись о списании
+            AdTariffCharge::create([
+                'profile_ad_tariff_id' => $profileTariff->id,
+                'user_id' => $freshUser->id,
+                'amount' => $totalCost,
+                'charged_at' => $now,
+            ]);
+
+            // Создаем транзакцию с подробным описанием
+            $description = '';
+            switch ($tariff->slug) {
+                case 'basic':
+                    $description = "Приобретение базового тарифа для профиля ID№{$profile->id}";
+                    break;
+                case 'priority':
+                    $description = "Приоритетное приобретение тарифов (уровень {$profileTariff->priority_level}) для профиля ID№{$profile->id}";
+                    break;
+                case 'vip':
+                    $description = "VIP-покупка для профиля ID№{$profile->id}";
+                    break;
+            }
+            
+            $freshUser->transactions()->create([
+                'amount' => -$totalCost,
+                'type' => 'purchase',
+                'status' => 'completed',
+                'reference_id' => $tariff->slug . '_tariff_' . $profileTariff->id,
+                'description' => $description,
+            ]);
+          
+ 
         });
 
         $profile->update(['is_active' => true]); 

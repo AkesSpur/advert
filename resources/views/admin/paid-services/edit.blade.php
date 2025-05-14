@@ -3,7 +3,7 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h1>Paid Services</h1>
+            <h1>Платные услуги</h1>
         </div>
 
         <div class="section-body">
@@ -11,18 +11,18 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4>Edit Paid Service</h4>
+                            <h4>Редактировать платные услуги</h4>
                         </div>
                         <div class="card-body">
                             <form action="{{route('admin.paid-services.update', $paidService->id)}}" method="POST">
                                 @csrf
                                 @method('PUT')
                                 <div class="form-group">
-                                    <label>Name</label>
+                                    <label>Имя</label>
                                     <input type="text" class="form-control" name="name" value="{{$paidService->name}}">
                                 </div>
                                 
-                                <button type="submit" class="btn btn-primary">Update</button>
+                                <button type="submit" class="btn btn-primary">Обновление</button>
                             </form>
                         </div>
                     </div>

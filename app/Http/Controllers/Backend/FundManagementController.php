@@ -42,7 +42,7 @@ class FundManagementController extends Controller
 
         toastr()->success('Wallet topped up successfully');
 
-        return redirect()->route('admin.dashboard');
+        return redirect()->back();
     }
     
     // return view page
@@ -85,6 +85,6 @@ class FundManagementController extends Controller
 
             toastr()->success('Amount withdrew successfully');
     
-            return redirect()->route('admin.dashboard');                       
+            return redirect()->back();                       
         }
 }

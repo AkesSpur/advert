@@ -134,7 +134,7 @@
             style="background: linear-gradient(358.53deg, #131313 8%, rgba(0, 0, 0, 0) 92%);">
             <div class="absolute bottom-3 left-4 right-4">
                <div class="flex items-center gap-2">
-                  <h3 class="text-white text-xl font-semibold flex items-center gap-1">
+                  <h3 class="text-white capitalize text-xl font-semibold flex items-center gap-1">
                       {{ $name }},
                       <span class="relative inline-flex items-center">
                           <span>{{ $age }}</span>

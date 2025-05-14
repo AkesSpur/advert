@@ -14,7 +14,9 @@ class NeighborhoodController extends Controller
      */
     public function index()
     {
-        $neighborhoods = Neighborhood::all();
+        $neighborhoods = Neighborhood::withCount('profiles')
+        ->orderBy('name', 'asc')
+        ->paginate(25);
         return view('admin.neighborhoods.index', compact('neighborhoods'));
     }
 

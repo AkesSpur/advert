@@ -67,7 +67,9 @@
 
                                                     <td>{{$admin->name}}</td>
 
-                                                    <td>{{$admin->email}}</td>
+                                                    <td>
+                                                        <a href="mailto:{{$admin->email}}">{{$admin->email}}</a>
+                                                    </td>
 
                                                     <td>{{$admin->balance}}</td>
 

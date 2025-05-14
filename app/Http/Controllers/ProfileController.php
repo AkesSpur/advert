@@ -119,13 +119,15 @@ class ProfileController extends Controller
     {
         $profiles = Profile::where("user_id", Auth::id())
             ->where("is_archived", false)
-            ->with(['primaryImage', 'services', 'metroStations', 'neighborhoods'])
+            ->with(['primaryImage', 'services', 'metroStations', 'neighborhoods', 'tariffs'])
+            ->withCount('tariffs')
             ->orderBY('created_at', 'desc')
             ->get();
             
         $archivedProfiles = Profile::where("user_id", Auth::id())
             ->where("is_archived", true)
-            ->with(['primaryImage', 'services', 'metroStations', 'neighborhoods'])
+            ->with(['primaryImage', 'services', 'metroStations', 'neighborhoods','tariffs'])
+            ->withCount('tariffs')
             ->orderBY('created_at', 'desc')
             ->get();
             
@@ -202,6 +204,8 @@ class ProfileController extends Controller
             'photos' => 'required|array|min:1|max:30',
             'photos.*' => 'image|max:5120', // 5MB max
             'video' => 'nullable|file|mimes:mp4,mov,avi|max:20480', // 20MB max
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
         ]);
 
         $profile = new Profile();
@@ -235,6 +239,8 @@ class ProfileController extends Controller
         $profile->appartamenti_1hour = $validated['appartamenti_1hour'] ?? null;
         $profile->appartamenti_2hours = $validated['appartamenti_2hours'] ?? null;
         $profile->appartamenti_night = $validated['appartamenti_night'] ?? null;
+        $profile->latitude = $validated['latitude'] ?? null;
+        $profile->longitude = $validated['longitude'] ?? null;
 
         $profile->save();
 
@@ -500,6 +506,8 @@ class ProfileController extends Controller
             'delete_photos' => 'nullable|array',
             'delete_photos.*' => 'integer|exists:profile_images,id',
             'delete_video' => 'nullable|boolean',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
         ]);
 
         // Update profile basic information
@@ -532,6 +540,8 @@ class ProfileController extends Controller
         $profile->appartamenti_1hour = $validated['appartamenti_1hour'] ?? null;
         $profile->appartamenti_2hours = $validated['appartamenti_2hours'] ?? null;
         $profile->appartamenti_night = $validated['appartamenti_night'] ?? null;
+        $profile->latitude = $validated['latitude'] ?? null;
+        $profile->longitude = $validated['longitude'] ?? null;
 
         $profile->save();
 

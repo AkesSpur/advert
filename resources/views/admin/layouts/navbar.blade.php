@@ -8,15 +8,15 @@
         <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
           <i class="p-2 far fa-user"></i>
         <div class="d-sm-none d-lg-inline-block">
-          Hi, {{auth()->user()->name}}
+          Привет, {{auth()->user()->name}}
         </div>
       </a>
         <div class="dropdown-menu dropdown-menu-right">
           <a href="" class="dropdown-item has-icon">
-            <i class="far fa-user"></i> Profile
+            <i class="far fa-user"></i> Профиль
 
           {{-- <a href="{{route('admin.settings.index')}}" class="dropdown-item has-icon">
-            <i class="fas fa-cog"></i> Settings
+            <i class="fas fa-cog"></i> Настройки
           </a> --}}
 
           <div class="dropdown-divider"></div>
@@ -26,7 +26,7 @@
             @csrf
                 <a href="{{route('logout')}}" onclick="event.preventDefault();
                 this.closest('form').submit();" class="dropdown-item has-icon text-danger">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                    <i class="fas fa-sign-out-alt"></i> Выйти
                 </a>
             </form>
         </div>

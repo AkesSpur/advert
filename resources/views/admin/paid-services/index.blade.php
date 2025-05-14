@@ -3,7 +3,7 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h1>Paid Services</h1>
+            <h1>Платные услуги</h1>
         </div>
 
         <div class="section-body">
@@ -11,19 +11,20 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4>All Paid Services</h4>
+                            <h4>Все платные услуги</h4>
                             <div class="card-header-action">
-                                <a href="{{route('admin.paid-services.create')}}" class="btn btn-primary"><i class="fas fa-plus"></i> Create New</a>
+                                <a href="{{route('admin.paid-services.create')}}" class="btn btn-primary"><i class="fas fa-plus"></i> Создать новый</a>
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-striped dataTable no-footer" id="table-2" role="grid">
+                                <table class="table table-striped dataTable no-footer">
                                     <thead>
                                         <tr>
                                             <th>Id</th>
-                                            <th>Name</th>
-                                            <th>Action</th>
+                                            <th>Имя</th>
+                                            <th>Подсчет профилей</th>
+                                            <th>Действие</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -31,6 +32,7 @@
                                         <tr>
                                             <td>{{$paidService->id}}</td>
                                             <td>{{$paidService->name}}</td>
+                                            <td>{{$paidService->profiles_count}}</td>
                                             <td>
                                                 <a href="{{route('admin.paid-services.edit', $paidService->id)}}" class="btn btn-primary"><i class="fas fa-edit"></i></a>
                                                 <a href="{{route('admin.paid-services.destroy', $paidService->id)}}" class="btn btn-danger delete-item"><i class="fas fa-trash"></i></a>
@@ -40,6 +42,15 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <div class="text-muted">
+                                    Показать {{ $paidServices->firstItem() }}–{{ $paidServices->lastItem() }} из {{ $paidServices->total() }}
+                                </div>
+                                <div>
+                                    {{ $paidServices->links() }}
+                                </div>
+                            </div>
+                            
                         </div>
                     </div>
                 </div>
