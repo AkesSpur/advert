@@ -23,6 +23,10 @@
                                         <tr>
                                             <th>Id</th>
                                             <th>Имя</th>
+                                            <th>Title</th>
+                                            <th>Meta Description</th>
+                                            <th>H1 Заголовок</th>
+                                            <th>Статус</th>
                                             <th>Подсчет профилей</th>
                                             <th>Действие</th>
                                         </tr>
@@ -32,9 +36,19 @@
                                         <tr>
                                             <td>{{$service->id}}</td>
                                             <td>{{$service->name}}</td>
+                                            <td>{{ $service->title }}</td>
+                                            <td>{{ Str::limit($service->meta_description, 50) }}</td>
+                                            <td>{{ $service->h1_header }}</td>
+                                            <td>
+                                                @if ($service->status)
+                                                    <span class="badge badge-success">Активен</span>
+                                                @else
+                                                    <span class="badge badge-danger">Неактивен</span>
+                                                @endif
+                                            </td>
                                             <td>{{$service->profiles_count}}</td>
                                             <td>
-                                                <a href="{{route('admin.services.edit', $service->id)}}" class="btn btn-primary"><i class="fas fa-edit"></i></a>
+                                                <a href="{{route('admin.services.edit', $service->id)}}" class="mb-1 btn btn-primary"><i class="fas fa-edit"></i></a>
                                                 <a href="{{route('admin.services.destroy', $service->id)}}" class="btn btn-danger delete-item"><i class="fas fa-trash"></i></a>
                                             </td>
                                         </tr>

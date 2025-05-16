@@ -66,6 +66,13 @@ class CustomCategoryController extends Controller
         $data['metro_station_ids'] = $request->metro_station_ids ?? [];
         $data['neighborhood_ids'] = $request->neighborhood_ids ?? [];
 
+        // Add new boolean filters
+        $data['filter_is_vip'] = $request->has('filter_is_vip');
+        $data['filter_is_new'] = $request->has('filter_is_new');
+        $data['filter_is_verified'] = $request->has('filter_is_verified');
+        $data['filter_has_video'] = $request->has('filter_has_video');
+        $data['filter_is_cheapest'] = $request->has('filter_is_cheapest');
+
         CustomCategory::create($data);
 
         return redirect()->route('admin.custom-category.index')
@@ -116,6 +123,13 @@ class CustomCategoryController extends Controller
         $data['service_ids'] = $request->service_ids ?? [];
         $data['metro_station_ids'] = $request->metro_station_ids ?? [];
         $data['neighborhood_ids'] = $request->neighborhood_ids ?? [];
+
+        // Add new boolean filters
+        $data['filter_is_vip'] = $request->has('filter_is_vip');
+        $data['filter_is_new'] = $request->has('filter_is_new');
+        $data['filter_is_verified'] = $request->has('filter_is_verified');
+        $data['filter_has_video'] = $request->has('filter_has_video');
+        $data['filter_is_cheapest'] = $request->has('filter_is_cheapest');
 
         $customCategory->update($data);
 

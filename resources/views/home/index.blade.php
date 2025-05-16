@@ -204,36 +204,6 @@
             this.activeFilter = filter;
             this.showModal = true;
         },
-        slugifyText(text) {
-            // Simple transliteration map for Russian characters
-            const rusMap = {
-                'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh',
-                'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o',
-                'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'ts',
-                'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu',
-                'я': 'ya'
-            };
-            
-            // Convert to lowercase and replace spaces with hyphens
-            let slug = text.toLowerCase();
-            
-            // Transliterate Russian characters
-            slug = slug.split('').map(char => rusMap[char] || char).join('');
-            
-            // Replace spaces with hyphens
-            slug = slug.replace(/ /g, '-');
-            
-            // Remove any remaining non-alphanumeric characters except hyphens
-            slug = slug.replace(/[^\w\-]+/g, '');
-            
-            // Remove duplicate hyphens
-            slug = slug.replace(/-+/g, '-');
-            
-            // Trim hyphens from beginning and end
-            slug = slug.replace(/^-+|-+$/g, '');
-            
-            return slug;
-        },
         selectService(service) {
             this.selectedService = service.name;
             this.showServices = false;
@@ -247,40 +217,39 @@
             window.location.href = '{{ url("/metro") }}/' + station.slug;
         },
         selectPrice(price) {
-            console.log('Selected station:');
             this.selectedPrice = price;
             this.showPrice = false;
-            const slug = this.slugifyText(price);
+            const slug = price;
             window.location.href = '{{ url("/price") }}/' + slug;
         },
         selectAge(age) {
             this.selectedAge = age;
             this.showAge = false;
-            const slug = this.slugifyText(age);
+            const slug = age;
             window.location.href = '{{ url("/age") }}/' + slug;
         },
         selectHairColor(color) {
             this.selectedHairColor = color;
             this.showHairColor = false;
-            const slug = this.slugifyText(color);
+            const slug = color;
             window.location.href = '{{ url("/hair-color") }}/' + slug;
         },
         selectHeight(height) {
             this.selectedHeight = height;
             this.showHeight = false;
-            const slug = this.slugifyText(height);
+            const slug = height;
             window.location.href = '{{ url("/height") }}/' + slug;
         },
         selectWeight(weight) {
             this.selectedWeight = weight;
             this.showWeight = false;
-            const slug = this.slugifyText(weight);
+            const slug = weight;
             window.location.href = '{{ url("/weight") }}/' + slug;
         },
         selectSize(size) {
             this.selectedSize = size;
             this.showSize = false;
-            const slug = this.slugifyText(size);
+            const slug = size;
             window.location.href = '{{ url("/breast-size") }}/' + slug;
         },
         selectNeighborhood(neighborhood) {
@@ -440,10 +409,10 @@
                  @click.away="showPrice = false"
                  style="display: none;">
                 <div class="grid grid-cols-1 gap-y-4">
-                    <template x-for="price in prices" :key="price.range">
+                    <template x-for="price in prices" :key="price.name">
                         <div @click="selectPrice(price.value)" 
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
-                            <span x-text="price.range"></span>
+                            <span x-text="price.name"></span>
                         </div>
                     </template>
                 </div>
@@ -475,7 +444,7 @@
                  style="display: none;">
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="age in ages" :key="age.value"> {{-- Changed from age.range --}}
-                        <div @click="selectAge(age); activeFilter = null" {{-- Changed from selectAge(age.value) --}}
+                        <div @click="selectAge(age.value); activeFilter = null" {{-- Changed from selectAge(age.value) --}}
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
                             <span x-text="age.name"></span> {{-- Changed from age.range --}}
                         </div>
@@ -508,8 +477,8 @@
                  @click.away="showHairColor = false"
                  style="display: none;">
                 <div class="grid grid-cols-1 gap-y-4">
-                    <template x-for="color in hairColors" :key="color.name">
-                        <div @click="selectHairColor(color); activeFilter = null" {{-- Changed from selectHairColor(color.value) --}}
+                    <template x-for="color in hairColors" :key="color.value">
+                        <div @click="selectHairColor(color.value); activeFilter = null" {{-- Changed from selectHairColor(color.value) --}}
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
                             <span x-text="color.name"></span>
                         </div>
@@ -543,7 +512,7 @@
                  style="display: none;">
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="height in heights" :key="height.value"> {{-- Changed from height.range --}}
-                        <div @click="selectHeight(height)" {{-- Changed from selectHeight(height.value) --}}
+                        <div @click="selectHeight(height.value)" {{-- Changed from selectHeight(height.value) --}}
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
                             <span x-text="height.name"></span> {{-- Changed from height.range --}}
                         </div>
@@ -576,7 +545,7 @@
                  style="display: none;">
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="weight in weights" :key="weight.value">
-                        <div @click="selectWeight(weight); activeFilter = null" 
+                        <div @click="selectWeight(weight.value); activeFilter = null" 
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
                             <span x-text="weight.name"></span>
                         </div>
@@ -610,7 +579,7 @@
                  style="display: none;">
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="size in sizes" :key="size.value"> {{-- Changed from size.range --}}
-                        <div @click="selectSize(size)" {{-- Changed from selectSize(size.value) --}}
+                        <div @click="selectSize(size.value)" {{-- Changed from selectSize(size.value) --}}
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
                             <span x-text="size.name"></span> {{-- Changed from size.range --}}
                         </div>
@@ -664,7 +633,7 @@
             <div x-show="activeFilter === 'services'" class="bg-neutral-900 p-4 rounded-xl max-h-[300px] overflow-y-auto custom-scrollbar">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
                     <template x-for="service in services" :key="service.name">
-                        <div @click="selectService(service.name); activeFilter = null" 
+                        <div @click="selectService(service); activeFilter = null" 
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
                             <span x-text="service.name"></span>
                             <span x-text="'(' + service.count + ')'"></span>
@@ -768,7 +737,7 @@
             <div x-show="activeFilter === 'hairColor'" class="bg-neutral-900 p-4 rounded-xl max-h-[300px] overflow-y-auto custom-scrollbar">
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="color in hairColors" :key="color.value"> {{-- Changed from color.name --}}
-                        <div @click="selectHairColor(color); activeFilter = null" {{-- Changed from selectHairColor(color.value) --}}
+                        <div @click="selectHairColor(color.value); activeFilter = null" {{-- Changed from selectHairColor(color.value) --}}
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
                             <span x-text="color.name"></span>
                         </div>
@@ -780,7 +749,7 @@
             <div x-show="activeFilter === 'size'" class="bg-neutral-900 p-4 rounded-xl max-h-[300px] overflow-y-auto custom-scrollbar">
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="size in sizes" :key="size.value"> {{-- Changed from size.range --}}
-                        <div @click="selectSize(size); activeFilter = null" {{-- Changed from selectSize(size.value) --}}
+                        <div @click="selectSize(size.value); activeFilter = null" {{-- Changed from selectSize(size.value) --}}
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
                             <span x-text="size.name"></span> {{-- Changed from size.range --}}
                         </div>
@@ -822,7 +791,7 @@
             <div x-show="activeFilter === 'height'" class="bg-neutral-900 p-4 rounded-xl max-h-[300px] overflow-y-auto custom-scrollbar">
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="height in heights" :key="height.value"> {{-- Changed from height.range --}}
-                        <div @click="selectHeight(height); activeFilter = null" {{-- Changed from selectHeight(height.value) --}}
+                        <div @click="selectHeight(height.value); activeFilter = null" {{-- Changed from selectHeight(height.value) --}}
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
                             <span x-text="height.name"></span> {{-- Changed from height.range --}}
                         </div>
@@ -836,7 +805,7 @@
                     <template x-for="weight in weights" :key="weight.value">
                         <div @click="selectWeight(weight.value); activeFilter = null" 
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
-                            <span x-text="weight.range"></span>
+                            <span x-text="weight.name"></span>
                         </div>
                     </template>
                 </div>
@@ -876,10 +845,10 @@
             <!-- Price Options -->
             <div x-show="activeFilter === 'price'" class="bg-neutral-900 p-4 rounded-xl max-h-[300px] overflow-y-auto custom-scrollbar">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
-                    <template x-for="price in prices" :key="price.range">
+                    <template x-for="price in prices" :key="price.value">
                         <div @click="selectPrice(price.value); activeFilter = null" 
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
-                            <span x-text="price.range"></span>
+                            <span x-text="price.name"></span>
                         </div>
                     </template>
                 </div>
@@ -888,10 +857,10 @@
             <!-- Age Options -->
             <div x-show="activeFilter === 'age'" class="bg-neutral-900 p-4 rounded-xl max-h-[300px] overflow-y-auto custom-scrollbar">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
-                    <template x-for="age in ages" :key="age.range">
+                    <template x-for="age in ages" :key="age.value">
                         <div @click="selectAge(age.value); activeFilter = null" 
                              class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
-                            <span x-text="age.range"></span>
+                            <span x-text="age.name"></span>
                         </div>
                     </template>
                 </div>
@@ -1102,11 +1071,6 @@
                     if (showMoreBtn) {
                         showMoreBtn.textContent = originalButtonText;
                         showMoreBtn.disabled = false;
-                        // Check again if the button should be hidden based on the latest data
-                        // This is a fallback, ideally data.has_more_pages in .then() handles this
-                        if (showMoreContainer && !data.has_more_pages) { 
-                            showMoreContainer.style.display = 'none';
-                        }
                     }
                 });
             });

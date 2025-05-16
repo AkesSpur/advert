@@ -35,14 +35,22 @@ class MetroStationController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'h1_header' => 'nullable|string|max:255',
+            'status' => 'required|boolean',
         ]);
 
         MetroStation::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
+            'title' => $request->title,
+            'meta_description' => $request->meta_description,
+            'h1_header' => $request->h1_header,
+            'status' => $request->status,
         ]);
 
-        toastr()->success('Metro Station created successfully!');
+        toastr()->success('Станция метро создана успешно!');
         return redirect()->route('admin.metro-stations.index');
     }
 
@@ -62,19 +70,27 @@ class MetroStationController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'h1_header' => 'nullable|string|max:255',
+            'status' => 'required|boolean',
         ]);
 
         $metroStation = MetroStation::findOrFail($id);
         $metroStation->update([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
+            'title' => $request->title,
+            'meta_description' => $request->meta_description,
+            'h1_header' => $request->h1_header,
+            'status' => $request->status,
         ]);
 
-        toastr()->success('Metro Station updated successfully!');
+        toastr()->success('Станция метро успешно обновлена!');
         return redirect()->route('admin.metro-stations.index');
     }
 
-    /**
+    /** 
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
@@ -82,6 +98,6 @@ class MetroStationController extends Controller
         $metroStation = MetroStation::findOrFail($id);
         $metroStation->delete();
 
-        return response(['status' => 'success', 'message' => 'Metro Station deleted successfully!']);
+        return response(['status' => 'success', 'message' => 'Станция метро удалена успешно!']);
     }
 }

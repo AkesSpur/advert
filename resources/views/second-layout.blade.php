@@ -62,7 +62,7 @@
             
             <div class="max-w-screen-2xl  mx-auto px-6 py-5 flex items-center justify-between">
                 <a href="/" class="text-xl font-bold">Logo</a>
-            <h2 class="hidden lg:block text-3xl text-white text-center">Escort услуги в Санкт-Петербурге</h2>     
+            <h2 class="hidden lg:block text-3xl text-white text-center">{{$seoH1 ?? 'Проститутки услуги в Санкт-Петербурге'}}</h2>     
 
                 <div class="flex space-x-4">
                     @guest
@@ -99,7 +99,7 @@
                 
             </div>
 
-            <h2 class=" lg:hidden text-3xl max-w-screen-2xl px-6 mx-auto pb-4 mb-2 text-white text-center">Escort услуги в Санкт-Петербурге</h2>     
+            <h2 class=" lg:hidden text-3xl max-w-screen-2xl px-6 mx-auto pb-4 mb-2 text-white text-center">{{$seoH1 ?? 'Проститутки услуги в Санкт-Петербурге'}}</h2>     
         </header>
 
         <!-- Page Content -->

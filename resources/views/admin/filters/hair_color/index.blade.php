@@ -36,7 +36,7 @@
                                     <td>{{ $hairColor->h1_header }}</td>
                                     <td>{{ $hairColor->sort_order }}</td>
                                     <td>
-                                        @if ($size->status)
+                                        @if ($hairColor->status)
                                             <span class="badge badge-success">Активен</span>
                                         @else
                                             <span class="badge badge-danger">Неактивен</span>

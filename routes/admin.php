@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CustomCategoryController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SeoTemplateController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Backend\AdminListController;
 use App\Http\Controllers\Backend\ChatController;
 use App\Http\Controllers\Backend\CustomerListController;
@@ -152,3 +153,9 @@ Route::put('footer-footer-/status-change', [FooterMenuController::class, 'change
 // Admin SEO Templates Routes
     Route::get('seo-templates/{pageType?}/edit', [SeoTemplateController::class, 'edit'])->name('seo_templates.edit')->defaults('pageType', 'profile');
     Route::put('seo-templates/{pageType?}', [SeoTemplateController::class, 'update'])->name('seo_templates.update')->defaults('pageType', 'profile');
+
+/* Settings Routes */
+Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+Route::put('general-setting-update', [SettingController::class, 'updateGeneralSetting'])->name('general-setting.update');
+Route::put('email-setting-update', [SettingController::class, 'updateEmailSetting'])->name('email-setting.update');
+Route::put('logo-setting-update', [SettingController::class, 'updateLogoSetting'])->name('logo-setting.update');

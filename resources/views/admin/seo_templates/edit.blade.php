@@ -8,7 +8,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Редактирование SEO-шаблона для {{ ucfirst($pageType) }} Страница</h3>
+                    <h3 class="card-title">Редактирование SEO-шаблона для страницы {{ ucfirst($pageType) }}</h3>
                 </div>
                 <div class="card-body">
                     @if(session('success'))
@@ -22,7 +22,7 @@
                         @method('PUT')
 
                         <div class="form-group">
-                            <label for="title_template">Шаблон названия</label>
+                            <label for="title_template">Шаблон Title</label>
                             <input type="text" name="title_template" id="title_template" class="form-control @error('title_template') is-invalid @enderror" value="{{ old('title_template', $template->title_template) }}">
                             @error('title_template')
                                 <span class="invalid-feedback" role="alert">
@@ -32,7 +32,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="meta_description_template">Шаблон метаописания</label>
+                            <label for="meta_description_template">Шаблон Meta Description</label>
                             <textarea name="meta_description_template" id="meta_description_template" class="form-control @error('meta_description_template') is-invalid @enderror" rows="3">{{ old('meta_description_template', $template->meta_description_template) }}</textarea>
                             @error('meta_description_template')
                                 <span class="invalid-feedback" role="alert">
@@ -52,6 +52,27 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary">Обновить шаблон</button>
+                        <div class="mt-4">
+                            <h4>Доступные плейсхолдеры:</h4>
+                            <p>Используйте эти плейсхолдеры в шаблонах. Они будут автоматически заменены на соответствующие значения из профиля.</p>
+                            <ul>
+                                <li><code>{имя}</code> - Имя профиля</li>
+                                <li><code>{возраст}</code> - Возраст</li>
+                                <li><code>{цвет_волос}</code> - Цвет волос</li>
+                                <li><code>{город}</code> - Город (например, St. Petersburg)</li>
+                                <li><code>{тип_профиля}</code> - Тип профиля (Индивидуалка/Интим-салон)</li>
+                                <li><code>{описание}</code> - Описание профиля</li>
+                                <li><code>{телефон}</code> - Телефон</li>
+                                <li><code>{вес}</code> - Вес</li>
+                                <li><code>{высота}</code> - Рост</li>
+                                <li><code>{грудь}</code> - Размер груди</li>
+                                <li><code>{метро}</code> - Станции метро (через запятую)</li>
+                                <li><code>{район}</code> - Районы (через запятую)</li>
+                                <li><code>{услуги}</code> - Услуги (через запятую)</li>
+                                <li><code>{цена_1_часа_апартаментов}</code> - Цена за 1 час в апартаментах</li>
+                                <li><code>{цена_1_час_отъезда}</code> - Цена за 1 час на выезд</li>
+                            </ul>
+                        </div>
                         <a href="{{ url()->previous() }}" class="btn btn-secondary">Отмена</a>
                     </form>
                 </div>

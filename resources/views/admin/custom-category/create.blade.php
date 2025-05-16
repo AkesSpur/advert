@@ -305,6 +305,51 @@
                                     </div>
                                 </div>
 
+                                <!-- Boolean Filters -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6>Дополнительные фильтры</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" name="filter_is_vip" value="1" id="filter_is_vip">
+                                                            <label class="form-check-label" for="filter_is_vip">VIP</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" name="filter_is_new" value="1" id="filter_is_new">
+                                                            <label class="form-check-label" for="filter_is_new">Новые</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" name="filter_is_verified" value="1" id="filter_is_verified">
+                                                            <label class="form-check-label" for="filter_is_verified">Проверенные</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" name="filter_has_video" value="1" id="filter_has_video">
+                                                            <label class="form-check-label" for="filter_has_video">С видео</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" name="filter_is_cheapest" value="1" id="filter_is_cheapest">
+                                                            <label class="form-check-label" for="filter_is_cheapest">Дешевые</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Price Filters -->
                                 <div class="row">
                                     <div class="col-md-12">

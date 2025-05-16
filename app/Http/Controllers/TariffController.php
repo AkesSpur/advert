@@ -135,7 +135,7 @@ class TariffController extends Controller
         $tariff = AdTariff::where('slug', $validated['tariff_type'])->firstOrFail();
 
         // Начинаем транзакцию
-         DB::transaction(function () use ($validated, $profile, $tariff) {
+        return DB::transaction(function () use ($validated, $profile, $tariff) {
             $user = Auth::user();
             $now = Carbon::now();
             $dailyCharge = 0;
@@ -328,15 +328,13 @@ class TariffController extends Controller
                 'reference_id' => $tariff->slug . '_tariff_' . $profileTariff->id,
                 'description' => $description,
             ]);
-          
+            $profile->update(['is_active' => true]); 
+            $profile->save();  
+    
+            return redirect()->route('user.advert.index')->with('success', 'Тариф успешно активирован для вашего профиля.');          
  
         });
 
-        $profile->update(['is_active' => true]); 
-        $profile->save();  
-
-        return redirect()->route('user.advert.index')
-        ->with('success', 'Тариф успешно активирован для вашего профиля.');
     }
 
     /**

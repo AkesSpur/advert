@@ -89,8 +89,9 @@ class PageController extends Controller
                     }
                     break;
                 case 'home.hair_color':
-                    $hairColorValue = $slug; // $slug is the 'value' from the URL
+                    $hairColorValue = $slug; // $slug is the 'value' from the URL                    
                     $hairColorModel = HairColor::where('value', $hairColorValue)->first();
+                    $hairColorValue = $hairColorModel->type; 
                     if ($hairColorModel) {
                         $seoTitle = $hairColorModel->title;
                         $seoMetaDescription = $hairColorModel->meta_description;
@@ -145,11 +146,15 @@ class PageController extends Controller
             $metroSlug = $request->input('metro');
             $priceValue = $request->input('price');
             $ageValue = $request->input('age');
-            $hairColorValue = $request->input('hair_color');
             $heightValue = $request->input('height');
             $weightValue = $request->input('weight');
             $sizeValue = $request->input('size');
             $neighborhoodSlug = $request->input('neighborhood');
+
+            if ($request->input('hair_color')) {
+                $hairColorModel = HairColor::where('value', $request->input('hair_color'))->first();
+                $hairColorValue = $hairColorModel->type;
+            }
         }
 
         // First, get all VIP profiles regardless of filters
@@ -420,14 +425,14 @@ class PageController extends Controller
                 
                 // Apply all the same filters to the combined query
                 if ($serviceSlug) {
-                    $combinedQuery->whereHas('services', function ($query) use ($service) {
-                        $query->where('slug', $service);
+                    $combinedQuery->whereHas('services', function ($query) use ($serviceSlug) {
+                        $query->where('slug', $serviceSlug);
                     });
                 }
                 
-                if ($metroSliuug) {
-                    $combinedQuery->whereHas('metroStations', function ($query) use ($metro) {
-                        $query->where('slug', $metro);
+                if ($metroSlug) {
+                    $combinedQuery->whereHas('metroStations', function ($query) use ($metroSlug) {
+                        $query->where('slug', $metroSlug);
                     });
                 }
                 
@@ -446,8 +451,8 @@ class PageController extends Controller
                     }
                 }
                 
-                if ($age) {
-                    preg_match_all('/\d+/', $age, $matches);
+                if ($ageValue) {
+                    preg_match_all('/\d+/', $ageValue, $matches);
                     if (count($matches[0]) === 2) {
                         $minAge = (int)$matches[0][0];
                         $maxAge = (int)$matches[0][1];
@@ -489,7 +494,7 @@ class PageController extends Controller
                 }
                 
                 // Paginate the combined results
-                $profiles = $combinedQuery->paginate(12);
+                $profiles = $combinedQuery->paginate(1);
             } else {
                 // For all other filters without sorting, we'll handle VIP and non-VIP profiles separately
                 // Apply sorting only to non-VIP profiles
@@ -555,10 +560,10 @@ class PageController extends Controller
         }
 
         // Sidebar: Services
-        $services = Service::withCount(['profiles as profiles_count' => function ($query) {
+        $services = Service::where('status', true)
+        ->withCount(['profiles as profiles_count' => function ($query) {
             $query->where('is_active', true);
         }])
-            ->orderBy('sort_order')
             ->orderBy('name')
             ->get()
             ->map(function($s) {
@@ -572,10 +577,10 @@ class PageController extends Controller
             });
 
         // Sidebar: Neighborhoods
-        $neighborhoods = Neighborhood::withCount(['profiles as profiles_count' => function ($query) {
+        $neighborhoods = Neighborhood::where('status', true)
+        ->withCount(['profiles as profiles_count' => function ($query) {
             $query->where('is_active', true);
         }])
-            ->orderBy('sort_order')
             ->orderBy('name')
             ->get()
             ->map(function($n) {
@@ -589,10 +594,10 @@ class PageController extends Controller
             });
 
         // Sidebar: Metro stations grouped by alphabet
-        $metroStations = MetroStation::withCount(['profiles as profiles_count' => function ($query) {
+        $metroStations = MetroStation::where('status', true)
+        ->withCount(['profiles as profiles_count' => function ($query) {
             $query->where('is_active', true);
         }])
-            ->orderBy('sort_order')
             ->orderBy('name')
             ->get()
             ->groupBy(fn($item) => mb_strtoupper(mb_substr($item->name, 0, 1, 'UTF-8')))
@@ -605,12 +610,12 @@ class PageController extends Controller
             ->toArray();
 
         // New filters from database
-        $hairColors = HairColor::orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
-        $heights = Height::orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
-        $weights = Weight::orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
-        $sizes = Size::orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
-        $prices = Price::orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
-        $ages = Age::orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+        $hairColors = HairColor::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+        $heights = Height::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+        $weights = Weight::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+        $sizes = Size::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+        $prices = Price::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+        $ages = Age::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
 
         // Get active custom categories for filtering
         $customCategories = CustomCategory::where('status', 1)->orderBy('name')->get();
@@ -640,7 +645,7 @@ class PageController extends Controller
         // Final fallbacks if still empty
         if (empty($seoTitle)) $seoTitle = config('app.name') . ' - Главная';
         if (empty($seoMetaDescription)) $seoMetaDescription = 'Описание сайта по умолчанию.';
-        if (empty($seoH1)) $seoH1 = 'Каталог анкет';
+        if (empty($seoH1)) $seoH1 = 'Проститутки услуги в Санкт-Петербурге';
 
 
         return view('home.index', compact('services',
@@ -676,34 +681,159 @@ class PageController extends Controller
     /**
      * Filter profiles by custom category
      */
-    public function filterByCustomCategory($slug)
+    public function filterByCustomCategory($slug, Request $request): mixed
     {
         // Find the custom category by slug
         $customCategory = CustomCategory::where('slug', $slug)->where('status', 1)->firstOrFail();
 
+        $seoTitle = $customCategory->title;
+        $seoMetaDescription = $customCategory->meta_description;
+        $seoH1 = $customCategory->h1;
+        $pageType = 'category';
+
         // Use the getMatchingProfiles method from the CustomCategory model
-        // This handles all filters: age, weight, height, hair color, size, price, services, metro stations, and neighborhoods
-        $matchingProfiles = $customCategory->getMatchingProfiles();
+        $initialProfilesQuery = $customCategory->getMatchingProfiles();
 
-        // Convert the collection to a paginator
-        $page = request()->get('page', 1);
-        $perPage = 20;
-        $offset = ($page - 1) * $perPage;
+        $filter = $request->input('filter', 'all'); // 'all', 'vip', 'video', 'new', 'cheap', 'verified'
+        $sort = $request->input('sort'); // 'popular', 'cheapest', 'expensive'
 
-        $profiles = new \Illuminate\Pagination\LengthAwarePaginator(
-            $matchingProfiles->slice($offset, $perPage),
-            $matchingProfiles->count(),
-            $perPage,
-            $page,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
+        // Base query for VIP profiles - these are always shown first if not sorting
+        $vipQuery = Profile::with(['metroStations', 'services', 'images', 'video', 'activeAds.adTariff'])
+        ->where('profiles.is_active', true)
+        ->where('is_vip', true);
+ 
+        $vipQuery->where('is_vip', true)
+            ->withCount(['activeAds as vip_score' => function ($query) {
+                $query->whereHas('adTariff', fn($q) => $q->where('slug', 'vip'))
+                    ->where('is_paused', 0);
+            }])
+            ->withCount(['activeAds as priority_score' => function ($query) {
+                $query->whereHas('adTariff', fn($q) => $q->where('slug', 'priority'))
+                    ->where('is_paused', 0)
+                    ->select(DB::raw('MAX(priority_level)'));
+            }])
+            ->orderByDesc('vip_score')
+            ->orderByDesc('priority_score');
 
+        // Base query for non-VIP profiles (filtered further)
+        $filteredQuery = clone $initialProfilesQuery;
+        $filteredQuery->where('is_vip', false); // Exclude VIPs from this query initially
+
+        // Apply additional filters from request (video, new, cheap, verified)
+        if ($filter !== 'all' && $filter !== 'vip') {
+            switch ($filter) {
+                case 'video':
+                    $filteredQuery->hasVideo();
+                    break;
+                case 'new':
+                    $filteredQuery->isNew();
+                    break;
+                case 'cheap':
+                    $filteredQuery->isCheap();
+                    break;
+                case 'verified':
+                    $filteredQuery->isVerified();
+                    break;
+            }
+        }
+
+        if ($filter === 'vip' && !$sort) {
+            $profiles = $vipQuery
+                ->with(['metroStations', 'services', 'images', 'video', 'activeAds.adTariff'])
+                ->paginate(12);
+        } elseif ($sort) {
+            $combinedQuery = clone $initialProfilesQuery; // Start with all profiles matching category
+            $combinedQuery->with(['metroStations', 'services', 'images', 'video', 'activeAds.adTariff']);
+
+            // Apply additional filters if any (video, new, cheap, verified) to the combined query
+            if ($filter !== 'all' && $filter !== 'vip') {
+                switch ($filter) {
+                    case 'video':
+                        $combinedQuery->hasVideo();
+                        break;
+                    case 'new':
+                        $combinedQuery->isNew();
+                        break;
+                    case 'cheap':
+                        $combinedQuery->isCheap();
+                        break;
+                    case 'verified':
+                        $combinedQuery->isVerified();
+                        break;
+                }
+            }
+
+            switch ($sort) {
+                case 'popular':
+                    $combinedQuery->orderByDesc('profiles.views_count');
+                    break;
+                case 'cheapest':
+                    $combinedQuery->orderBy('profiles.vyezd_1hour');
+                    break;
+                case 'expensive':
+                    $combinedQuery->orderByDesc('profiles.vyezd_1hour');
+                    break;
+                default:
+                    // Default sort for combined could be VIP status then priority, then views or creation date
+                    $combinedQuery->orderByDesc('is_vip') // VIPs first
+                                  ->orderByDesc(DB::raw('(SELECT MAX(priority_level) FROM profile_ad_tariffs pat JOIN ad_tariffs at ON pat.ad_tariff_id = at.id WHERE pat.profile_id = profiles.id AND at.slug = \'priority\' AND pat.is_paused = 0)')) // Then by priority score
+                                  ->orderByDesc('profiles.views_count'); // Then by views
+            }
+            $profiles = $combinedQuery->paginate(12);
+        } else {
+            // Default case: Not sorting, and filter is 'all' or one of the specific non-VIP filters
+            $filteredQuery->with(['metroStations', 'services', 'images', 'video', 'activeAds.adTariff'])
+                ->withCount(['activeAds as priority_score' => function ($query) {
+                    $query->whereHas('adTariff', fn($q) => $q->where('slug', 'priority'))
+                        ->where('is_paused', 0)
+                        ->select(DB::raw('MAX(priority_level)'));
+                }])
+                ->orderByDesc('priority_score')
+                ->orderByDesc('profiles.views_count');
+
+            $vipProfiles = $vipQuery
+                ->with(['metroStations', 'services', 'images', 'video', 'activeAds.adTariff'])
+                ->get();
+
+            $filteredProfiles = $filteredQuery->get();
+
+            $allProfiles = $vipProfiles->concat($filteredProfiles);
+            $profiles = new LengthAwarePaginator(
+                $allProfiles->forPage($request->input('page', 1), 12),
+                $allProfiles->count(),
+                12,
+                $request->input('page', 1),
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
+        }
+
+        // Increment view count for displayed profiles
+        if (!$request->ajax()) {
+            foreach ($profiles as $profile) {
+                if (method_exists($profile, 'incrementViewCount')) {
+                    $profile->incrementViewCount();
+                } else {
+                    $profile->increment('views_count');
+                }
+            }
+        }
+
+        if ($request->ajax()) {
+            if ($profiles->isEmpty() && $request->input('page', 1) > 1) {
+                return response()->json(['html' => '', 'has_more_pages' => false]);
+            }
+            return response()->json([
+                'html' => view('partials.profiles-list', compact('profiles'))->render(),
+                'has_more_pages' => $profiles->hasMorePages()
+            ]);
+        }
 
         // Sidebar: Services
-        $services = Service::withCount(['profiles as profiles_count' => function ($query) {
+        $services = Service::where('status', true)
+        ->withCount(['profiles as profiles_count' => function ($query) {
             $query->where('is_active', true);
         }])
-            ->orderBy('sort_order')->orderBy('name') // Added sort_order
+            ->orderBy('name') // Added sort_order
             ->get()
             ->map(function($s) {
                 // Generate slug if it doesn't exist in the database
@@ -717,10 +847,11 @@ class PageController extends Controller
             });
 
         //neighborhoods
-        $neighborhoods = Neighborhood::withCount(['profiles as profiles_count' => function ($query) {
+        $neighborhoods = Neighborhood::where('status', true)
+        ->withCount(['profiles as profiles_count' => function ($query) {
             $query->where('is_active', true);
         }])
-            ->orderBy('sort_order')->orderBy('name') // Added sort_order
+            ->orderBy('name') // Added sort_order
             ->get()
             ->map(function($s) {
                 // Generate slug if it doesn't exist in the database
@@ -734,10 +865,11 @@ class PageController extends Controller
             }); 
 
         // Sidebar: Metro stations grouped by alphabet
-        $metroStations = MetroStation::withCount(['profiles as profiles_count' => function ($query) {
+        $metroStations = MetroStation::where('status', true)
+        ->withCount(['profiles as profiles_count' => function ($query) {
             $query->where('is_active', true);
         }])
-            ->orderBy('sort_order')->orderBy('name') // Added sort_order
+            ->orderBy('name') // Added sort_order
             ->get()
             ->groupBy(fn($item) => mb_strtoupper(mb_substr($item->name, 0, 1, 'UTF-8')))
             ->map(fn($group) => $group->map(fn($station) => [
@@ -748,8 +880,41 @@ class PageController extends Controller
             ]))
             ->toArray();
 
-        // Get active custom categories for filtering
-        $customCategories = CustomCategory::where('status', 1)->orderBy('name')->get();
+// New filters from database
+$hairColors = HairColor::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+$heights = Height::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+$weights = Weight::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+$sizes = Size::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+$prices = Price::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+$ages = Age::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+
+// Get active custom categories for filtering
+$customCategories = CustomCategory::where('status', 1)->orderBy('name')->get();
+
+// SEO Fallbacks if not set by specific filter
+if (empty($seoTitle) || empty($seoMetaDescription) || empty($seoH1)) {
+    $defaultSeo = SeoTemplate::where('page_type', $pageType)->first();
+    if ($defaultSeo) {
+        $placeholders = ['site_name' => config('app.name'), 'current_year' => date('Y')];
+        // Add more specific placeholders if available, e.g., selected filter names
+        // For example, if $serviceModel exists, add $serviceModel->name as {{service_name}}
+
+        if (empty($seoTitle)) {
+            $seoTitle = $defaultSeo->replacePlaceholders($defaultSeo->title_template, null, $placeholders);
+        }
+        if (empty($seoMetaDescription)) {
+            $seoMetaDescription = $defaultSeo->replacePlaceholders($defaultSeo->meta_description_template, null, $placeholders);
+        }
+        if (empty($seoH1)) {
+            $seoH1 = $defaultSeo->replacePlaceholders($defaultSeo->h1_template, null, $placeholders);
+        }
+    }
+}
+// Final fallbacks if still empty
+if (empty($seoTitle)) $seoTitle = config('app.name') . ' - Главная';
+if (empty($seoMetaDescription)) $seoMetaDescription = 'Описание сайта по умолчанию.';
+if (empty($seoH1)) $seoH1 = 'Проститутки услуги в Санкт-Петербурге';
+
 
         // Set filter information for the view
         $filter = [
@@ -772,7 +937,17 @@ class PageController extends Controller
           'sort',
           'topMenus',
           'footerMenus',
-          'customCategories'
+          'customCategories',
+          'hairColors',
+          'heights',
+          'weights',
+          'sizes',
+          'prices',
+          'ages',
+          'seoTitle',
+          'seoMetaDescription',
+          'seoH1'
+
         ));
     }
 
@@ -807,185 +982,5 @@ class PageController extends Controller
         return view('profiles.profile', compact('profile', 'seoTitle', 'seoMetaDescription', 'seoH1'));
     }
     
-    /**
-     * Apply age filters to the query
-     * 
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array $filters
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    protected function applyAgeFilters($query, $filters)
-    {
-        if (empty($filters)) {
-            return $query;
-        }
-        
-        $conditions = [];
-        
-        foreach ($filters as $filter) {
-            switch ($filter) {
-                case 'age-18-25':
-                    $conditions[] = ['age', '>=', 18];
-                    $conditions[] = ['age', '<=', 25];
-                    break;
-                case 'age-25-30':
-                    $conditions[] = ['age', '>=', 25];
-                    $conditions[] = ['age', '<=', 30];
-                    break;
-                case 'age-30-35':
-                    $conditions[] = ['age', '>=', 30];
-                    $conditions[] = ['age', '<=', 35];
-                    break;
-                case 'age-35-40':
-                    $conditions[] = ['age', '>=', 35];
-                    $conditions[] = ['age', '<=', 40];
-                    break;
-                case 'age-over-40':
-                    $conditions[] = ['age', '>', 40];
-                    break;
-            }
-        }
-        
-        // Apply the conditions using OR between different age ranges
-        return $query->where(function($q) use ($conditions) {
-            foreach ($conditions as $index => $condition) {
-                if ($index === 0) {
-                    $q->where($condition[0], $condition[1], $condition[2]);
-                } else {
-                    // If this is a continuation of a range (e.g., age >= 18 AND age <= 25)
-                    if ($index % 2 === 1 && $index > 0 && isset($conditions[$index-1]) && $conditions[$index-1][0] === $condition[0]) {
-                        $q->where($condition[0], $condition[1], $condition[2]);
-                    } else {
-                        $q->orWhere($condition[0], $condition[1], $condition[2]);
-                    }
-                }
-            }
-        });
-    }
-    
-    /**
-     * Apply weight filters to the query
-     * 
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array $filters
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    protected function applyWeightFilters($query, $filters)
-    {
-        if (empty($filters)) {
-            return $query;
-        }
-        
-        $conditions = [];
-        
-        foreach ($filters as $filter) {
-            switch ($filter) {
-                case 'weight-under-50':
-                    $conditions[] = ['weight', '<', 50];
-                    break;
-                case 'weight-50-60':
-                    $conditions[] = ['weight', '>=', 50];
-                    $conditions[] = ['weight', '<=', 60];
-                    break;
-                case 'weight-60-70':
-                    $conditions[] = ['weight', '>=', 60];
-                    $conditions[] = ['weight', '<=', 70];
-                    break;
-                case 'weight-over-70':
-                    $conditions[] = ['weight', '>', 70];
-                    break;
-            }
-        }
-        
-        // Apply the conditions using OR between different weight ranges
-        return $query->where(function($q) use ($conditions) {
-            foreach ($conditions as $index => $condition) {
-                if ($index === 0) {
-                    $q->where($condition[0], $condition[1], $condition[2]);
-                } else {
-                    // If this is a continuation of a range (e.g., weight >= 50 AND weight <= 60)
-                    if ($index % 2 === 1 && $index > 0 && isset($conditions[$index-1]) && $conditions[$index-1][0] === $condition[0]) {
-                        $q->where($condition[0], $condition[1], $condition[2]);
-                    } else {
-                        $q->orWhere($condition[0], $condition[1], $condition[2]);
-                    }
-                }
-            }
-        });
-    }
-    
-    /**
-     * Apply size (height) filters to the query
-     * 
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array $filters
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    protected function applySizeFilters($query, $filters)
-    {
-        if (empty($filters)) {
-            return $query;
-        }
-        
-        $conditions = [];
-        
-        foreach ($filters as $filter) {
-            switch ($filter) {
-                case 'height-under-160':
-                    $conditions[] = ['height', '<', 160];
-                    break;
-                case 'height-160-170':
-                    $conditions[] = ['height', '>=', 160];
-                    $conditions[] = ['height', '<=', 170];
-                    break;
-                case 'height-170-180':
-                    $conditions[] = ['height', '>=', 170];
-                    $conditions[] = ['height', '<=', 180];
-                    break;
-                case 'height-over-180':
-                    $conditions[] = ['height', '>', 180];
-                    break;
-            }
-        }
-        
-        // Apply the conditions using OR between different height ranges
-        return $query->where(function($q) use ($conditions) {
-            foreach ($conditions as $index => $condition) {
-                if ($index === 0) {
-                    $q->where($condition[0], $condition[1], $condition[2]);
-                } else {
-                    // If this is a continuation of a range (e.g., height >= 160 AND height <= 170)
-                    if ($index % 2 === 1 && $index > 0 && isset($conditions[$index-1]) && $conditions[$index-1][0] === $condition[0]) {
-                        $q->where($condition[0], $condition[1], $condition[2]);
-                    } else {
-                        $q->orWhere($condition[0], $condition[1], $condition[2]);
-                    }
-                }
-            }
-        });
-    }
-    
-    /**
-     * Apply hair color filters to the query
-     * 
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array $filters
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    protected function applyHairColorFilters($query, $filters)
-    {
-        if (empty($filters)) {
-            return $query;
-        }
-        
-        return $query->where(function($q) use ($filters) {
-            foreach ($filters as $index => $hairColor) {
-                if ($index === 0) {
-                    $q->where('hair_color', $hairColor);
-                } else {
-                    $q->orWhere('hair_color', $hairColor);
-                }
-            }
-        });
-    }
+  
 }

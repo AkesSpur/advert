@@ -255,8 +255,11 @@ class Profile extends Model
     }
 
     // Add a scope to get cheap profiles (price below a certain threshold)
-    public function scopeIsCheap($query, $threshold = 5000)
+    public function scopeIsCheap($query)
     {
+        $settings = GeneralSetting::first();
+        $threshold = $settings ? $settings->cheap_threshold : 5000; // Default value if not found
+
         return $query->where('vyezd_1hour', '<=', $threshold);
     }
 

@@ -109,11 +109,11 @@
       <td class="p-4 align-top">
         <div class="flex items-center justify-end space-x-3">
           @if ($profile->is_vip)
-          <a  href="{{route('profiles.view', $profile->id)}}" class="px-2 py-1 text-sm text-gray-400">
+          <a  href="{{route('user.advert.index')}}" class="px-2 py-1 text-sm text-gray-400">
             Премиум
           </a>
           @else          
-          <a  href="{{route('profiles.view', $profile->id)}}" class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs">
+          <a  href="{{route('user.advert.index')}}" class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs">
             Рекламировать
           </a>
           @endif
@@ -521,11 +521,11 @@
       <div class="flex justify-between mb-2">
       <div class="text-white">Реклама</div>
       @if ($profile->is_vip)
-          <a href="{{route('profiles.view', $profile->id)}}" class="text-sm text-gray-400">
+          <a href="{{route('user.advert.index')}}" class="text-sm text-gray-400">
             Премиум
           </a>
           @else          
-          <a href="{{route('profiles.view', $profile->id)}}" class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs">
+          <a href="{{route('user.advert.index')}}" class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs">
             Рекламировать
           </a>
           @endif

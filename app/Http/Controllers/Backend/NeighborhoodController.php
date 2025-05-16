@@ -35,14 +35,22 @@ class NeighborhoodController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'h1_header' => 'nullable|string|max:255',
+            'status' => 'required|boolean',
         ]);
 
         Neighborhood::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
+            'title' => $request->title,
+            'meta_description' => $request->meta_description,
+            'h1_header' => $request->h1_header,
+            'status' => $request->status,
         ]);
 
-        toastr()->success('Neighborhood created successfully!');
+        toastr()->success(message: 'Соседство создано успешно!');
         return redirect()->route('admin.neighborhoods.index');
     }
 
@@ -62,15 +70,23 @@ class NeighborhoodController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'h1_header' => 'nullable|string|max:255',
+            'status' => 'required|boolean',
         ]);
 
         $neighborhood = Neighborhood::findOrFail($id);
         $neighborhood->update([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
+            'title' => $request->title,
+            'meta_description' => $request->meta_description,
+            'h1_header' => $request->h1_header,
+            'status' => $request->status,
         ]);
 
-        toastr()->success('Neighborhood updated successfully!');
+        toastr()->success('Соседство успешно обновлено!');
         return redirect()->route('admin.neighborhoods.index');
     }
 
@@ -82,6 +98,6 @@ class NeighborhoodController extends Controller
         $neighborhood = Neighborhood::findOrFail($id);
         $neighborhood->delete();
 
-        return response(['status' => 'success', 'message' => 'Neighborhood deleted successfully!']);
+        return response(['status' => 'success', 'message' => 'Соседство успешно удалено!']);
     }
 }

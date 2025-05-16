@@ -36,7 +36,7 @@
                                     <td>{{ $height->h1_header }}</td>
                                     <td>{{ $height->sort_order }}</td>
                                     <td>
-                                        @if ($size->status)
+                                        @if ($height->status)
                                             <span class="badge badge-success">Активен</span>
                                         @else
                                             <span class="badge badge-danger">Неактивен</span>

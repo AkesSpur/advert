@@ -43,15 +43,15 @@ return new class extends Migration
     public function down()
     {
         Schema::table('services', function (Blueprint $table) {
-            $table->dropColumn(['title', 'meta_description', 'h1_header']);
+            $table->dropColumn(['title', 'meta_description', 'h1_header', 'status']);
         });
 
         Schema::table('neighborhoods', function (Blueprint $table) {
-            $table->dropColumn(['title', 'meta_description', 'h1_header']);
+            $table->dropColumn(['title', 'meta_description', 'h1_header', 'status']);
         });
 
         Schema::table('metro_stations', function (Blueprint $table) {
-            $table->dropColumn(['title', 'meta_description', 'h1_header']);
+            $table->dropColumn(['title', 'meta_description', 'h1_header', 'status']);
         });
     }
 };

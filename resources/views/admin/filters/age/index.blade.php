@@ -35,23 +35,23 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($ages as $ages)
+                            @foreach ($ages as $age)
                                 <tr>
-                                    <td>{{ $ages->id }}</td>
-                                    <td>{{ $ages->name }}</td>
-                                    <td>{{ $ages->title }}</td>
-                                    <td>{{ Str::limit($ages->meta_description, 50) }}</td>
-                                    <td>{{ $ages->h1_header }}</td>
-                                    <td>{{ $ages->sort_order }}</td>
+                                    <td>{{ $age->id }}</td>
+                                    <td>{{ $age->name }}</td>
+                                    <td>{{ $age->title }}</td>
+                                    <td>{{ Str::limit($age->meta_description, 50) }}</td>
+                                    <td>{{ $age->h1_header }}</td>
+                                    <td>{{ $age->sort_order }}</td>
                                     <td>
-                                        @if ($size->status)
+                                        @if ($age->status)
                                             <span class="badge badge-success">Активен</span>
                                         @else
                                             <span class="badge badge-danger">Неактивен</span>
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.filters.age.edit', $ages->id) }}" class="btn btn-primary"><i class="fas fa-edit"></i></a>
+                                        <a href="{{ route('admin.filters.age.edit', $age->id) }}" class="btn btn-primary"><i class="fas fa-edit"></i></a>
                                     </td>
                                 </tr>
                             @endforeach

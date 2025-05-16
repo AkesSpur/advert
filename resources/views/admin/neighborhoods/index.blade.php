@@ -23,6 +23,10 @@
                                         <tr>
                                             <th>Id</th>
                                             <th>Имя</th>
+                                            <th>Title</th>
+                                            <th>Meta Description</th>
+                                            <th>H1 Заголовок</th>
+                                            <th>Статус</th>
                                             <th>Подсчет профилей</th>
                                             <th>Действие</th>
                                         </tr>
@@ -32,9 +36,19 @@
                                         <tr>
                                             <td>{{$neighborhood->id}}</td>
                                             <td>{{$neighborhood->name}}</td>
+                                            <td>{{ $neighborhood->title }}</td>
+                                            <td>{{ Str::limit($neighborhood->meta_description, 50) }}</td>
+                                            <td>{{ $neighborhood->h1_header }}</td>
+                                            <td>
+                                                @if ($neighborhood->status)
+                                                    <span class="badge badge-success">Активен</span>
+                                                @else
+                                                    <span class="badge badge-danger">Неактивен</span>
+                                                @endif
+                                            </td>
                                             <td>{{$neighborhood->profiles_count}}</td>
                                             <td>
-                                                <a href="{{route('admin.neighborhoods.edit', $neighborhood->id)}}" class="btn btn-primary"><i class="fas fa-edit"></i></a>
+                                                <a href="{{route('admin.neighborhoods.edit', $neighborhood->id)}}" class="btn btn-primary mb-1"><i class="fas fa-edit"></i></a>
                                                 <a href="{{route('admin.neighborhoods.destroy', $neighborhood->id)}}" class="btn btn-danger delete-item"><i class="fas fa-trash"></i></a>
                                             </td>
                                         </tr>

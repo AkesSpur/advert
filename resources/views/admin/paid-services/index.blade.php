@@ -34,7 +34,7 @@
                                             <td>{{$paidService->name}}</td>
                                             <td>{{$paidService->profiles_count}}</td>
                                             <td>
-                                                <a href="{{route('admin.paid-services.edit', $paidService->id)}}" class="btn btn-primary"><i class="fas fa-edit"></i></a>
+                                                <a href="{{route('admin.paid-services.edit', $paidService->id)}}" class="mb-1 btn btn-primary"><i class="fas fa-edit"></i></a>
                                                 <a href="{{route('admin.paid-services.destroy', $paidService->id)}}" class="btn btn-danger delete-item"><i class="fas fa-trash"></i></a>
                                             </td>
                                         </tr>

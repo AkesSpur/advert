@@ -35,11 +35,19 @@ class ServiceController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'h1_header' => 'nullable|string|max:255',
+            'status' => 'required|boolean',
         ]);
 
         Service::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
+            'title' => $request->title,
+            'meta_description' => $request->meta_description,
+            'h1_header' => $request->h1_header,
+            'status' => $request->status,
         ]);
 
         toastr()->success('Service created successfully!');
@@ -62,12 +70,20 @@ class ServiceController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'h1_header' => 'nullable|string|max:255',
+            'status' => 'required|boolean',
         ]);
 
         $service = Service::findOrFail($id);
         $service->update([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
+            'title' => $request->title,
+            'meta_description' => $request->meta_description,
+            'h1_header' => $request->h1_header,
+            'status' => $request->status,
         ]);
 
         toastr()->success('Service updated successfully!');

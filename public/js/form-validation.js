@@ -271,21 +271,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Add click handler to video label
     if (videoLabel) {
-        const placeholder = videoLabel.querySelector(".video-placeholder");
-        if (placeholder) {
-            placeholder.addEventListener("click", function (e) {
-                // Only trigger the file input click if the event target is the placeholder itself
-                // This prevents double-opening of the file dialog
-                if (e.target === this || e.target.closest('.video-placeholder') === this) {
-                    const input = videoLabel.querySelector(".video-input");
-                    if (input) {
-                        input.click();
-                    }
+        videoLabel.addEventListener("click", function (e) {
+            // Only trigger the file input click if the event target is the label itself or the placeholder
+            // This prevents double-opening of the file dialog
+            if (e.target === this || e.target.closest('.video-placeholder')) {
+                const input = this.querySelector(".video-input");
+                if (input) {
+                    input.click();
                 }
-                e.stopPropagation();
-                e.preventDefault();
-            });
-        }
+            }
+            e.stopPropagation();
+        });
     }
 
     // Form validation before submit

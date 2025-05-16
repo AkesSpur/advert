@@ -18,12 +18,10 @@ class Neighborhood extends Model
     protected $fillable = [
         'name',
         'slug',
-        'city_id',
-        'is_active',
         'title',
         'meta_description',
         'h1_header',
-        'sort_order',
+        'status'
     ];
 
     

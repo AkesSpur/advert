@@ -36,7 +36,7 @@
                                     <td>{{ $price->h1_header }}</td>
                                     <td>{{ $price->sort_order }}</td>
                                     <td>
-                                        @if ($size->status)
+                                        @if ($price->status)
                                             <span class="badge badge-success">Активен</span>
                                         @else
                                             <span class="badge badge-danger">Неактивен</span>

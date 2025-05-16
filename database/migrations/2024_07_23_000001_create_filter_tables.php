@@ -18,6 +18,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('value')->unique(); // Fixed value for backend logic
+            $table->string('type')->nullable();
             $table->boolean('status')->default(true);
             $table->string('title')->nullable();
             $table->text('meta_description')->nullable();
@@ -27,11 +28,11 @@ return new class extends Migration
         });
 
         DB::table('hair_colors')->insert([
-            ['name' => 'Блондинки', 'value' => 'blondes', 'sort_order' => 1],
-            ['name' => 'Брюнетки', 'value' => 'brunettes', 'sort_order' => 2],
-            ['name' => 'Рыжие', 'value' => 'redheads', 'sort_order' => 3],
-            ['name' => 'Русые', 'value' => 'Wolverines', 'sort_order' => 4],
-            ['name' => 'Шатенки', 'value' => 'brown-haired', 'sort_order' => 5],
+            ['name' => 'Блондинки', 'value' => 'blondes', 'type' => 'Блондинка','sort_order' => 1],
+            ['name' => 'Брюнетки', 'value' => 'brunettes','type' => 'Брюнетка', 'sort_order' => 2],
+            ['name' => 'Рыжие', 'value' => 'redheads', 'type' => 'Рыжая','sort_order' => 3],
+            ['name' => 'Русые', 'value' => 'Wolverines','type' => 'Русая', 'sort_order' => 4],
+            ['name' => 'Шатенки', 'value' => 'brown-haired', 'type' => 'Шатенка', 'sort_order' => 5],
         ]);
 
         Schema::create('heights', function (Blueprint $table) {

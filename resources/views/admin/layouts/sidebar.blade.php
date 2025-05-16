@@ -20,46 +20,8 @@
                         class="fas fa-globe"></i><span>Сайт</span></a>
             </li>
 
-            {{-- <li
-                class="dropdown {{ setActive([
-                'admin.category.*',
-                'admin.section.*'
-                ]) }}">
-                <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-list"></i>
-                    <span>Управление категориями</span></a>
-                <ul class="dropdown-menu">
-                    <li class="{{ setActive(['admin.section.index']) }}"><a class="nav-link"
-                        href="{{ route('admin.section.index') }}">Просмотр разделов</a>
-                </li>
-                    <li class="{{ setActive(['admin.category.index']) }}"><a class="nav-link"
-                            href="{{ route('admin.category.index') }}">Просмотр категорий</a>
-                    </li>
-                    <li class="{{ setActive(['admin.seo_templates.*']) }}"><a class="nav-link"
-                            href="{{ route('admin.seo_templates.edit') }}">SEO Templates</a>
-                    </li>
-                </ul>
-            </li> --}}
 
-            <li
-                class="dropdown {{ setActive([
-                    'admin.customer.index',
-                    'admin.manage-user.index',
-                    'admin.admin-list.index',
-                    'admin.add-fund.*',
-                    'admin.withdraw-fund.*'
-                ]) }}">
-                <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-users"></i>
-                    <span>Пользователи</span></a>
-                <ul class="dropdown-menu">
-                    <li class="{{ setActive(['admin.admin-list.index']) }}"><a class="nav-link"
-                            href="{{ route('admin.admin-list.index') }}">Список администраторов</a></li>
-                    <li class="{{ setActive(['admin.customer.index']) }}"><a class="nav-link"
-                            href="{{ route('admin.customer.index') }}">Список клиентов</a></li> 
-                    <li class="{{ setActive(['admin.manage-user.index']) }}"><a class="nav-link"
-                            href="{{ route('admin.manage-user.index') }}">Управление пользователями</a></li>
-
-                </ul>
-            </li>
+            <hr>
 
             <li
             class="dropdown {{ setActive([
@@ -196,9 +158,11 @@
     </a>
 </li>
 
-<li class="dropdown {{ setActive(['admin.custom-category.*']) }}">
+
+
+            <li class="dropdown {{ setActive(['admin.custom-category.*']) }}">
     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-tags"></i>
-        <span>Пользовательские категории</span></a>
+        <span> категории</span></a>
     <ul class="dropdown-menu">
         <li class="{{ setActive(['admin.custom-category.index']) }}"><a class="nav-link"
                 href="{{ route('admin.custom-category.index') }}">Просмотр категорий</a>
@@ -209,7 +173,27 @@
     </ul>
 </li>
 
-<li class="menu-header">Управление сайтом</li>
+<li
+class="dropdown {{ setActive([
+    'admin.customer.index',
+    'admin.manage-user.index',
+    'admin.admin-list.index',
+    'admin.add-fund.*',
+    'admin.withdraw-fund.*'
+]) }}">
+<a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-users"></i>
+    <span>Пользователи</span></a>
+<ul class="dropdown-menu">
+    <li class="{{ setActive(['admin.admin-list.index']) }}"><a class="nav-link"
+            href="{{ route('admin.admin-list.index') }}">Список администраторов</a></li>
+    <li class="{{ setActive(['admin.customer.index']) }}"><a class="nav-link"
+            href="{{ route('admin.customer.index') }}">Список клиентов</a></li> 
+    <li class="{{ setActive(['admin.manage-user.index']) }}"><a class="nav-link"
+            href="{{ route('admin.manage-user.index') }}">Управление пользователями</a></li>
+
+</ul>
+</li>
+
 
             <li
                 class="dropdown {{setActive([
@@ -237,33 +221,16 @@
                 <a class="nav-link" href="{{ route('admin.seo_templates.edit',['pageType' => 'profile']) }}">
                 <i class="fas fa-star"></i>
              <span>
-                SEO Templates
-            </span>   
-            </a>
-            </li>
-            {{-- <li class="{{ setActive(['admin.seo_templates.*']) }}"><a class="nav-link"
-                href="{{ route('admin.seo_templates.edit', ['pageType' => 'profile']) }}">SEO Templates</a>
-        </li> --}}
-             {{-- <li class="{{ setActive(['admin.support-info.*']) }}"><a class="nav-link" href="{{ route('admin.support-info.index') }}">
-                <i class="fas fa-headset"></i>
-             <span>
-                Информация поддержки
+                Профиль SEO 
             </span>   
             </a>
             </li>
 
-            <li class="{{ setActive(['admin.payment-settings.*']) }}"><a class="nav-link"
-                href="{{ route('admin.payment-settings.index') }}"><i class="fas fa-cog"></i>
-                <span>
-                Настройки оплаты
-                </span>
-            </a></li>
-
- 
-                    <li><a class="nav-link {{ setActive(['admin.settings']) }}" href="{{ route('admin.settings.index') }}"><i class="fas fa-wrench"></i>
-                    <span>Настройки</span></a>
-                   </li> --}}
-
+            <li class="{{ setActive(['admin.settings.*']) }}">
+                <a class="nav-link" href="{{ route('admin.settings.index') }}">
+                    <i class="fas fa-cog"></i> <span>Настройки</span></a>
+            </li>
+            
         </ul>
 
     </aside>

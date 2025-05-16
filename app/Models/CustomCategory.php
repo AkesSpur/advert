@@ -32,6 +32,11 @@ class CustomCategory extends Model
         'metro_station_ids',
         'neighborhood_ids',
         'status',
+        'filter_is_vip',
+        'filter_is_new',
+        'filter_is_verified',
+        'filter_has_video',
+        'filter_is_cheapest',
     ];
 
     /**
@@ -50,6 +55,11 @@ class CustomCategory extends Model
         'metro_station_ids' => 'array',
         'neighborhood_ids' => 'array',
         'status' => 'boolean',
+        'filter_is_vip' => 'boolean',
+        'filter_is_new' => 'boolean',
+        'filter_is_verified' => 'boolean',
+        'filter_has_video' => 'boolean',
+        'filter_is_cheapest' => 'boolean',
     ];
 
     /**
@@ -78,8 +88,11 @@ class CustomCategory extends Model
 
     /**
      * Get profiles that match the criteria of this custom category.
+     * 
+     * @param bool $returnQuery If true, returns the query builder instead of the collection
+     * @return \Illuminate\Database\\Eloquent\Builder|\Illuminate\Database\Eloquent\Collection
      */
-    public function getMatchingProfiles()
+    public function getMatchingProfiles($returnQuery = false)
     {
         $query = Profile::query()->where('is_active', true);
 
@@ -248,24 +261,43 @@ class CustomCategory extends Model
         // Filter by services
         if (!empty($this->service_ids)) {
             $query->whereHas('services', function($q) {
-                $q->whereIn('id', $this->service_ids);
+                $q->whereIn('services.id', $this->service_ids);
             });
         }
 
         // Filter by metro stations
         if (!empty($this->metro_station_ids)) {
             $query->whereHas('metroStations', function($q) {
-                $q->whereIn('id', $this->metro_station_ids);
+                $q->whereIn('metro_stations.id', $this->metro_station_ids);
             });
         }
 
         // Filter by neighborhoods
         if (!empty($this->neighborhood_ids)) {
             $query->whereHas('neighborhoods', function($q) {
-                $q->whereIn('id', $this->neighborhood_ids);
+                $q->whereIn('neighborhoods.id', $this->neighborhood_ids);
             });
         }
 
-        return $query->get();
+        // Apply new boolean filters
+        if ($this->filter_is_vip) {
+            $query->isVip();
+        }
+        if ($this->filter_is_new) {
+            $query->isNew();
+        }
+        if ($this->filter_is_verified) {
+            $query->isVerified();
+        }
+        if ($this->filter_has_video) {
+            $query->hasVideo();
+        }
+        if ($this->filter_is_cheapest) {
+            $query->isCheap(); // Assuming default threshold or modify if CustomCategory needs its own threshold
+        }
+
+        // Return either the query builder or the collection of profiles
+        // return $returnQuery ? $query : $query->get();
+        return $query->with(['metroStations', 'services', 'images', 'video', 'activeAds.adTariff']);
     }
 }
