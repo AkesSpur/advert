@@ -54,9 +54,27 @@
                                         <div class="form-group">
                                             <label>Статус</label>
                                             <select class="form-control" name="status">
-                                                <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Активный</option>
+                                                <option value="1" {{ old('status', 1) == '1' ? 'selected' : '' }}>Активный</option>
                                                 <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Неактивный</option>
                                             </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <div class="control-label">Показывать в верхнем меню</div>
+                                            <label class="custom-switch mt-2">
+                                                <input type="checkbox" name="show_in_top_menu" class="custom-switch-input" value="1" {{ old('show_in_top_menu', 1) ? 'checked' : '' }}>
+                                                <span class="custom-switch-indicator"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <div class="control-label">Показывать в нижнем меню</div>
+                                            <label class="custom-switch mt-2">
+                                                <input type="checkbox" name="show_in_footer_menu" class="custom-switch-input" value="1" {{ old('show_in_footer_menu', 1) ? 'checked' : '' }}>
+                                                <span class="custom-switch-indicator"></span>
+                                            </label>
                                         </div>
                                     </div>
                                     <div class="col-md-12">

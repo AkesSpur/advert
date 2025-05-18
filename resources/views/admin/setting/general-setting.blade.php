@@ -30,6 +30,11 @@
                 <label>SEO Description по умолчанию</label>
                 <textarea class="form-control" name="default_seo_description">{{@$generalSettings->default_seo_description}}</textarea>
             </div>
+            <hr>
+            <div class="form-group">
+                <label>Yandex Maps API Key</label>
+                <input type="text" class="form-control" name="yandex_api_key" value="{{@$generalSettings->yandex_api_key}}">
+            </div>
             <button type="submit" class="btn btn-primary">Обновить</button>
         </form>
     </div>

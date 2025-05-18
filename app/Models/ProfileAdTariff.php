@@ -146,6 +146,7 @@ class ProfileAdTariff extends Model
             ->where('id', '!=', $this->id)
             ->where('is_active', true)
             ->where('is_paused', false)
+            ->where('queue_position', '==', 0)
             ->exists();
             
         if (!$hasOtherActiveTariffs) {

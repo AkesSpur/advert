@@ -46,7 +46,7 @@
             <div class="block md:block lg:hidden py-2 px-4">
                 <div class="flex items-center mb-1 md:mb-none">
                     <h1 class="text-3xl capitalize font-semibold text-white mr-2 relative">
-                        {{ $seoH1 ?? ($profile->name . ', ' . $profile->age) }}
+                        {{ ($profile->name . ', ' . $profile->age) }}
                         @if ($profile->is_verified)
                             <span class="absolute -top-1 -right-5">
                                 <img src="{{ asset('assets/svg/verified.png') }}" class="w-4 h-4">
@@ -183,7 +183,7 @@
                                 <!-- Carousel Controls -->
                                 <div class="absolute inset-y-0 left-0 flex items-center">
                                     <button class="p-2 text-white hover:text-gray-300 focus:outline-none"
-                                        onclick="prevSlide()">
+                                        onclick="prevSlide()" name="prev">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -193,7 +193,7 @@
                                 </div>
                                 <div class="absolute inset-y-0 right-0 flex items-center">
                                     <button class="p-2 text-white hover:text-gray-300 focus:outline-none"
-                                        onclick="nextSlide()">
+                                        onclick="nextSlide()" name="next">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -206,7 +206,7 @@
                                 <div class="absolute top-4 right-4 z-10">
                                     <button 
                                         class="like-button p-2 rounded-full hover:scale-105 transition"
-                                        data-profile-id="{{ $profile->id }}">
+                                        data-profile-id="{{ $profile->id }}" name="like">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" 
                                             fill="{{ Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $profile->id)->exists() ? 'red' : 'none' }}" 
                                             stroke="{{ Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $profile->id)->exists() ? 'none' : 'white' }}"
@@ -217,17 +217,6 @@
                                         </svg>
                                     </button>
                                 </div>
-
-                                {{-- <!-- Mobile indicators (visible on small and medium screens) -->
-                                <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 lg:hidden">
-                                    <button class="h-2 w-2 rounded-full bg-white opacity-100"
-                                        onclick="showSlide(0)"></button>
-                                    <button class="h-2 w-2 rounded-full bg-white opacity-50"
-                                        onclick="showSlide(1)"></button>
-                                    <button class="h-2 w-2 rounded-full bg-white opacity-50"
-                                        onclick="showSlide(2)"></button>
-                                    <button class="h-2 w-2 rounded-full bg-white opacity-50" onclick="showVideo()"></button>
-                                </div> --}}
                             </div>
                         </div>
                     </div>
@@ -237,7 +226,7 @@
                 <div class="lg:block lg:w-1/2 p-4 hidden">
                     <div class="flex items-center ">
                         <h1 class="text-3xl capitalize font-semibold text-white mr-2 relative">
-                            {{ $seoH1 ?? ($profile->name . ', ' . $profile->age) }}
+                            {{  ($profile->name . ', ' . $profile->age) }}
                             @if ($profile->is_verified)
                                 <span class="absolute -top-1 -right-5">
                                     <img src="{{ asset('assets/svg/verified.png') }}" class="w-4 h-4">
@@ -257,7 +246,7 @@
                             </svg>
                             <span class="text-[#C2C2C2]">
                               @foreach ($profile->neighborhoods as $key => $neighborhood)
-                              <a href="{{ route('home', ['district' => $neighborhood->name]) }}"
+                              <a href="{{ route('home.neighborhood', ['slug' => $neighborhood->slug]) }}"
                                   class="hover:text-[#6340FF] transition-colors">
                                   {{$neighborhood->name}}{{ $key < count($profile->neighborhoods) - 1 ? ',' : '' ;}}</a>
                             @endforeach
@@ -271,7 +260,7 @@
                             </svg>
                             <span class="text-[#C2C2C2]">                              
                                 @foreach ($profile->metroStations as $key => $metroStation)
-                                <a href="{{ route('home', ['metro' => $metroStation->name]) }}"
+                                <a href="{{ route('home.metro', ['slug' => $metroStation->slug]) }}"
                                     class="hover:text-[#6340FF] transition-colors">
                                     м. {{ $metroStation->name }}{{$key < count($profile->metroStations) - 1 ? ',' : '';}}</a>
                               @endforeach
@@ -417,7 +406,7 @@
                     </svg>
                     <span class="text-[#C2C2C2]">
                       @foreach ($profile->neighborhoods as $key => $neighborhood)
-                      <a href="{{ route('home', ['district' => $neighborhood->name]) }}"
+                      <a href="{{ route('home.neighborhood', ['slug' => $neighborhood->slug]) }}"
                           class="hover:text-[#6340FF] transition-colors">
                           {{$neighborhood->name}}{{ $key < count($profile->neighborhoods) - 1 ? ',' : '' ;}}</a>
                     @endforeach
@@ -431,7 +420,7 @@
                     </svg>
                     <span class="text-[#C2C2C2]">                              
                         @foreach ($profile->metroStations as $key => $metroStation)
-                        <a href="{{ route('home', ['metro' => $metroStation->name]) }}"
+                        <a href="{{ route('home.metro', ['slug' => $metroStation->slug]) }}"
                             class="hover:text-[#6340FF] transition-colors">
                             м. {{ $metroStation->name }}{{$key < count($profile->metroStations) - 1 ? ',' : '';}}</a>
                       @endforeach
@@ -565,10 +554,23 @@
                         <div id="map" class="rounded-xl overflow-hidden" style="width: 100%; height: 400px;"></div>
                         <p id="map-address" class="text-[#A0A0A0] mt-2 mb-2"></p>
                         {{-- IMPORTANT: Replace YOUR_API_KEY_HERE with your actual Yandex Maps API key --}}
-                        <script src="https://api-maps.yandex.ru/2.1/?apikey=ef000210-ee4f-45fe-a5a1-2f89cddce2cc&lang=ru_RU" type="text/javascript"></script>
+@once
+                        <script src="https://api-maps.yandex.ru/2.1/?apikey={{ $yandexApiKey ?? 'ef000210-ee4f-45fe-a5a1-2f89cddce2cc' }}&lang=ru_RU" type="text/javascript" id="yandex-maps-api-script-profile-{{ $profile->id }}"></script>
+@endonce
                         <script type="text/javascript">
-                            ymaps.ready(init);
                             function init(){
+                                const mapContainer = document.getElementById('map');
+                                if (mapContainer && mapContainer.dataset.mapInitialized === 'true') {
+                                    return; // Map already initialized
+                                }
+                                if (typeof ymaps === 'undefined' || typeof ymaps.Map === 'undefined') {
+                                    // Yandex Maps API not loaded yet, try again after a short delay
+                                    setTimeout(init, 100);
+                                    return;
+                                }
+                                if(mapContainer) {
+                                    mapContainer.dataset.mapInitialized = 'true';
+                                }
                                 var myMap = new ymaps.Map("map", {
                                     center: [{{ $profile->latitude }}, {{ $profile->longitude }}],
                                     zoom: 15
@@ -602,6 +604,34 @@
                                     var addressElement = document.getElementById('map-address');
                                     if (addressElement) {
                                         addressElement.textContent = 'Ошибка при определении адреса.';
+                                    }
+                                });
+                            }
+
+                            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                                if (typeof ymaps !== 'undefined') {
+                                    ymaps.ready(init);
+                                } else {
+                                    const scriptTag = document.getElementById('yandex-maps-api-script-profile-{{ $profile->id }}');
+                                    if (scriptTag) {
+                                        scriptTag.onload = () => ymaps.ready(init);
+                                        scriptTag.onerror = () => console.error('Yandex Maps API script failed to load for profile page.');
+                                    } else {
+                                        console.error('Yandex Maps API script tag not found for profile page.');
+                                    }
+                                }
+                            } else {
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    if (typeof ymaps !== 'undefined') {
+                                        ymaps.ready(init);
+                                    } else {
+                                        const scriptTag = document.getElementById('yandex-maps-api-script-profile-{{ $profile->id }}');
+                                        if (scriptTag) {
+                                            scriptTag.onload = () => ymaps.ready(init);
+                                            scriptTag.onerror = () => console.error('Yandex Maps API script failed to load for profile page.');
+                                        } else {
+                                            console.error('Yandex Maps API script tag not found for profile page.');
+                                        }
                                     }
                                 });
                             }

@@ -5,13 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class LogoSetting extends Model
+class HeroSectionSetting extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'logo',
-        'favicon',
-        'login_image',
+        'title',
+        'text_content',
+        'image',
     ];
 }

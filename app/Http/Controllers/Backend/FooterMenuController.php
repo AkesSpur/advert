@@ -4,13 +4,15 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\FooterMenu;
+use App\Models\CustomCategory;
 use Illuminate\Http\Request;
 
 class FooterMenuController extends Controller
 {
     public function index(){
         $menus = FooterMenu::all();
-        return view('admin.footer-menu.index', compact('menus'));
+        $customCategories = CustomCategory::where('status', 1)->orderBy('name')->get();
+        return view('admin.footer-menu.index', compact('menus', 'customCategories'));
     }
 
     public function edit($id)

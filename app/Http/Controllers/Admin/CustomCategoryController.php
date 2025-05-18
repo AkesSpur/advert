@@ -72,6 +72,8 @@ class CustomCategoryController extends Controller
         $data['filter_is_verified'] = $request->has('filter_is_verified');
         $data['filter_has_video'] = $request->has('filter_has_video');
         $data['filter_is_cheapest'] = $request->has('filter_is_cheapest');
+        $data['show_in_top_menu'] = $request->has('show_in_top_menu');
+        $data['show_in_footer_menu'] = $request->has('show_in_footer_menu');
 
         CustomCategory::create($data);
 
@@ -130,6 +132,8 @@ class CustomCategoryController extends Controller
         $data['filter_is_verified'] = $request->has('filter_is_verified');
         $data['filter_has_video'] = $request->has('filter_has_video');
         $data['filter_is_cheapest'] = $request->has('filter_is_cheapest');
+        $data['show_in_top_menu'] = $request->has('show_in_top_menu');
+        $data['show_in_footer_menu'] = $request->has('show_in_footer_menu');
 
         $customCategory->update($data);
 
@@ -155,5 +159,24 @@ class CustomCategoryController extends Controller
         $category->save();
 
         return response(['message' => 'Статус был обновлен!']);
+    }
+
+    public function changeMenuStatus(Request $request)
+    {
+        $category = CustomCategory::findOrFail($request->id);
+        $menuType = $request->menu_type; // 'top' or 'footer'
+        $status = $request->status == 'true' ? 1 : 0;
+
+        if ($menuType === 'top') {
+            $category->show_in_top_menu = $status;
+        } elseif ($menuType === 'footer') {
+            $category->show_in_footer_menu = $status;
+        } else {
+            return response(['message' => 'Неверный тип меню'], 400);
+        }
+
+        $category->save();
+
+        return response(['message' => 'Статус меню успешно обновлен']);
     }
 }

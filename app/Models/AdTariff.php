@@ -22,6 +22,7 @@ class AdTariff extends Model
         'base_price',
         'billing_period',
         'is_active',
+        'status'
     ];
 
     /**
@@ -32,6 +33,7 @@ class AdTariff extends Model
     protected $casts = [
         'base_price' => 'decimal:2',
         'is_active' => 'boolean',
+        'status' => 'boolean',
     ];
 
     /**
@@ -55,21 +57,4 @@ class AdTariff extends Model
         return $this->base_price;
     }
 
-    /**
-     * Get the price for a specific duration (for VIP tariff)
-     */
-    public function getPriceForDuration(string $duration): float
-    {
-        if ($this->slug !== 'vip') {
-            return $this->base_price;
-        }
-
-        // Calculate price based on duration
-        return match ($duration) {
-            '1_day' => $this->base_price,
-            '1_week' => $this->base_price * 7 * 0.9, // 10% discount for week
-            '1_month' => $this->base_price * 30 * 0.8, // 20% discount for month
-            default => $this->base_price,
-        };
-    }
 }

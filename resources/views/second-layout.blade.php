@@ -7,7 +7,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $seoTitle ?? config('app.name', 'Laravel') }}</title>
-    <meta name="description" content="{{ $seoMetaDescription ?? '' }}">
+    <meta name="description" content="{{ $seoMetaDescription ?? $settings->default_seo_description }}">
+
+    <link rel="icon" type="image/png" href="{{asset($logoSetting->favicon ?? '' )}}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">

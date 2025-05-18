@@ -45,7 +45,15 @@
                                             <th class="sorting_disabled" rowspan="1" colspan="1"
                                               aria-label="Progress" >
                                               Статус
-                                            </th>  
+                                            </th>
+                                            <th class="sorting_disabled" rowspan="1" colspan="1"
+                                              aria-label="Progress" >
+                                              Верхнее меню
+                                            </th>
+                                            <th class="sorting_disabled" rowspan="1" colspan="1"
+                                              aria-label="Progress" >
+                                              Нижнее меню
+                                            </th>    
                                             <th class="sorting_disabled" tabindex="0" aria-controls="table-2"
                                                 rowspan="1" colspan="1"
                                                 aria-label="Due Date: activate to sort column ascending">
@@ -71,7 +79,21 @@
                                                     <span class="custom-switch-indicator"></span>
                                                 </label>
                                               @endif
+
                                             </td>
+                                            <td>
+                                                <label class="custom-switch mt-2">
+                                                    <input type="checkbox" {{ $category->show_in_top_menu ? 'checked' : '' }} name="custom-switch-checkbox" data-id="{{ $category->id }}" data-menu-type="top" class="custom-switch-input change-menu-status">
+                                                    <span class="custom-switch-indicator"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <label class="custom-switch mt-2">
+                                                    <input type="checkbox" {{ $category->show_in_footer_menu ? 'checked' : '' }} name="custom-switch-checkbox" data-id="{{ $category->id }}" data-menu-type="footer" class="custom-switch-input change-menu-status">
+                                                    <span class="custom-switch-indicator"></span>
+                                                </label>
+                                            </td>
+
                                             <td>
                                                 <a href="{{route('admin.custom-category.edit', $category->id)}}" class='btn btn-primary'><i class='far fa-edit'></i></a>
                                                 <a href="{{route('admin.custom-category.destroy', $category->id)}}" class='btn btn-danger ml-2 delete-item'><i class='far fa-trash-alt'></i></a>
@@ -113,10 +135,44 @@
                     },
                     error: function(xhr, status, error){
                         console.log(error);
+                        toastr.error('Произошла ошибка при обновлении статуса меню.'); // Added error toastr
+                    }
+                })
+            })
+
+            // Handle menu status change
+            $('body').on('click', '.change-menu-status', function(){
+                let isChecked = $(this).is(':checked');
+                let id = $(this).data('id');
+                let menuType = $(this).data('menu-type'); // 'top' or 'footer'
+
+                $.ajax({
+                    url: "{{ route('admin.custom-category.change-menu-status') }}", // New route for menu status
+                    method: 'PUT',
+                    data: {
+                        status: isChecked,
+                        id: id,
+                        menu_type: menuType,
+                        _token: "{{ csrf_token() }}" // Added CSRF token
+                    },
+                    success: function(data){
+                        toastr.success(data.message)
+                    },
+                    error: function(xhr, status, error){
+                        console.log(error);
+                        toastr.error('Произошла ошибка при обновлении статуса меню.');
+                    }
+                })
+            })
+        })
+    </script>
+@endpush
+                    {{-- error: function(xhr, status, error){
+                        console.log(error);
                     }
                 })
 
             })
         })
     </script>
-@endpush
+@endpush --}}

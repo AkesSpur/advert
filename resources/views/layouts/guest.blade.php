@@ -5,7 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{$settings->default_seo_title ?? config('app.name', 'Laravel') }}</title>
+
+        <meta name="description" content="{{ $settings->default_seo_description }}">
+
+      <link rel="icon" type="image/png" href="{{asset($logoSetting->favicon ?? '' )}}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -21,7 +25,7 @@
             
             @media (min-width: 640px) {
                 body {
-                    background-image: linear-gradient(rgba(0, 0, 0, 0.572), rgba(0, 0, 0, 0.5)), url('{{asset('assets/images/login.jpg')}}');
+                    background-image: linear-gradient(rgba(0, 0, 0, 0.572), rgba(0, 0, 0, 0.5)), url('{{asset($logoSetting->login_image ?? 'assets/images/login.jpg')}}');
                     background-size: cover;
                     background-position: center;
                     background-repeat: no-repeat;

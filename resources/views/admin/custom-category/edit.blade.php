@@ -60,6 +60,24 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <div class="control-label">Показывать в верхнем меню</div>
+                                            <label class="custom-switch mt-2">
+                                                <input type="checkbox" name="show_in_top_menu" class="custom-switch-input" value="1" {{ old('show_in_top_menu', $customCategory->show_in_top_menu) ? 'checked' : '' }}>
+                                                <span class="custom-switch-indicator"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <div class="control-label">Показывать в нижнем меню</div>
+                                            <label class="custom-switch mt-2">
+                                                <input type="checkbox" name="show_in_footer_menu" class="custom-switch-input" value="1" {{ old('show_in_footer_menu', $customCategory->show_in_footer_menu) ? 'checked' : '' }}>
+                                                <span class="custom-switch-indicator"></span>
+                                            </label>
+                                        </div>
+                                    </div>
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label>Meta описание</label>

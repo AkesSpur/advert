@@ -13,10 +13,10 @@ window.Pusher = Pusher;
 // Initialize Laravel Echo
 // First check if window.Laravel is defined (from pusher-config.blade.php)
 if (window.Laravel?.pusherKey) {
-    console.log('Initializing Echo with Laravel config');
+    // console.log('Initializing Echo with Laravel config');
     
     // Enable Pusher logging for debugging
-    Pusher.logToConsole = true;
+    // Pusher.logToConsole = false;
     
     window.Echo = new Echo({
         broadcaster: 'pusher',
@@ -30,18 +30,18 @@ if (window.Laravel?.pusherKey) {
     // Add connection event handlers
     const pusher = window.Echo.connector.pusher;
     pusher.connection.bind('connected', () => {
-        console.log('Successfully connected to Pusher');
+        // console.log('Successfully connected to Pusher');
     });
     pusher.connection.bind('error', (err) => {
-        console.error('Pusher connection error:', err);
+        // console.error('Pusher connection error:', err);
     });
 } 
 // Fallback to Vite env variables if window.Laravel is not available
 else if (import.meta.env.VITE_PUSHER_APP_KEY) {
-    console.log('Initializing Echo with Vite env variables');
+    // console.log('Initializing Echo with Vite env variables');
     
     // Enable Pusher logging for debugging
-    Pusher.logToConsole = true;
+    // Pusher.logToConsole = false;
     
     window.Echo = new Echo({
         broadcaster: 'pusher',
@@ -55,11 +55,11 @@ else if (import.meta.env.VITE_PUSHER_APP_KEY) {
     // Add connection event handlers
     const pusher = window.Echo.connector.pusher;
     pusher.connection.bind('connected', () => {
-        console.log('Successfully connected to Pusher (via Vite env)');
+        // console.log('Successfully connected to Pusher (via Vite env)');
     });
     pusher.connection.bind('error', (err) => {
-        console.error('Pusher connection error (Vite env):', err);
+        // console.error('Pusher connection error (Vite env):', err);
     });
 } else {
-    console.warn('Pusher configuration is missing. Real-time messaging will not work.');
+    // console.warn('Pusher configuration is missing. Real-time messaging will not work.');
 }

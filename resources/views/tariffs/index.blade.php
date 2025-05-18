@@ -22,7 +22,7 @@
             @if ($type->slug === 'basic')
             <div x-data="{ showModal: false }" class="bg-[#191919] rounded-2xl overflow-hidden">
                 <div class="p-6">
-                    <h3 class="text-xl border-b border-[#363636] font-medium mb-6 pb-4">Базовая активация</h3>
+                    <h3 class="text-xl border-b border-[#363636] font-medium mb-6 pb-4 capitalize">{{$type->name ?? 'Базовая активация'}}</h3>
                     <p class="text-[#C2C2C2] mb-6 text-sm font-medium">
                        {{$type->description}}
                     </p>
@@ -121,7 +121,7 @@
                     <!-- Приоритетный тариф -->
         <div x-data="{ showModal: false }" class="bg-[#191919] rounded-2xl overflow-hidden">
             <div class="p-6">
-                <h3 class="text-xl border-b border-[#363636] font-medium mb-6 pb-4">Приоритетное объявление</h3>
+                <h3 class="text-xl border-b border-[#363636] font-medium mb-6 pb-4">{{$type->name ?? 'Приоритетное объявление'}}</h3>
                 <p class="text-[#C2C2C2] mb-6 text-sm font-medium">
                     {{$type->description}}
                 </p>
@@ -233,7 +233,7 @@
                     <!-- VIP тариф -->
         <div x-data="{ showModal: false }" class="bg-[#191919] rounded-2xl overflow-hidden">
             <div class="p-6">
-                <h3 class="text-xl border-b border-[#363636] font-medium mb-6 pb-4">VIP анкета</h3>
+                <h3 class="text-xl border-b border-[#363636] font-medium mb-6 pb-4">{{$type->name ?? 'VIP анкета'}}</h3>
                 <p class="text-[#C2C2C2] mb-6 text-sm font-medium">
                     {{$type->description}}
                 </p>

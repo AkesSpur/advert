@@ -37,6 +37,8 @@ class CustomCategory extends Model
         'filter_is_verified',
         'filter_has_video',
         'filter_is_cheapest',
+        'show_in_top_menu',
+        'show_in_footer_menu',
     ];
 
     /**
@@ -60,6 +62,8 @@ class CustomCategory extends Model
         'filter_is_verified' => 'boolean',
         'filter_has_video' => 'boolean',
         'filter_is_cheapest' => 'boolean',
+        'show_in_top_menu' => 'boolean',
+        'show_in_footer_menu' => 'boolean',
     ];
 
     /**

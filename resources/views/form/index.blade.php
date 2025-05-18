@@ -6,7 +6,7 @@
             <nav class="text-sm text-[#A0A0A0] mb-4" aria-label="Breadcrumb">
                 <ol class="list-reset flex items-center space-x-1">
                     <li>
-                        <a href="/" class="hover:text-[#A0A0A0] text-[#636363]">Главная</a>
+                        <a href="{{route('user.profiles.index')}}" class="hover:text-[#A0A0A0] text-[#636363]">Главная</a>
                     </li>
                     <li><span>/</span></li>
                     <li class="text-[#6340FF] font-medium" aria-current="page">Добавить анкету</li>
@@ -410,11 +410,21 @@
     @endsection
 
 @push('scripts')
-{{-- IMPORTANT: Replace YOUR_API_KEY_HERE with your actual Yandex Maps API key if not using the one below --}}
-<script src="https://api-maps.yandex.ru/2.1/?apikey=ef000210-ee4f-45fe-a5a1-2f89cddce2cc&lang=ru_RU" type="text/javascript"></script>
+@once
+    <script src="https://api-maps.yandex.ru/2.1/?apikey={{$yandexApiKey}}&lang=ru_RU" type="text/javascript" id="yandex-maps-api-script-index"></script>
+@endonce
 <script type="text/javascript">
-    ymaps.ready(initCreateFormMap);
-    function initCreateFormMap() {
+    function initFormMap() {
+        if (document.getElementById('map-select') && document.getElementById('map-select').dataset.mapInitialized === 'true') {
+            return; // Map already initialized
+        }
+        if (typeof ymaps === 'undefined' || typeof ymaps.Map === 'undefined') {
+            // Yandex Maps API not loaded yet, try again after a short delay
+            setTimeout(initFormMap, 100);
+            return;
+        }
+
+        document.getElementById('map-select').dataset.mapInitialized = 'true';
         var latitudeInput = document.getElementById('latitude');
         var longitudeInput = document.getElementById('longitude');
         var initialCoords = [59.9343, 30.3351]; // Default to Saint Petersburg 
@@ -531,6 +541,34 @@
             });
         }
         myMap.behaviors.disable('scrollZoom');
+    }
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        if (typeof ymaps !== 'undefined') {
+            ymaps.ready(initFormMap);
+        } else {
+            const scriptTag = document.getElementById('yandex-maps-api-script-index');
+            if (scriptTag) {
+                scriptTag.onload = () => ymaps.ready(initFormMap);
+                scriptTag.onerror = () => console.error('Yandex Maps API script failed to load for index form.');
+            } else {
+                console.error('Yandex Maps API script tag not found for index form.');
+            }
+        }
+    } else {
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof ymaps !== 'undefined') {
+                ymaps.ready(initFormMap);
+            } else {
+                const scriptTag = document.getElementById('yandex-maps-api-script-index');
+                if (scriptTag) {
+                    scriptTag.onload = () => ymaps.ready(initFormMap);
+                    scriptTag.onerror = () => console.error('Yandex Maps API script failed to load for index form.');
+                } else {
+                    console.error('Yandex Maps API script tag not found for index form.');
+                }
+            }
+        });
     }
 </script>
 @endpush

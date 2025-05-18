@@ -107,11 +107,11 @@
 <body>
     <div class="email-wrapper">
         
-        <div class="email-hero">
+        {{-- <div class="email-hero">
             <div class="email-hero-overlay">
                 <div class="email-hero-text">@yield('hero_text', 'Уведомление')</div>
             </div>
-        </div>
+        </div> --}}
         
         <div class="email-body">
             @yield('content')

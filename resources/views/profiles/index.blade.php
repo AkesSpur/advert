@@ -118,14 +118,11 @@
           </a>
           @endif
           
-          @if($profile->tariffs_count > 0)
           <button onclick="document.getElementById('adStatsModal-{{ $profile->id }}').classList.remove('hidden')" class="text-[#C2C2C2] hover:text-white p-1">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </button>
-          
-          @endif
           <!-- Dropdown menu -->
           <div x-data="{ open: false }">
             <button @click="open = !open" class="text-[#C2C2C2] hover:text-white">
@@ -292,20 +289,20 @@
   <!-- Ad Stats Modals -->
   @if(count($profiles) > 0)
     @foreach ($profiles as $profile)
-      @if($profile->tariffs_count > 0)
-        <div id="adStatsModal-{{ $profile->id }}" class="fixed inset-0 z-50 overflow-y-auto hidden">
-          <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="fixed inset-0 bg-black bg-opacity-75 transition-opacity"></div>
-            <div class="relative bg-[#191919] rounded-lg max-w-3xl w-full mx-auto shadow-xl overflow-hidden">
-              <div class="px-4 py-5 sm:px-6 flex justify-between items-center border-b border-gray-700">
-                <h3 class="text-lg font-medium text-white capitalize">Статистика расходов на рекламу - {{ $profile->name }}</h3>
-                <button onclick="document.getElementById('adStatsModal-{{ $profile->id }}').classList.add('hidden')" class="text-gray-400 hover:text-white">
-                  <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <div class="p-6">
+      <div id="adStatsModal-{{ $profile->id }}" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+          <div class="fixed inset-0 bg-black bg-opacity-75 transition-opacity"></div>
+          <div class="relative bg-[#191919] rounded-lg max-w-3xl w-full mx-auto shadow-xl overflow-hidden">
+            <div class="px-4 py-5 sm:px-6 flex justify-between items-center border-b border-gray-700">
+              <h3 class="text-lg font-medium text-white capitalize">Статистика расходов на рекламу - {{ $profile->name }}</h3>
+              <button onclick="document.getElementById('adStatsModal-{{ $profile->id }}').classList.add('hidden')" class="text-gray-400 hover:text-white">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div class="p-6">
+              @if($profile->tariffs_count > 0)
                 @php
                   // Group tariffs by type
                   $basicTariffs = $profile->tariffs->filter(function($tariff) {
@@ -434,11 +431,21 @@
                     </tbody>
                   </table>
                 </div>
-              </div>
+              @else
+                <div class="text-center py-10">
+                  <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2zm3-9V3a2 2 0 00-2-2H5a2 2 0 00-2 2v4M7 7h10" />
+                  </svg>
+                  <h3 class="mt-2 text-sm font-medium text-white">Нет данных о рекламных кампаниях</h3>
+                  <p class="mt-1 text-sm text-gray-500">
+                    Для данного профиля отсутствуют активные или завершенные рекламные тарифы. Статистика будет доступна после запуска рекламной кампании.
+                  </p>
+                </div>
+              @endif
             </div>
           </div>
         </div>
-      @endif
+      </div>
     @endforeach
   @endif
 
@@ -471,13 +478,11 @@
       </div>
       </div>
       <!-- Ad Stats Button -->
-      @if($profile->tariffs_count > 0)
       <button onclick="document.getElementById('adStatsModal-{{ $profile->id }}').classList.remove('hidden')" class="text-[#C2C2C2] hover:text-white p-1">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
       </button>
-      @endif
       </div>
 
       <div class="mt-4 space-y-2 text-sm">

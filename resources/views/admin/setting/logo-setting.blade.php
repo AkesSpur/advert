@@ -24,6 +24,14 @@
 
 
 
+                <div class="form-group">
+                    <img src="{{asset(@$logoSetting->login_image)}}" width="150px" alt="">
+                    <br>
+                    <label>Изображение для страницы входа</label>
+                    <input type="file" class="form-control" name="login_image" value="">
+                    <input type="hidden" class="form-control" name="old_login_image" value="{{$logoSetting->login_image ?? ''}}">
+                </div>
+
                 <button type="submit" class="btn btn-primary">Обновить</button>
             </form>
         </div>

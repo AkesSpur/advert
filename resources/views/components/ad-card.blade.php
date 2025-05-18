@@ -9,8 +9,9 @@
     'weight' => '66 кг',
     'height' => '175 см',
     'size' => '3 размер',
-    'metro' => 'м. Пионерская, м. Новослободская',
-    'district' => 'р. Василеостровский',
+    'metro_items' => [], // Array of objects: [{name: 'Station Name', slug: 'station-slug'}, ...]
+    'district_display' => 'р. Василеостровский', // For display
+    'district_slug' => '', // For link
     'phone' => '+7 (931) 632-86-00',
     'prices' => [
         'hour' => '4000 руб.',
@@ -20,7 +21,7 @@
     'img' => [],
     ])
 
-<a href="{{route('profiles.clicks', $id)}}" >
+<a href="{{route('profiles.clicks', $id)}}" name="profile">
 <div
     class="bg-[#191919] rounded-2xl mb-3 mr-1 overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:ring-2 hover:ring-[#6340FF] w-full">
     <!-- Image section with gradient overlay -->
@@ -69,7 +70,7 @@
             @if ($video)
             <!-- Video badge -->
             <div class="w-7 h-7 flex items-center justify-center rounded-full bg-pink-500 text-white">
-                <img src="{{asset('assets/svg/vid.png')}}" class="w-4 h-3">
+                <img alt="badge" src="{{asset('assets/svg/vid.png')}}" class="w-4 h-3">
 
             </div>                
             @endif
@@ -93,7 +94,7 @@
         <!-- Like button -->
         <button 
             onclick="event.preventDefault(); event.stopPropagation();"
-            data-profile-id="{{ $id }}"
+            data-profile-id="{{ $id }}" name="like"
             class="like-button absolute top-3 right-3 p-1.5 hover:scale-105 transition z-20 rounded-full 'bg-transparent'">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" 
                 fill="{{ Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $id)->exists() ? 'red' : 'none' }}" 
@@ -112,7 +113,7 @@
         <div class="absolute inset-0 flex items-center justify-between z-10 transition-opacity duration-300"
             :class="{ 'opacity-100 pointer-events-auto': isHovering, 'opacity-0 pointer-events-none': !isHovering }">
 
-            <button @click.stop.prevent="prevSlide()"
+            <button @click.stop.prevent="prevSlide()" name="prev"
                 class="text-[#FFFFFFCC] ml-2 hover:scale-110 transition-transform duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" fill="none" viewBox="0 0 24 24"
                     stroke="white">
@@ -120,7 +121,7 @@
                 </svg>
             </button>
 
-            <button @click.stop.prevent="nextSlide()"
+            <button @click.stop.prevent="nextSlide()" name="next"
                 class="text-[#FFFFFFCC] mr-2 hover:scale-110 transition-transform duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" fill="none" viewBox="0 0 24 24"
                     stroke="white">
@@ -140,7 +141,7 @@
                           <span>{{ $age }}</span>
                           @if ($verified)
                               <img src="{{ asset('assets/svg/verified.png') }}"
-                                   class="absolute -top-1 -right-4 w-4 h-4">
+                                   class="absolute -top-1 -right-4 w-[24px] h-[24px]" alt="badge">
                           @endif
                       </span>
                   </h3>
@@ -166,15 +167,23 @@
                 <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#4059FF"
                     font-family="Arial, sans-serif">M</text>
             </svg>
-            @if($metro)
-                @php
-                    $metroStations = explode(', ', str_replace('м. ', '', $metro));
-                @endphp
-                <div class="text-[#FFFFFF] line-clamp-2">
-                    @foreach($metroStations as $index => $station)
-                        <a href="{{ route('home', ['metro' => $station]) }}" class="hover:text-[#6340FF] transition-colors">
-                            м. {{ $station }}</a>@if($index < count($metroStations) - 1), @endif
+            @if(!empty($metro_items))
+                <div x-data="{ showAllMetro: false }" class="text-[#FFFFFF]">
+                    @foreach($metro_items as $index => $station_item)
+                        @if($loop->index < 2)
+                            <a href="{{ route('home.metro', ['slug' => $station_item->slug]) }}" class="hover:text-[#6340FF] transition-colors">
+                                м. {{ $station_item->name }}</a>@if(!$loop->last && $loop->index < count($metro_items) - 1 && $loop->index < 1), @endif
+                        @elseif($loop->index >= 2)
+                            <a x-show="showAllMetro" href="{{ route('home.metro', ['slug' => $station_item->slug]) }}" class="hover:text-[#6340FF] transition-colors">
+                                м. {{ $station_item->name }}</a>@if(!$loop->last && $loop->index < count($metro_items) - 1), @endif
+                        @endif
                     @endforeach
+                    @if(count($metro_items) > 2)
+                        <button @click="showAllMetro = !showAllMetro" class="text-[#FFFFFFCC] hover:text-[#6340FF] transition-colors text-sm focus:outline-none">
+                            <span x-show="!showAllMetro">{{ count($metro_items) - 2 }}+ Еще</span>
+                            <span x-show="showAllMetro">Скрыть</span>
+                        </button>
+                    @endif
                 </div>
             @else
                 <span class="text-[#FFFFFF66]">Метро не указано</span>
@@ -186,13 +195,27 @@
                 <path
                     d="M12 2C7.589 2 4 5.589 4 9.995C4 15.4 12 22 12 22C12 22 20 15.4 20 9.995C20 5.589 16.411 2 12 2ZM12 14C9.791 14 8 12.209 8 10C8 7.791 9.791 6 12 6C14.209 6 16 7.791 16 10C16 12.209 14.209 14 12 14Z" />
             </svg>
-            @if($district)
-                @php
-                    $districtName = str_replace('р. ', '', $district);
-                @endphp
-                <a href="{{ route('home', ['district' => $districtName]) }}" class="text-[#FFFFFF] hover:text-[#6340FF] transition-colors">
-                    {{ $district }}
-                </a>
+            @php
+                $districts = is_array($district_display) ? $district_display : [];
+            @endphp
+            @if(!empty($districts))
+                <div x-data="{ showAllDistricts: false }" class="text-[#FFFFFF]">
+                    @foreach($districts as $index => $district_item)
+                         @if($loop->index < 2)
+                            <a href="{{ route('home.neighborhood', ['slug' => $district_item['slug']]) }}" class="hover:text-[#6340FF] transition-colors">
+                                {{ $district_item['name'] }}</a>@if(!$loop->last && $loop->index < count($districts) - 1 && $loop->index < 1), @endif
+                        @elseif($loop->index >= 2)
+                            <a x-show="showAllDistricts" href="{{ route('home.neighborhood', ['slug' => $district_item['slug']]) }}" class="hover:text-[#6340FF] transition-colors">
+                                {{ $district_item['name'] }}</a>@if(!$loop->last && $loop->index < count($districts) - 1), @endif
+                        @endif
+                    @endforeach
+                    @if(count($districts) > 2)
+                        <button @click="showAllDistricts = !showAllDistricts" class="text-[#FFFFFFCC] hover:text-[#6340FF] transition-colors text-sm focus:outline-none">
+                            <span x-show="!showAllDistricts">{{ count($districts) - 2 }}+ Еще</span>
+                            <span x-show="showAllDistricts">Скрыть</span>
+                        </button>
+                    @endif
+                </div>
             @else
                 <span class="text-[#FFFFFF66]">Район не указан</span>
             @endif

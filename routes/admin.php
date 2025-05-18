@@ -20,6 +20,7 @@ use App\Http\Controllers\Backend\TopMenuController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\Admin\AdTariffController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -95,6 +96,9 @@ Route::get('paid-services/{id}/edit', [PaidServiceController::class, 'edit'])->n
 Route::put('paid-services/{id}', [PaidServiceController::class, 'update'])->name('paid-services.update');
 Route::delete('paid-services/{id}', [PaidServiceController::class, 'destroy'])->name('paid-services.destroy');
 
+/** Ad Tariff routes */
+Route::resource('ad-tariffs', AdTariffController::class);
+
 
 /** comment routes */
 Route::get('comments', [CommentController::class, 'index'])->name('comments.index');
@@ -137,7 +141,8 @@ Route::put('filters/price/{id}', [FilterManageController::class, 'priceUpdate'])
 
 /** Custom Category routes */
 Route::put('custom-category/status-change', [CustomCategoryController::class, 'changeStatus'])->name('custom-category.status-change');
-Route::resource('custom-category', CustomCategoryController::class);
+Route::put('custom-category/change-menu-status', [CustomCategoryController::class, 'changeMenuStatus'])->name('custom-category.change-menu-status');
+    Route::resource('custom-category', CustomCategoryController::class);
 
 // menus
 Route::get('top-menu', [TopMenuController::class, 'index'])->name('top-menu.index');
@@ -159,3 +164,7 @@ Route::get('settings', [SettingController::class, 'index'])->name('settings.inde
 Route::put('general-setting-update', [SettingController::class, 'updateGeneralSetting'])->name('general-setting.update');
 Route::put('email-setting-update', [SettingController::class, 'updateEmailSetting'])->name('email-setting.update');
 Route::put('logo-setting-update', [SettingController::class, 'updateLogoSetting'])->name('logo-setting.update');
+
+// Hero Section Settings
+Route::get('hero-section-setting', [SettingController::class, 'heroSectionSetting'])->name('hero-section-setting.index');
+Route::put('hero-section-setting-update', [SettingController::class, 'updateHeroSectionSetting'])->name('hero-section-setting.update');

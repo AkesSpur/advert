@@ -5,8 +5,8 @@
     window.Laravel.pusherCluster = '{{ env("PUSHER_APP_CLUSTER") }}';
     
     // Debug Pusher configuration
-    console.log('Pusher configuration loaded:', {
-        key: window.Laravel.pusherKey,
-        cluster: window.Laravel.pusherCluster
-    });
+    // console.log('Pusher configuration loaded:', {
+    //     key: window.Laravel.pusherKey,
+    //     cluster: window.Laravel.pusherCluster
+    // });
 </script>

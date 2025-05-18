@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\GeneralSetting;
 use App\Models\EmailSetting; // Assuming EmailSetting model exists
+use App\Models\HeroSectionSetting;
 use App\Models\LogoSetting;  // Assuming LogoSetting model exists
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -31,6 +32,7 @@ class SettingController extends Controller
             'default_h1_heading' => ['nullable', 'string', 'max:255'],
             'default_seo_title' => ['nullable', 'string', 'max:255'],
             'default_seo_description' => ['nullable', 'string'],
+            'yandex_api_key' => ['nullable', 'string', 'max:255'], // Added Yandex API Key validation
         ]);
 
         GeneralSetting::updateOrCreate(
@@ -42,6 +44,7 @@ class SettingController extends Controller
                 'default_h1_heading' => $request->default_h1_heading,
                 'default_seo_title' => $request->default_seo_title,
                 'default_seo_description' => $request->default_seo_description,
+                'yandex_api_key' => $request->yandex_api_key, // Added Yandex API Key saving
             ]
         );
 
@@ -93,12 +96,14 @@ class SettingController extends Controller
         $request->validate([
             'logo' => ['nullable', 'image', 'max:3000'], // Max 3MB
             'favicon' => ['nullable', 'image', 'max:3000'], // Max 1MB, maybe .ico specific validation
+            'login_image' => ['nullable', 'image', 'max:5000'] // Max 5MB
         ]);
 
         $logoSetting = LogoSetting::firstOrCreate(['id' => 1]);
 
         $logoPath = $this->updateImage($request, 'logo', $logoSetting->logo, 'uploads/logos');
         $faviconPath = $this->updateImage($request, 'favicon', $logoSetting->favicon, 'uploads/logos');
+        $loginImagePath = $this->updateImage($request, 'login_image', $logoSetting->login_image, 'uploads/logos');
 
         $updateData = [];
         if ($logoPath) {
@@ -106,6 +111,9 @@ class SettingController extends Controller
         }
         if ($faviconPath) {
             $updateData['favicon'] = $faviconPath;
+        }
+        if ($loginImagePath) {
+            $updateData['login_image'] = $loginImagePath;
         }
 
         if (!empty($updateData)) {
@@ -116,7 +124,44 @@ class SettingController extends Controller
         Artisan::call('cache:clear');
         Artisan::call('config:clear');
 
-        toastr()->success('Logo Settings Updated Successfully!');
+        toastr()->success('Настройки логотипа успешно обновлены!');
+        return redirect()->back();
+    }
+
+    public function heroSectionSetting()
+    {
+        $heroSetting = HeroSectionSetting::first();
+        return view('admin.setting.hero-section-setting', compact('heroSetting'));
+    }
+
+    public function updateHeroSectionSetting(Request $request)
+    {
+        $request->validate([
+            'title' => ['nullable', 'string', 'max:255'],
+            'text_content' => ['nullable', 'string'],
+            'image' => ['nullable', 'image', 'max:5000'] // Max 5MB
+        ]);
+
+        $heroSetting = HeroSectionSetting::firstOrCreate(['id' => 1]);
+
+        $imagePath = $this->updateImage($request, 'image', $heroSetting->image, 'uploads/hero');
+
+        $updateData = [
+            'title' => $request->title,
+            'text_content' => $request->text_content,
+        ];
+
+        if ($imagePath) {
+            $updateData['image'] = $imagePath;
+        }
+
+        $heroSetting->update($updateData);
+
+        // Clear cache for settings
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+
+        toastr()->success('Настройки секции Hero успешно обновлены!');
         return redirect()->back();
     }
 }

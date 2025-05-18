@@ -1,8 +1,8 @@
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
         <div class="sidebar-brand">
-            <a href="">
-                {{ env('APP_NAME') }}
+            <a href="{{route('admin.dashboard')}}">
+               {{$settings->site_name}}
         </a>
         </div>
         <div class="sidebar-brand sidebar-brand-sm">
@@ -21,7 +21,8 @@
             </li>
 
 
-            <hr>
+            <li class="menu-header">Управление</li>
+
 
             <li
             class="dropdown {{ setActive([
@@ -108,6 +109,15 @@
         </li>
     </ul>
 </li>
+
+
+        <li class="dropdown {{ setActive(['admin.ad-tariffs.*']) }}"><a class="nav-link"
+            href="{{ route('admin.ad-tariffs.index') }}"><i class="fas fa-ad"></i>
+            <span>
+                Тарифы на рекламу
+            </span>
+            </a>
+    </li>
 
 <li class="{{ setActive(['admin.comments.*']) }}"><a class="nav-link" href="{{ route('admin.comments.index') }}">
     <i class="fas fa-comments"></i>
@@ -226,9 +236,12 @@ class="dropdown {{ setActive([
             </a>
             </li>
 
-            <li class="{{ setActive(['admin.settings.*']) }}">
-                <a class="nav-link" href="{{ route('admin.settings.index') }}">
-                    <i class="fas fa-cog"></i> <span>Настройки</span></a>
+            <li class="dropdown {{setActive(['admin.settings.*', 'admin.hero-section-setting.*'])}}">
+                <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-cog"></i> <span>Настройки</span></a>
+                <ul class="dropdown-menu">
+                    <li class="{{setActive(['admin.settings.*'])}}"><a class="nav-link" href="{{route('admin.settings.index')}}">Общие настройки</a></li>
+                    <li class="{{setActive(['admin.hero-section-setting.*'])}}"><a class="nav-link" href="{{route('admin.hero-section-setting.index')}}">Настройки секции Hero</a></li>
+                </ul>
             </li>
             
         </ul>

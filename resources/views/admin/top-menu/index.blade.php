@@ -48,36 +48,46 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                      {{-- each data --}}
+                                      {{-- Predefined Menus --}}
                                       @foreach ($menus as $menu)
-
                                         <tr role="row" class="odd">
-
                                             <td>{{$menu->id}}</td>
-
-                                            <td>{{$menu->name}}</td>
-
+                                            <td>{{$menu->name}} (Предопределенное)</td>
                                             <td>
-                                                
                                               @if($menu->status == true )
                                                 <label class="custom-switch mt-2">
-                                                    <input type="checkbox" checked name="custom-switch-checkbox" data-id="{{$menu->id}}" class="custom-switch-input change-status" >
+                                                    <input type="checkbox" checked name="custom-switch-checkbox" data-id="{{$menu->id}}" data-type="predefined" class="custom-switch-input change-status" >
                                                     <span class="custom-switch-indicator"></span>
                                                 </label>
                                               @else 
                                                 <label class="custom-switch mt-2">
-                                                    <input type="checkbox" name="custom-switch-checkbox" data-id="{{$menu->id}}" class="custom-switch-input change-status">
+                                                    <input type="checkbox" name="custom-switch-checkbox" data-id="{{$menu->id}}" data-type="predefined" class="custom-switch-input change-status">
                                                     <span class="custom-switch-indicator"></span>
                                                 </label>
                                               @endif
-
                                             </td>
-
                                             <td>
                                                 <a href="{{route('admin.top-menu.edit', $menu->id)}}" class='btn btn-primary'><i class='far fa-edit'></i></a>                                                  
                                             </td>
                                         </tr>                                                  
-                                        @endforeach
+                                      @endforeach
+
+                                      {{-- Custom Categories for Top Menu --}}
+                                      @foreach ($customCategories as $category)
+                                        <tr role="row" class="odd">
+                                            <td>CC-{{$category->id}}</td> {{-- Prefix to distinguish from predefined --}}
+                                            <td>{{$category->name}} (Пользовательская)</td>
+                                            <td>
+                                                <label class="custom-switch mt-2">
+                                                    <input type="checkbox" {{ $category->show_in_top_menu ? 'checked' : '' }} name="custom-switch-checkbox" data-id="{{ $category->id }}" data-type="custom" data-menu-type="top" class="custom-switch-input change-custom-category-menu-status">
+                                                    <span class="custom-switch-indicator"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <a href="{{route('admin.custom-category.edit', $category->id)}}" class='btn btn-info'><i class='far fa-eye'></i></a> {{-- Link to custom category edit --}}
+                                            </td>
+                                        </tr>
+                                      @endforeach
                                     </tbody>
                                 </table>
                             </div>
@@ -102,14 +112,28 @@
             $('body').on('click', '.change-status', function(){
                 let isChecked = $(this).is(':checked');
                 let id = $(this).data('id');
+                let type = $(this).data('type'); // 'predefined' or 'custom'
+
+                let url = "";
+                let dataPayload = {};
+
+                if (type === 'predefined') {
+                    url = "{{route('admin.top-menu.status-change')}}";
+                    dataPayload = {
+                        status: isChecked,
+                        id: id,
+                        _token: "{{ csrf_token() }}"
+                    };
+                } else { // This case should not happen with current setup, but good for future
+                    // Potentially handle other types if needed
+                    return; 
+                }
 
                 $.ajax({
-                  url: "{{route('admin.top-menu.status-change')}}",
+                    url: url,
                     method: 'PUT',
-                    data: {
-                        status: isChecked,
-                        id: id
-                    },
+                    data: dataPayload,
+
                     success: function(data){
                         toastr.success(data.message)
                     },
@@ -118,6 +142,31 @@
                     }
                 })
 
+            })
+
+            // Handle Custom Category Menu Status Change
+            $('body').on('click', '.change-custom-category-menu-status', function(){
+                let isChecked = $(this).is(':checked');
+                let id = $(this).data('id');
+                // menuType is already defined in the data attribute as 'top' for this view
+
+                $.ajax({
+                    url: "{{ route('admin.custom-category.change-menu-status') }}",
+                    method: 'PUT',
+                    data: {
+                        status: isChecked,
+                        id: id,
+                        menu_type: 'top', // Explicitly 'top' for this view
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(data){
+                        toastr.success(data.message)
+                    },
+                    error: function(xhr, status, error){
+                        console.log(error);
+                        toastr.error('Произошла ошибка при обновлении статуса меню пользовательской категории.');
+                    }
+                })
             })
         })
     </script>

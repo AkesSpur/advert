@@ -924,7 +924,7 @@
                     <!-- Custom Categories as Filter Buttons -->
                     @if(isset($customCategories) && count($customCategories) > 0)
                         @foreach($customCategories as $category)
-                            @if($category->status == 1)
+                            @if($category->status == 1 && $category->show_in_top_menu == 1)
                             <a href="{{ url('/category/' . $category->slug) }}" 
                                class="capitalize px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ request()->is('category/' . $category->slug) ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">{{ $category->name }}</a>
                             @endif
@@ -1086,39 +1086,85 @@
     <div class="py-8 md:py-12 lg:py-16">
         <div class="max-w-screen-2xl mx-auto px-6">
             <div class="flex flex-col md:flex-col lg:flex-row items-stretch h-full">
+                @php
+                    $heroSetting = \App\Models\HeroSectionSetting::first();
+                @endphp
                 <!-- Text Content -->
                 <div class="w-full lg:w-1/2 p-5 text-white bg-[#191919] rounded-tl-3xl lg:rounded-bl-3xl rounded-tr-3xl lg:rounded-tr-none">
-                    <h1 class="text-3xl md:text-4xl font-bold mb-6">База анкет проституток, откровенные индивидуалки</h1>
+                    <h1 class="text-3xl md:text-4xl font-bold mb-6">{{@$heroSetting->title ?? 'База анкет проституток, откровенные индивидуалки'}}</h1>
                     <div class="space-y-4 text-[#FFFFFFCC]">
-                        <p>Здравствуйте, дорогой гость нашего сайта для взрослых! Если вас интересуют лучшие проститутки из Челябинска, обязательно изучите представленную подборку анкет, и вы сможете подобрать идеальную шлюху для совместных развлечений. Девушки, страницы которых опубликованы в нашем масштабном каталоге, отличаются:</p>
-                        
-                        <ul class="list-disc pl-5 space-y-1">
-                            <li>ослепительно красивой внешностью;</li>
-                            <li>шикарными формами;</li>
-                            <li>горячим темпераментом;</li>
-                            <li>богатым опытом обслуживания мужчин;</li>
-                            <li>индивидуальным подходом к каждому клиенту.</li>
-                        </ul>
-                        
-                        <p>Кроме того, нашим женщинам характерен широкий ассортимент практикуемых услуг. Каждая индивидуалка практикует десятки видов интимных процедур, выходя за рамки традиционного секса. Сняв обученную путану, вы сможете заказать любые виды секса, в том числе:</p>
-                        
-                        <ul class="list-disc pl-5 space-y-1">
-                            <li>классику;</li>
-                            <li>анал;</li>
-                            <li>минет;</li>
-                            <li>лесби;</li>
-                            <li>БДСМ.</li>
-                        </ul>
+                        {!! @$heroSetting->text_content ?? '<p>Здравствуйте, дорогой гость нашего сайта для взрослых! Если вас интересуют лучшие проститутки из Челябинска, обязательно изучите представленную подборку анкет, и вы сможете подобрать идеальную шлюху для совместных развлечений. Девушки, страницы которых опубликованы в нашем масштабном каталоге, отличаются:</p><ul class="list-disc pl-5 space-y-1"><li>ослепительно красивой внешностью;</li><li>шикарными формами;</li><li>горячим темпераментом;</li><li>богатым опытом обслуживания мужчин;</li><li>индивидуальным подходом к каждому клиенту.</li></ul><p>Кроме того, нашим женщинам характерен широкий ассортимент практикуемых услуг. Каждая индивидуалка практикует десятки видов интимных процедур, выходя за рамки традиционного секса. Сняв обученную путану, вы сможете заказать любые виды секса, в том числе:</p><ul class="list-disc pl-5 space-y-1"><li>классику;</li><li>анал;</li><li>минет;</li><li>лесби;</li><li>БДСМ.</li></ul>' !!}
                     </div>
                 </div>
                 
                 <!-- Image -->
                 <div class="w-full lg:w-1/2 relative">
                     <div class="overflow-hidden shadow-xl bg-[#191919] rounded-bl-3xl lg:rounded-bl-none lg:rounded-tr-3xl rounded-br-3xl h-full">
-                        <img src="{{asset('assets/images/hero.jpg')}}" alt="Hero image" class="w-full h-full object-cover">
+                        <img src="{{asset(@$heroSetting->image ?? 'assets/images/hero.jpg')}}" alt="Hero image" class="w-full h-full object-cover">
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="max-w-screen-2xl px-6 mt-4 mx-auto">
+            <!-- Filter Buttons -->
+            <div class="flex overflow-x-auto hide-scrollbar justify-center gap-3 mb-4">
+                @foreach ($footerMenus as $menu)
+                    @if ($menu->all_accounts == true && $menu->status == true)
+                    <a href="{{ Request::url() }}" 
+                    class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'all' || !$filter ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
+                    {{$menu->name}}
+                    </a>                             
+                    @endif
+
+                    @if ($menu->has_video == true && $menu->status == true)
+                    <a href="{{ Request::url() . '?filter=video' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+                    class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'video' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
+                    {{$menu->name}}
+                    </a>                             
+                    @endif
+
+                    @if ($menu->new == true && $menu->status == true)
+                    <a href="{{ Request::url() . '?filter=new' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+                    class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'new' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
+                    {{$menu->name}}
+                    </a>                             
+                    @endif
+
+                    @if ($menu->vip == true && $menu->status == true)
+                    <a href="{{ Request::url() . '?filter=vip' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+                    class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'vip' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
+                    {{$menu->name}}
+                    </a>
+                         
+                    @endif
+
+                    @if ($menu->cheapest == true && $menu->status == true)
+                    <a href="{{ Request::url() . '?filter=cheap' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+                    class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'cheap' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
+                    {{$menu->name}}
+                    </a>                    
+                    @endif
+
+                    @if ($menu->verified == true && $menu->status == true)
+                    <a href="{{ Request::url() . '?filter=verified' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+                    class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'verified' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
+                    {{$menu->name}}
+                    </a>                             
+                    @endif
+
+                @endforeach
+                
+                <!-- Custom Categories as Filter Buttons -->
+                @if(isset($customCategories) && count($customCategories) > 0)
+                    @foreach($customCategories as $category)
+                        @if($category->status == 1 && $category->show_in_footer_menu == 1)
+                        <a href="{{ url('/category/' . $category->slug) }}" 
+                           class="capitalize px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ request()->is('category/' . $category->slug) ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">{{ $category->name }}</a>
+                        @endif
+                    @endforeach
+                @endif
+            </div>
     </div>
 @endsection

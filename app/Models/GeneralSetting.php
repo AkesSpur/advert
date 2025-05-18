@@ -16,6 +16,7 @@ class GeneralSetting extends Model
         'default_h1_heading',
         'default_seo_title',
         'default_seo_description',
+        'yandex_api_key', // Added Yandex API Key
         // Add any other pre-existing fields from the old general_settings table here if needed
         // For example: 'contact_email', 'contact_phone', 'contact_address', 'currency_name', 'currency_icon'
     ];
