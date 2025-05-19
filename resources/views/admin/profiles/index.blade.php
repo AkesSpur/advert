@@ -219,7 +219,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="">
+      <div class=" ml-4 pl-1">
         <h6 class="text-muted"> 
           Пользователь: 
               <a href="mailto:{{ $profile->user->email }}">{{ $profile->user->email }}</a>

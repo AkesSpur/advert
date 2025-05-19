@@ -4,6 +4,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const videoInput = document.querySelector(".video-input");
     const photoLabels = document.querySelectorAll(".photo-label");
     const videoLabel = document.querySelector(".video-label");
+    
+    // Prevent form submission when Enter is pressed on file inputs
+    // This prevents the file dialog from opening twice
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                return false;
+            }
+        });
+    });
 
     // Setup delete photo functionality
     function setupPhotoDeleteButtons() {
@@ -106,36 +117,65 @@ document.addEventListener("DOMContentLoaded", function () {
     if (deleteVideoCheckbox) {
         const label = deleteVideoCheckbox.closest("label");
         if (label) {
+            // Remove existing event listeners to prevent duplicates
+            const newLabel = label.cloneNode(true);
+            label.parentNode.replaceChild(newLabel, label);
+            
+            // Get the new checkbox reference after cloning
+            const newCheckbox = newLabel.querySelector('input[type="checkbox"]');
+            
             // Add click event to the label itself
-            label.addEventListener("click", function (e) {
+            newLabel.addEventListener("click", function (e) {
                 // Toggle the checkbox when the label is clicked
-                deleteVideoCheckbox.checked = !deleteVideoCheckbox.checked;
+                newCheckbox.checked = !newCheckbox.checked;
 
                 // Visual feedback
-                if (deleteVideoCheckbox.checked) {
-                    label.classList.add("bg-red-700");
+                if (newCheckbox.checked) {
+                    newLabel.classList.add("bg-red-700");
+                    // Add visual indication to the parent container
+                    const videoContainer = newLabel.closest(".video-upload-container");
+                    if (videoContainer) {
+                        videoContainer.classList.add("opacity-50");
+                    }
                 } else {
-                    label.classList.remove("bg-red-700");
+                    newLabel.classList.remove("bg-red-700");
+                    // Remove visual indication from the parent container
+                    const videoContainer = newLabel.closest(".video-upload-container");
+                    if (videoContainer) {
+                        videoContainer.classList.remove("opacity-50");
+                    }
                 }
 
                 e.preventDefault(); // Prevent default label behavior
+                e.stopPropagation(); // Stop event propagation
             });
 
             // Also add click event to the X span inside the label
-            const deleteSpan = label.querySelector("span");
+            const deleteSpan = newLabel.querySelector("span");
             if (deleteSpan) {
                 deleteSpan.addEventListener("click", function (e) {
                     // Toggle the checkbox
-                    deleteVideoCheckbox.checked = !deleteVideoCheckbox.checked;
+                    newCheckbox.checked = !newCheckbox.checked;
 
                     // Visual feedback
-                    if (deleteVideoCheckbox.checked) {
-                        label.classList.add("bg-red-700");
+                    if (newCheckbox.checked) {
+                        newLabel.classList.add("bg-red-700");
+                        // Add visual indication to the parent container
+                        const videoContainer = newLabel.closest(".video-upload-container");
+                        if (videoContainer) {
+                            videoContainer.classList.add("opacity-50");
+                        }
                     } else {
-                        label.classList.remove("bg-red-700");
+                        newLabel.classList.remove("bg-red-700");
+                        // Remove visual indication from the parent container
+                        const videoContainer = newLabel.closest(".video-upload-container");
+                        if (videoContainer) {
+                            videoContainer.classList.remove("opacity-50");
+                        }
                     }
 
                     e.stopPropagation(); // Prevent event from bubbling to label
+                    e.preventDefault(); // Prevent default behavior
                 });
             }
         }

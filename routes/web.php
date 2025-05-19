@@ -6,6 +6,7 @@ use App\Http\Controllers\FormController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\Payment\WebMoneyController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceController;
@@ -27,6 +28,17 @@ use Illuminate\Support\Facades\Route;
 */
 
 require __DIR__ . '/auth.php';
+
+// WebMoney Payment Routes
+Route::group(['prefix' => 'payment/webmoney', 'as' => 'payment.webmoney.'], function () {
+    Route::post('pay', [WebMoneyController::class, 'pay'])->name('pay')->middleware('auth');
+    Route::post('result', [WebMoneyController::class, 'result'])->name('result'); // WebMoney sends POST here
+    Route::get('success', [WebMoneyController::class, 'success'])->name('success')->middleware('auth'); // User redirected here on success
+    Route::get('fail', [WebMoneyController::class, 'fail'])->name('fail')->middleware('auth'); // User redirected here on failure
+});
+
+
+
 
 
 Route::get('/', [PageController::class, 'index'])->name('home');

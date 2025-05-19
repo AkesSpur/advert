@@ -411,7 +411,7 @@
 
 @push('scripts')
 @once
-    <script src="https://api-maps.yandex.ru/2.1/?apikey={{$yandexApiKey}}&lang=ru_RU" type="text/javascript" id="yandex-maps-api-script-index"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey={{ $yandexApiKey ?? 'ef000210-ee4f-45fe-a5a1-2f89cddce2cc' }}&lang=ru_RU" type="text/javascript" id="yandex-maps-api-script-index"></script>
 @endonce
 <script type="text/javascript">
     function initFormMap() {

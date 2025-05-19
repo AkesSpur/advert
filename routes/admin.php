@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Backend\AdminListController;
 use App\Http\Controllers\Backend\ChatController;
 use App\Http\Controllers\Backend\CustomerListController;
+use App\Http\Controllers\Backend\ProfileController as AccountProfileController;
 use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Backend\FilterManageController;
 use App\Http\Controllers\Backend\FooterMenuController;
@@ -35,6 +36,12 @@ Route::prefix('profiles')->name('profiles.')->group(function () {
     Route::post('/{id}/restore', [ProfileController::class, 'restore'])->name('restore');
     Route::delete('/{id}', [ProfileController::class, 'destroy'])->name('destroy');
 });
+
+/** Profile Routes */
+Route::get('profile', [AccountProfileController::class, 'index'])->name('profile');
+Route::post('profile/update', [AccountProfileController::class, 'updateProfile'])->name('profile.update');
+Route::post('profile/update/password', [AccountProfileController::class, 'updatePassword'])->name('password.update');
+
 
 /* verification routes */
 Route::get('verifications', [VerificationController::class, 'adminVerificationList'])->name('verifications.index');
@@ -164,6 +171,7 @@ Route::get('settings', [SettingController::class, 'index'])->name('settings.inde
 Route::put('general-setting-update', [SettingController::class, 'updateGeneralSetting'])->name('general-setting.update');
 Route::put('email-setting-update', [SettingController::class, 'updateEmailSetting'])->name('email-setting.update');
 Route::put('logo-setting-update', [SettingController::class, 'updateLogoSetting'])->name('logo-setting.update');
+Route::put('webmoney-setting-update', [SettingController::class, 'updateWebmoneySetting'])->name('webmoney-setting.update');
 
 // Hero Section Settings
 Route::get('hero-section-setting', [SettingController::class, 'heroSectionSetting'])->name('hero-section-setting.index');

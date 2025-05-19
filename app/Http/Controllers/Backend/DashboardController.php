@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\AdTariffCharge;
 use App\Models\Profile;
 use App\Models\User;
+use App\Models\VerificationPhoto;
+use App\Models\Comment;
+use App\Models\Review;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +49,15 @@ class DashboardController extends Controller
             
         $revenueThisYear = AdTariffCharge::whereYear('charged_at', Carbon::now()->year)
             ->sum('amount');
+
+        // Get pending verifications count
+        $pendingVerifications = VerificationPhoto::where('status', 'pending')->count();
+
+        // Get total comments count
+        $totalComments = Comment::count();
+
+        // Get total reviews count
+        $totalReviews = Review::count();
         
         // Get monthly revenue for chart
         $monthlyRevenue = AdTariffCharge::select(
@@ -80,7 +92,10 @@ class DashboardController extends Controller
             'revenueThisMonth',
             'revenueThisYear',
             'chartData',
-            'monthNames'
+            'monthNames',
+            'pendingVerifications',
+            'totalComments',
+            'totalReviews'
         ));
     }
 }

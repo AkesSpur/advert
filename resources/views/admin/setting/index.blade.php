@@ -20,6 +20,7 @@
                             <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home" role="tab">Общие настройки</a>
                             <a class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab">Настройка почты</a>
                             <a class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages" role="tab">Логотип и Favicon</a>
+                            <a class="list-group-item list-group-item-action" id="list-webmoney-list" data-toggle="list" href="#list-webmoney" role="tab">WebMoney Настройки</a>
 
                           </div>
                         </div>
@@ -31,6 +32,8 @@
                             @include('admin.setting.email-configuration')
 
                             @include('admin.setting.logo-setting')
+
+                            @include('admin.setting.webmoney-setting')
 
                           </div>
                         </div>

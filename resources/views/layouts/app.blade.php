@@ -75,12 +75,17 @@
             <!-- Header -->
             <header class="">
                 <div class="max-w-screen-2xl  mx-auto px-6 py-6 flex items-center justify-between">
-                    <a href="/" class="text-xl font-bold">Logo</a>
+                    <a href="/" class="inline-block">
+                        <img src="{{ asset($logoSetting->logo) }}" 
+                             alt="SHEMK logo" 
+                             class="h-16 w-auto object-contain"
+                             loading="lazy">
+                    </a>
                     <div class="flex items-center gap-4">
                         <div class="text-white">
                             <span>Баланс: </span>
                             <span class="font-medium">{{Auth::user()->balance}} ₽</span>
-                            <a href="#" class="text-white underline ml-2 text-sm">Пополнить</a>
+                            <a href="#" id="topUpBalance" class="text-white underline ml-2 text-sm">Пополнить</a>
                         </div>
                         @if(Auth::user()->role == 'admin')
                         <a href="{{ route('admin.dashboard') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
@@ -210,7 +215,12 @@
                 <div class="max-w-screen-2xl mx-auto px-6">
                     <div class="flex border-t border-[#363636] pt-6 justify-between items-center ">
                         <div class="mb-4 sm:mb-0">
-                            <a href="/" class="text-xl font-bold">Logo</a>
+                            <a href="/" class="inline-block">
+                                <img src="{{ asset($logoSetting->logo) }}" 
+                                     alt="SHEMK logo" 
+                                     class="h-16 w-auto object-contain"
+                                     loading="lazy">
+                            </a>
                         </div>
                         
                         <div class="flex space-x-4">
@@ -266,6 +276,95 @@
     </div>
 @endif
 
+
+    <div id="webmoneyPaymentModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="webmoney-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div id="webmoneyModalOverlay" class="fixed inset-0 transition-opacity bg-gray-800 bg-opacity-75" aria-hidden="true">
+            </div>
+
+            <!-- Modal panel -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-[#1e1e1e] rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                        <h3 class="text-lg font-medium leading-6 text-white" id="webmoney-modal-title">
+                            Пополнение баланса через WebMoney
+                        </h3>
+                        <div class="mt-4">
+                            <form id="webmoneyPaymentForm" action="{{ route('payment.webmoney.pay') }}" method="POST">
+                            {{-- <form id="pay" action="https://merchant.webmoney.com/lmi/payment.asp" method="POST" accept-charset="windows-1251"> --}}
+                                @csrf
+                                <div class="mb-4">
+                                    <label for="amount" class="block text-sm font-medium text-gray-300">Сумма пополнения (₽)</label>
+                                    <input type="number" name="amount" id="amount" class="w-full px-3 py-2 mt-1 text-gray-300 bg-[#2a2a2a] border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required min="1" placeholder="Введите сумму">
+                                </div>
+                                <input type="hidden" name="LMI_PAYMENT_NO" value="{{ time() }}_{{ Auth::id() }}">
+                                <input type="hidden" name="LMI_PAYMENT_DESC" value="Пополнение баланса пользователя {{ Auth::user()->email }}">
+                                {{-- <input type="hidden" name="LMI_PAYEE_PURSE" value="{{ config('services.webmoney.merchant_purse') }}"> --}}
+                                <p class="text-xs text-gray-400 mt-2">Вы будете перенаправлены на сайт WebMoney для завершения платежа.</p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
+                    <button 
+                        type="submit" 
+                        form="webmoneyPaymentForm" 
+                        class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#1e1e1e] focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
+                    >
+                        Перейти к оплате
+                    </button>
+                    <button 
+                        type="button" 
+                        id="webmoneyModalCloseButton"
+                        class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-300 bg-gray-700 border border-gray-600 rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#1e1e1e] focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                    >
+                        Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const topUpButton = document.getElementById('topUpBalance');
+            const webmoneyModal = document.getElementById('webmoneyPaymentModal');
+            const webmoneyModalCloseButton = document.getElementById('webmoneyModalCloseButton');
+            const webmoneyModalOverlay = document.getElementById('webmoneyModalOverlay');
+
+            function openModal() {
+                webmoneyModal.classList.remove('hidden');
+            }
+
+            function closeModal() {
+                webmoneyModal.classList.add('hidden');
+            }
+
+            if (topUpButton) {
+                topUpButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    openModal();
+                });
+            }
+
+            if (webmoneyModalCloseButton) {
+                webmoneyModalCloseButton.addEventListener('click', closeModal);
+            }
+
+            if (webmoneyModalOverlay) {
+                webmoneyModalOverlay.addEventListener('click', closeModal);
+            }
+
+            // Optional: Close modal on Escape key press
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && !webmoneyModal.classList.contains('hidden')) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
 
          @stack('scripts')
          <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>

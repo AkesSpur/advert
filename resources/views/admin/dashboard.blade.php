@@ -67,6 +67,51 @@
                 </div>
             </div>
         </div>
+        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <div class="card-icon bg-danger">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div class="card-wrap">
+                    <div class="card-header">
+                        <h4>Заявки на верификацию</h4>
+                    </div>
+                    <div class="card-body">
+                        {{ number_format($pendingVerifications) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <div class="card-icon bg-secondary">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="card-wrap">
+                    <div class="card-header">
+                        <h4>Всего комментариев</h4>
+                    </div>
+                    <div class="card-body">
+                        {{ number_format($totalComments) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <div class="card-icon bg-dark">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="card-wrap">
+                    <div class="card-header">
+                        <h4>Всего отзывов</h4>
+                    </div>
+                    <div class="card-body">
+                        {{ number_format($totalReviews) }}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row">

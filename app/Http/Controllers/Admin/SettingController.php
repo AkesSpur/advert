@@ -20,7 +20,12 @@ class SettingController extends Controller
         $generalSettings = GeneralSetting::first();
         $emailSettings = EmailSetting::first(); // Fetch email settings
         $logoSetting = LogoSetting::first(); // Fetch logo settings
-        return view('admin.setting.index', compact('generalSettings', 'emailSettings', 'logoSetting'));
+        $webmoneySettings = [
+            'merchant_purse' => config('services.webmoney.merchant_purse'),
+            'secret_key' => config('services.webmoney.secret_key'),
+            'sim_mode' => config('services.webmoney.sim_mode'),
+        ];
+        return view('admin.setting.index', compact('generalSettings', 'emailSettings', 'logoSetting', 'webmoneySettings'));
     }
 
     public function updateGeneralSetting(Request $request)
@@ -162,6 +167,44 @@ class SettingController extends Controller
         Artisan::call('config:clear');
 
         toastr()->success('Настройки секции Hero успешно обновлены!');
+        return redirect()->back();
+    }
+
+    public function updateWebmoneySetting(Request $request)
+    {
+        $request->validate([
+            'webmoney_merchant_purse' => ['required', 'string', 'max:255'],
+            'webmoney_secret_key' => ['required', 'string', 'max:255'],
+            'webmoney_sim_mode' => ['required', 'in:0,1'],
+        ]);
+
+        // It's generally better to store sensitive keys in .env file
+        // and update them using a method that modifies .env or by instructing the user.
+        // For simplicity here, we'll update config/services.php directly.
+        // This requires config/services.php to be writable by the web server.
+        // A more robust solution would involve a custom config writer or .env manipulation.
+
+        $path = config_path('services.php');
+        $config = require $path;
+
+        // Ensure 'webmoney' key exists
+        if (!isset($config['webmoney'])) {
+            $config['webmoney'] = [];
+        }
+
+        $config['webmoney']['merchant_purse'] = $request->webmoney_merchant_purse;
+        $config['webmoney']['secret_key'] = $request->webmoney_secret_key;
+        $config['webmoney']['sim_mode'] = $request->webmoney_sim_mode;
+
+        $newConfigContent = "<?php\n\nreturn " . var_export($config, true) . ";\n";
+
+        file_put_contents($path, $newConfigContent);
+
+        // Clear cache for settings
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+
+        toastr()->success('Настройки WebMoney успешно обновлены!');
         return redirect()->back();
     }
 }

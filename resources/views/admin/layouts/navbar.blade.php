@@ -12,14 +12,9 @@
         </div>
       </a>
         <div class="dropdown-menu dropdown-menu-right">
-          <a href="" class="dropdown-item has-icon">
+          <a href="{{route('admin.profile')}}" class="dropdown-item has-icon">
             <i class="far fa-user"></i> Профиль
-
-          {{-- <a href="{{route('admin.settings.index')}}" class="dropdown-item has-icon">
-            <i class="fas fa-cog"></i> Настройки
-          </a> --}}
-
-          <div class="dropdown-divider"></div>
+          </a>
 
             <!-- Authentication -->
             <form method="POST" action="{{ route('logout') }}">

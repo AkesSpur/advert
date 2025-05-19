@@ -141,7 +141,7 @@
                           <span>{{ $age }}</span>
                           @if ($verified)
                               <img src="{{ asset('assets/svg/verified.png') }}"
-                                   class="absolute -top-1 -right-4 w-[24px] h-[24px]" alt="badge">
+                                   class="absolute -top-1 -right-4 w-4 h-4" alt="badge">
                           @endif
                       </span>
                   </h3>

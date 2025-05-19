@@ -161,9 +161,7 @@ class ProfileController extends Controller
      */
     public function store(Request $request)
     {
-        // echo '<pre>';
-        // var_dump($request->all());
-        // die;
+    
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',

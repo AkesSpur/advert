@@ -152,7 +152,7 @@
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">
                                         {{-- Видео --}}
                                         @if($profile->video)
-                                        <div class="relative">
+                                        <div class="relative video-container">
                                             <video src="{{ asset('storage/' . $profile->video->path) }}" 
                                                 class="aspect-[64/100] object-cover rounded-xl" controls></video>
                                             <div class="absolute top-2 right-2">
@@ -163,7 +163,7 @@
                                             </div>
                                         </div>
                                     @else
-                                        <div class="video-upload-container">
+                                        <div class="video-upload-container video-container">
                                             <label
                                                 class="cursor-pointer aspect-[64/100] sm:aspect-[64/100] md:aspect-[81/100] lg:aspect-[64/100] bg-neutral-900 rounded-xl flex items-center justify-center text-center text-sm text-[#FFFFFF66] hover:text-white hover:bg-neutral-800 transition video-label">
                                                 <div class="video-placeholder">
@@ -187,9 +187,9 @@
                                 <img src="{{ asset('storage/' . $image->path) }}" alt="Фото профиля" 
                                     class="w-full h-full object-cover">
                                 <div class="absolute top-2 right-2">
-                                    <label class="flex items-center justify-center w-6 h-6 bg-red-500 rounded-full cursor-pointer">
+                                    <label class="flex items-center justify-center w-6 h-6 bg-red-500 rounded-full cursor-pointer existing-photo-delete-btn">
                                         <input type="checkbox" name="delete_photos[]" value="{{ $image->id }}" class="hidden"> 
-                                        <button type="button" class="text-white text-sm w-full h-full flex items-center justify-center">×</button>
+                                        <span class="text-white text-sm w-full h-full flex items-center justify-center">×</span>
                                     </label>
                                 </div>
                             </div>

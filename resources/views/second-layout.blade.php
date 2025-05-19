@@ -63,7 +63,12 @@
         <header class="bg-[#000000] pb-2">
             
             <div class="max-w-screen-2xl  mx-auto px-6 py-5 flex items-center justify-between">
-                <a href="/" class="text-xl font-bold">Logo</a>
+                <a href="/" class="inline-block">
+                    <img src="{{ asset($logoSetting->logo) }}" 
+                         alt="SHEMK logo" 
+                         class="h-16 w-auto object-contain"
+                         loading="lazy">
+                </a>
             <h2 class="hidden lg:block text-3xl text-white text-center">{{$seoH1 ?? 'Проститутки услуги в Санкт-Петербурге'}}</h2>     
 
                 <div class="flex space-x-4">
