@@ -77,9 +77,9 @@
                 <div class="max-w-screen-2xl  mx-auto px-6 py-6 flex items-center justify-between">
                     <a href="/" class="inline-block">
                         <img src="{{ asset($logoSetting->logo) }}" 
-                             alt="SHEMK logo" 
-                             class="h-16 w-auto object-contain"
-                             loading="lazy">
+                        alt="SHEMK logo" 
+                        class="h-12 w-auto object-contain"
+                        loading="lazy">
                     </a>
                     <div class="flex items-center gap-4">
                         <div class="text-white">
@@ -215,11 +215,10 @@
                 <div class="max-w-screen-2xl mx-auto px-6">
                     <div class="flex border-t border-[#363636] pt-6 justify-between items-center ">
                         <div class="mb-4 sm:mb-0">
-                            <a href="/" class="inline-block">
-                                <img src="{{ asset($logoSetting->logo) }}" 
-                                     alt="SHEMK logo" 
-                                     class="h-16 w-auto object-contain"
-                                     loading="lazy">
+                            <img src="{{ asset($logoSetting->logo) }}" 
+                            alt="SHEMK logo" 
+                            class="h-12 w-auto object-contain"
+                            loading="lazy">
                             </a>
                         </div>
                         

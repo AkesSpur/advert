@@ -19,6 +19,7 @@ class Review extends Model
         'profile_id',
         'name',
         'comment',
+        'approved',
     ];
 
     /**

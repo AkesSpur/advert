@@ -19,6 +19,7 @@ class CommentController extends Controller
             'content' => 'required|string',
         ]);
 
+        $validated['approved'] = false;
         $comment = Comment::create($validated);
 
         return redirect()->back()->with('success', 'Комментарий успешно добавлен!');
@@ -26,7 +27,7 @@ class CommentController extends Controller
 
     public function index()
     {
-        $comments = Comment::all();
+        $comments = Comment::orderBy('created_at', 'desc')->paginate(20);
         return view('admin.comment.index', compact('comments'));
     }
 
@@ -36,5 +37,17 @@ class CommentController extends Controller
         $comment->delete();
 
         return response(['status' => 'success', 'message' => 'Comment deleted successfully!']);
+    }
+
+    /**
+     * Approve a comment.
+     */
+    public function approve(string $id)
+    {
+        $comment = Comment::findOrFail($id);
+        $comment->approved = true;
+        $comment->save();
+
+        return redirect()->route('admin.comments.index')->with('success', 'Комментарий успешно одобрен!');
     }
 }

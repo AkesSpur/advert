@@ -37,7 +37,7 @@ class SeoTemplate extends Model
             '{город}' => 'St. Petersburg', // Assuming city is fixed for now, or get from config/profile
             '{тип_профиля}' => $profile->profile_type == 'individual' ? 'Индивидуалка' : 'Интим-салон',
             '{описание}' => $profile->description,
-            '{телефон}' => $profile->phone,
+            '{телефон}' => round($profile->phone),
             '{вес}' => $profile->weight,
             '{высота}' => $profile->height,
             '{грудь}' => $profile->size,

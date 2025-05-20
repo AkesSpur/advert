@@ -351,7 +351,7 @@ class PageController extends Controller
                     $profilesQuery->isNew();
                     break;
                 case 'cheap':
-                    $profilesQuery->isCheap($settings->cheap_threshold ?? 0); // Pass threshold from settings
+                    $profilesQuery->isCheap(); // Pass threshold from settings
                     break;
                 case 'verified':
                     $profilesQuery->isVerified();
@@ -610,7 +610,9 @@ class PageController extends Controller
         $profile = Profile::findOrFail($id);
         $profile->incrementClickCount();
 
-        return redirect()->route('profiles.view', $profile->id);
+        return redirect()->route('profiles.view', [
+            'slug' => $profile->slug, // Assuming 'slug' is the route parameter for the profile view
+            'id'=>$profile->id]);
     }
     
     /**
@@ -908,11 +910,79 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
         ));
     }
 
-    public function show($id)
+    public function show($slug, $id)
     {
         $profile = Profile::with(['metroStations', 'services', 'images', 'video', 'neighborhoods'])->findOrFail($id);
-        $profile->incrementViewCount();
 
+        $profile->incrementViewCount();
+        $profile->incrementClickCount();
+
+        $profiles = Profile::with(['metroStations', 'services', 'images', 'video', 'activeAds.adTariff'])
+        ->where('profiles.is_active', true)
+        ->where('profiles.id', '!=', $id)
+        ->inRandomOrder()
+        ->take(4)
+        ->get();
+
+
+                // Sidebar: Services
+                $services = Service::where('status', true)
+                ->withCount(['profiles as profiles_count' => function ($query) {
+                    $query->where('is_active', true);
+                }])
+                    ->orderBy('name')
+                    ->get()
+                    ->map(function($s) {
+                        $slug = isset($s->slug) ? $s->slug : slugify($s->name); // slugify might need to be a helper
+                        return [
+                            'name' => $s->name,
+                            'slug' => $slug,
+                            'value' => $s->slug, // Assuming slug is the value for services
+                            'count' => $s->profiles_count
+                        ];
+                    });
+        
+                // Sidebar: Neighborhoods
+                $neighborhoods = Neighborhood::where('status', true)
+                ->withCount(['profiles as profiles_count' => function ($query) {
+                    $query->where('is_active', true);
+                }])
+                    ->orderBy('name')
+                    ->get()
+                    ->map(function($n) {
+                        $slug = isset($n->slug) ? $n->slug : slugify($n->name);
+                        return [
+                            'name' => $n->name,
+                            'slug' => $slug,
+                            'value' => $n->slug, // Assuming slug is the value for neighborhoods
+                            'count' => $n->profiles_count
+                        ];
+                    });
+        
+                // Sidebar: Metro stations grouped by alphabet
+                $metroStations = MetroStation::where('status', true)
+                ->withCount(['profiles as profiles_count' => function ($query) {
+                    $query->where('is_active', true);
+                }])
+                    ->orderBy('name')
+                    ->get()
+                    ->groupBy(fn($item) => mb_strtoupper(mb_substr($item->name, 0, 1, 'UTF-8')))
+                    ->map(fn($group) => $group->map(fn($station) => [
+                        'name' => $station->name,
+                        'slug' => $station->slug,
+                        'value' => $station->slug, // Assuming slug is the value for metro
+                        'count' => $station->profiles_count
+                    ]))
+                    ->toArray();
+        
+                // New filters from database
+                $hairColors = HairColor::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+                $heights = Height::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+                $weights = Weight::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+                $sizes = Size::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+                $prices = Price::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+                $ages = Age::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
+        
         // Fetch SEO Template for 'profile' pages
         $seoTemplate = SeoTemplate::where('page_type', 'profile')->first();
         $seoTitle = null;
@@ -936,7 +1006,18 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
             $seoH1 = $profile->name . ', ' . $profile->age;
         }
 
-        return view('profiles.profile', compact('profile', 'seoTitle', 'seoMetaDescription', 'seoH1'));
+        return view('profiles.profile', compact(
+            'services',
+            'metroStations',
+            'neighborhoods',
+            'hairColors',
+            'heights',
+            'weights',
+            'sizes',
+            'prices',
+            'ages',
+            'profiles',
+   'profile', 'seoTitle', 'seoMetaDescription', 'seoH1'));
     }
     
   

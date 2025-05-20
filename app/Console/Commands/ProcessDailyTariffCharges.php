@@ -55,6 +55,12 @@ class ProcessDailyTariffCharges extends Command
             foreach ($tariffs as $tariff) {
                 $user = $tariff->profile->user;
                 
+                // Пропускаем проверку баланса и списание средств для администратора (user_id = 1)
+                if ($user->id === 1) {
+                    $this->info("Skipping charge for admin user (ID: 1) for profile {$tariff->profile->id}.");
+                    continue;
+                }
+                
                 // Check if user has enough balance
                 if ($user->balance < $tariff->daily_charge) {
                     $tariff->pause();
@@ -83,6 +89,7 @@ class ProcessDailyTariffCharges extends Command
                 ]);
                 
                 $this->info("Charged user {$user->id} {$tariff->daily_charge} for {$tariff->adTariff->name} tariff.");
+            
             }
         });
         

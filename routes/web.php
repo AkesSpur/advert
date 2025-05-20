@@ -56,7 +56,7 @@ Route::get('/category/{slug}', [PageController::class, 'filterByCustomCategory']
 Route::get('/neighborhood/{slug}', [PageController::class, 'index'])->name('home.neighborhood');
 
 Route::get('/profiles/click/{id}', [PageController::class, 'profileClick'])->name('profiles.clicks');
-Route::get('/profiles/{id}', [PageController::class, 'show'])->name('profiles.view');
+Route::get('/profiles/{slug}-{id}', [PageController::class, 'show'])->name('profiles.view');
 
 // Comment and Review routes (no auth required)
 Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');

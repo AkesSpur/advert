@@ -140,6 +140,8 @@ class TariffController extends Controller
             $now = Carbon::now();
             $dailyCharge = 0;
             $expiresAt = null;
+            $isAdmin = ($user->id === 1); // Проверяем, является ли пользователь администратором
+            $totalCost = 0; // Инициализируем переменную для общей стоимости
 
             // Рассчитываем стоимость и дату окончания в зависимости от типа тарифа
             switch ($tariff->slug) {
@@ -196,6 +198,11 @@ class TariffController extends Controller
                             $expiresAt = $now->copy()->addMonth();
                             break;
                     }
+                    
+                    // Для администратора устанавливаем срок действия VIP на 1 год
+                    // if ($isAdmin) {
+                    //     $expiresAt = $now->copy()->addYear();
+                    // }
 
                     // Проверяем, есть ли у данного профиля уже активный VIP-слот
                     $profileHasActiveVip = ProfileAdTariff::where('profile_id', $profile->id)
@@ -238,7 +245,7 @@ class TariffController extends Controller
                     break;
             }
 
-            // Проверяем баланс пользователя
+            // Проверяем баланс пользователя (пропускаем для администратора)
             if ($tariff->slug === 'vip') {
                 // Для VIP тарифа уже рассчитана полная стоимость выше
                 // totalCost уже установлен в соответствующем блоке switch
@@ -247,7 +254,8 @@ class TariffController extends Controller
                 $totalCost = $dailyCharge;
             }
 
-            if ($user->balance < $totalCost) {
+            // Пропускаем проверку баланса для администратора
+            if (!$isAdmin && $user->balance < $totalCost) {
                 return back()->with('error', 'Недостаточно средств на балансе. Пополните баланс.');
             }
 
@@ -320,8 +328,12 @@ class TariffController extends Controller
 
             // Получаем свежий экземпляр модели User для списания средств с баланса
             $freshUser = User::find($user->id);
-            $freshUser->balance -= $totalCost;
-            $freshUser->save();
+            
+            // Пропускаем списание средств для администратора
+            if (!$isAdmin) {
+                $freshUser->balance -= $totalCost;
+                $freshUser->save();
+            }
             
             // Для VIP тарифа устанавливаем статус VIP
             if ($tariff->slug === 'vip' && isset($queuePosition) && $queuePosition === 0) {
@@ -335,35 +347,40 @@ class TariffController extends Controller
                 $profile->save();
             }
 
-            // Создаем запись о списании
-            AdTariffCharge::create([
-                'profile_ad_tariff_id' => $profileTariff->id,
-                'user_id' => $freshUser->id,
-                'amount' => $totalCost,
-                'charged_at' => $now,
-            ]);
+            // Создаем запись о списании (пропускаем для администратора)
+            if (!$isAdmin) {
+                AdTariffCharge::create([
+                    'profile_ad_tariff_id' => $profileTariff->id,
+                    'user_id' => $freshUser->id,
+                    'amount' => $totalCost,
+                    'charged_at' => $now,
+                ]);
 
-            // Создаем транзакцию с подробным описанием
-            $description = '';
-            switch ($tariff->slug) {
-                case 'basic':
-                    $description = "Приобретение базового тарифа для профиля ID№{$profile->id}";
-                    break;
-                case 'priority':
-                    $description = "Приоритетное приобретение тарифов (уровень {$profileTariff->priority_level}) для профиля ID№{$profile->id}";
-                    break;
-                case 'vip':
-                    $description = "VIP-покупка для профиля ID№{$profile->id}";
-                    break;
+                // Создаем транзакцию с подробным описанием
+                $description = '';
+                switch ($tariff->slug) {
+                    case 'basic':
+                        $description = "Приобретение базового тарифа для профиля ID№{$profile->id}";
+                        break;
+                    case 'priority':
+                        $description = "Приоритетное приобретение тарифов (уровень {$profileTariff->priority_level}) для профиля ID№{$profile->id}";
+                        break;
+                    case 'vip':
+                        $description = "VIP-покупка для профиля ID№{$profile->id}";
+                        break;
+                }
+                
+                $freshUser->transactions()->create([
+                    'amount' => -$totalCost,
+                    'type' => 'purchase',
+                    'status' => 'completed',
+                    'reference_id' => $tariff->slug . '_tariff_' . $profileTariff->id,
+                    'description' => $description,
+                ]);
+            } else {
+                // Для администратора просто логируем информацию без финансовых операций
+                info("Admin (ID: 1) activated {$tariff->slug} tariff for profile ID№{$profile->id} without charge.");
             }
-            
-            $freshUser->transactions()->create([
-                'amount' => -$totalCost,
-                'type' => 'purchase',
-                'status' => 'completed',
-                'reference_id' => $tariff->slug . '_tariff_' . $profileTariff->id,
-                'description' => $description,
-            ]);
         
     
             return redirect()->route('user.advert.index')->with('success', 'Тариф успешно активирован для вашего профиля.');          

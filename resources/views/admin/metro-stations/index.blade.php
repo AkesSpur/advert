@@ -58,7 +58,7 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-center mt-2">
                                 <div class="text-muted">
-                                    Showing {{ $metroStations->firstItem() }}–{{ $metroStations->lastItem() }} of {{ $metroStations->total() }}
+                                    Показать {{ $metroStations->firstItem() }}–{{ $metroStations->lastItem() }} из {{ $metroStations->total() }}
                                 </div>
                                 <div>
                                     {{ $metroStations->links() }}

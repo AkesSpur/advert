@@ -20,6 +20,7 @@ class ReviewController extends Controller
             'comment' => 'required|string',
         ]);
 
+        $validated['approved'] = false;
         $review = Review::create($validated);
 
         return redirect()->back()->with('success', 'Отзыв успешно добавлен!');
@@ -27,7 +28,7 @@ class ReviewController extends Controller
 
     public function index()
     {
-        $reviews = Review::all();
+        $reviews = Review::orderBy('created_at', 'desc')->paginate(20);
         return view('admin.review.index', compact('reviews'));
     }
 
@@ -37,5 +38,17 @@ class ReviewController extends Controller
         $review->delete();
 
         return response(['status' => 'success', 'message' => 'Review deleted successfully!']);
+    }
+
+    /**
+     * Approve a review.
+     */
+    public function approve(string $id)
+    {
+        $review = Review::findOrFail($id);
+        $review->approved = true;
+        $review->save();
+
+        return redirect()->route('admin.reviews.index')->with('success', 'Отзыв успешно одобрен!');
     }
 }

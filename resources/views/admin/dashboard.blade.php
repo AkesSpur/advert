@@ -7,7 +7,7 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
             <div class="card card-statistic-1">
                 <div class="card-icon bg-primary">
                     <i class="fas fa-users"></i>
@@ -22,7 +22,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
             <div class="card card-statistic-1">
                 <div class="card-icon bg-success">
                     <i class="fas fa-user-circle"></i>
@@ -37,7 +37,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
             <div class="card card-statistic-1">
                 <div class="card-icon bg-warning">
                     <i class="fas fa-crown"></i>
@@ -52,7 +52,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
             <div class="card card-statistic-1">
                 <div class="card-icon bg-info">
                     <i class="fas fa-hourglass-half"></i>
@@ -67,7 +67,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
             <div class="card card-statistic-1">
                 <div class="card-icon bg-danger">
                     <i class="fas fa-user-check"></i>
@@ -82,7 +82,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
             <div class="card card-statistic-1">
                 <div class="card-icon bg-secondary">
                     <i class="fas fa-comments"></i>
@@ -93,11 +93,14 @@
                     </div>
                     <div class="card-body">
                         {{ number_format($totalComments) }}
+                        @if($pendingComments > 0)
+                            <span class="text-small text-warning">({{ number_format($pendingComments) }} ожидают проверки)</span>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
             <div class="card card-statistic-1">
                 <div class="card-icon bg-dark">
                     <i class="fas fa-star"></i>
@@ -108,6 +111,9 @@
                     </div>
                     <div class="card-body">
                         {{ number_format($totalReviews) }}
+                        @if($pendingReviews > 0)
+                            <span class="text-small text-warning">({{ number_format($pendingReviews) }} ожидают проверки)</span>
+                        @endif
                     </div>
                 </div>
             </div>

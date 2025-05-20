@@ -55,9 +55,11 @@ class DashboardController extends Controller
 
         // Get total comments count
         $totalComments = Comment::count();
+        $pendingComments = Comment::where('approved', false)->count();
 
         // Get total reviews count
         $totalReviews = Review::count();
+        $pendingReviews = Review::where('approved', false)->count();
         
         // Get monthly revenue for chart
         $monthlyRevenue = AdTariffCharge::select(
@@ -95,7 +97,9 @@ class DashboardController extends Controller
             'monthNames',
             'pendingVerifications',
             'totalComments',
-            'totalReviews'
+            'pendingComments',
+            'totalReviews',
+            'pendingReviews'
         ));
     }
 }

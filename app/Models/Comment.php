@@ -19,6 +19,7 @@ class Comment extends Model
         'profile_id',
         'name',
         'content',
+        'approved',
     ];
 
     /**

@@ -32,7 +32,7 @@
             </div>
             <hr>
             <div class="form-group">
-                <label>Yandex Maps API Key</label>
+                <label>Ключ API Яндекс Карт</label>
                 <input type="text" class="form-control" name="yandex_api_key" value="{{@$generalSettings->yandex_api_key}}">
             </div>
             <button type="submit" class="btn btn-primary">Обновить</button>

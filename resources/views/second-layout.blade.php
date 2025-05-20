@@ -66,7 +66,7 @@
                 <a href="/" class="inline-block">
                     <img src="{{ asset($logoSetting->logo) }}" 
                          alt="SHEMK logo" 
-                         class="h-16 w-auto object-contain"
+                         class="h-12 w-auto object-contain"
                          loading="lazy">
                 </a>
             <h2 class="hidden lg:block text-3xl text-white text-center">{{$seoH1 ?? 'Проститутки услуги в Санкт-Петербурге'}}</h2>     
@@ -119,7 +119,12 @@
             <div class="max-w-screen-2xl mx-auto px-6">
                 <div class="flex  border-t border-[#363636] pt-6 justify-between items-center ">
                     <div class="mb-4 sm:mb-0">
-                        <a href="/" class="text-xl font-bold">Logo</a>
+                        <a href="/" class="text-xl font-bold">
+                            <img src="{{ asset($logoSetting->logo) }}" 
+                            alt="SHEMK logo" 
+                            class="h-12 w-auto object-contain"
+                            loading="lazy">
+                        </a>
                     </div>
 
                     <div class="flex space-x-4">

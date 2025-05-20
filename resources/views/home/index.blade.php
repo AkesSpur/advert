@@ -610,7 +610,10 @@
         
         <!-- Modal Header -->
         <div class="flex items-center justify-between p-4 border-b border-gray-800">
-            <div class="text-xl font-bold">Logo</div>
+            <div class="text-xl font-bold">    <img src="{{ asset($logoSetting->logo) }}" 
+                alt="SHEMK logo" 
+                class="h-12 w-auto object-contain"
+                loading="lazy"></div>
             <button @click="showModal = false" class="text-white text-2xl">&times;</button>
         </div>
         

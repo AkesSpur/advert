@@ -119,20 +119,40 @@
             </a>
     </li>
 
-<li class="{{ setActive(['admin.comments.*']) }}"><a class="nav-link" href="{{ route('admin.comments.index') }}">
-    <i class="fas fa-comments"></i>
- <span>
-    Комментарии
-</span>   
-</a>
+<li class="{{ setActive(['admin.comments.*']) }}">
+    <a class="nav-link d-flex align-items-center justify-content-between" href="{{ route('admin.comments.index') }}">
+        <div>
+            <i class="fas fa-comments"></i>
+            <span>Комментарии</span>
+        </div>
+        @php
+            $pendingComments = \App\Models\Comment::where('approved', false)->count();
+        @endphp
+        @if($pendingComments > 0)
+            <span class="badge rounded-circle bg-warning text-white d-flex align-items-center justify-content-center"
+                  style="width: 24px; height: 24px;">
+                {{ $pendingComments }}
+            </span>
+        @endif
+    </a>
 </li>
 
-<li class="{{ setActive(['admin.reviews.*']) }}"><a class="nav-link" href="{{ route('admin.reviews.index') }}">
-    <i class="fas fa-star"></i>
- <span>
-    Отзывы
-</span>   
-</a>
+<li class="{{ setActive(['admin.reviews.*']) }}">
+    <a class="nav-link d-flex align-items-center justify-content-between" href="{{ route('admin.reviews.index') }}">
+        <div>
+            <i class="fas fa-star"></i>
+            <span>Отзывы</span>
+        </div>
+        @php
+            $pendingReviews = \App\Models\Review::where('approved', false)->count();
+        @endphp
+        @if($pendingReviews > 0)
+            <span class="badge rounded-circle bg-warning text-white d-flex align-items-center justify-content-center"
+                  style="width: 24px; height: 24px;">
+                {{ $pendingReviews }}
+            </span>
+        @endif
+    </a>
 </li>
 
 <li class="{{ setActive(['admin.verifications.*']) }}"><a class="nav-link" href="{{ route('admin.verifications.index') }}">
@@ -203,6 +223,7 @@ class="dropdown {{ setActive([
 
 </ul>
 </li>
+<li class="{{ setActive(['admin.transactions.*']) }}"><a class="nav-link" href="{{ route('admin.transactions.index') }}"><i class="fas fa-exchange-alt"></i><span>Транзакции</span></a></li>
 
 
             <li
@@ -235,6 +256,7 @@ class="dropdown {{ setActive([
             </span>   
             </a>
             </li>
+
 
             <li class="dropdown {{setActive(['admin.settings.*', 'admin.hero-section-setting.*'])}}">
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-cog"></i> <span>Настройки</span></a>

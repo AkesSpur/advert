@@ -1,4 +1,4 @@
-@extends('second-layout')
+@extends('profile-layout')
 
 @section('content')
     <style>
@@ -46,7 +46,7 @@
             <div class="block md:block lg:hidden py-2 px-4">
                 <div class="flex items-center mb-1 md:mb-none">
                     <h1 class="text-3xl capitalize font-semibold text-white mr-2 relative">
-                        {{ ($profile->name . ', ' . $profile->age) }}
+                        {{ $seoh1 ?? ($profile->name . ', ' . $profile->age) }}
                         @if ($profile->is_verified)
                             <span class="absolute -top-1 -right-5">
                                 <img src="{{ asset('assets/svg/verified.png') }}" class="w-4 h-4">
@@ -226,7 +226,7 @@
                 <div class="lg:block lg:w-1/2 p-4 hidden">
                     <div class="flex items-center ">
                         <h1 class="text-3xl capitalize font-semibold text-white mr-2 relative">
-                            {{  ($profile->name . ', ' . $profile->age) }}
+                            {{  $seoh1 ?? ($profile->name . ', ' . $profile->age) }}
                             @if ($profile->is_verified)
                                 <span class="absolute -top-1 -right-5">
                                     <img src="{{ asset('assets/svg/verified.png') }}" class="w-4 h-4">
@@ -547,9 +547,9 @@
         </div>
 
             <!-- Map Location -->
-            <div class="flex md:w-1/2 flex-col md:flex-row gap-8 mb-8">
+            <div class="flex lg:w-1/2 flex-col md:flex-row gap-8 mb-8">
                 <div class="w-full">
-                    <h3 class="text-4xl w-full font-semibold mb-8 capitalize">Расположение на карте</h3>
+                    <h3 class="text-3xl  w-full font-semibold mb-8 capitalize">Расположение на карте</h3>
                     @if ($profile->latitude && $profile->longitude)
                         <div id="map" class="rounded-xl overflow-hidden" style="width: 100%; height: 400px;"></div>
                         <p id="map-address" class="text-[#A0A0A0] mt-2 mb-2"></p>
@@ -653,29 +653,38 @@
                     data-tab="comments">Вопросы и комментарии</button>
                 <button id="tab-reviews"
                     class="tab-button px-4 py-2 bg-transparent border border-gray-700 rounded-md text-white"
-                    data-tab="reviews">Отзывы реальных клиентов</button>
+                    data-tab="reviews">
+                <span class="flex">
+                    <span>Отзывы</span>
+                    <span class="hidden md:flex">реальных клиентов</span>
+                </span>
+                </button>
             </div>
 
             <!-- Comments Tab Content -->
             <div id="tab-content-comments" class="tab-content">
                 <!-- Comments List -->
                 <div class="space-y-6">
-                    @forelse($profile->comments as $comment)
+                    @forelse($profile->comments->where('approved', true) as $comment)
+                    
                         <div class="bg-[#1A1A1A] rounded-xl p-6">
-                            <div class="flex flex-col mb-2">
-                                <div class="text-lg font-semibold">{{ $comment->name }}</div>
-                                <span class="text-gray-400">{{ $comment->created_at->format('d.m.Y') }}</span>
+                            <div class="flex flex-col mb-6">
+                                <div class="text-2xl font-semibold mb-2">{{ $comment->name }}</div>
+                                <span class="text-[#636363] text-sm">{{ $comment->created_at->format('d.m.Y') }}</span>
                             </div>
-                            <p class="text-gray-300">{{ $comment->content }}</p>
+                            <p class="text-lg text-[#FFFFFFCC]">{{ $comment->content }}</p>
                         </div>
                     @empty
-
+                        <div class="bg-[#1A1A1A] rounded-xl p-6 text-center">
+                            <p class="text-gray-300">Пока нет комментариев. Будьте первым!</p>
+                        </div>
                     @endforelse
                 </div>
 
                 <!-- Comment Form -->
                 <div class="mt-8">
-                    <h3 class="text-4xl font-semibold my-8">Добавить свой вопрос/комментарий</h3>
+                    <h3 class="text-4xl hidden md:flex font-semibold my-8">Добавить свой вопрос/комментарий</h3>
+                    <h3 class="text-3xl md:hidden font-semibold my-8">Оставьте свой отзыв</h3>
                     <form class="space-y-4" method="POST" action="{{ route('comments.store') }}">
                         @csrf
                         <input type="hidden" name="profile_id" value="{{ $profile->id }}">
@@ -705,18 +714,18 @@
             <div id="tab-content-reviews" class="tab-content hidden">
                 <!-- Reviews List -->
                 <div class="space-y-6">
-                    @forelse($profile->reviews as $review)
+                    @forelse($profile->reviews->where('approved', true) as $review)
                         <div class="bg-[#1A1A1A] rounded-xl p-6">
-                            <div class="flex flex-col mb-2">
-                                <div class="text-lg font-semibold">{{ $review->name }}</div>
-                                <span class="text-gray-400">{{ $review->created_at->format('d.m.Y') }}</span>
+                            <div class="flex flex-col mb-6">
+                                <div class="text-2xl font-semibold mb-2">{{ $review->name }}</div>
+                                <span class="text-[#636363] text-sm">{{ $review->created_at->format('d.m.Y') }}</span>
                             </div>
-                            <p class="text-gray-300">{{ $review->comment }}</p>
+                            <p class="text-lg text-[#FFFFFFCC]">{{ $review->comment }}</p>
                         </div>
                     @empty
-                        {{-- <div class="bg-[#1A1A1A] rounded-xl p-6 text-center">
+                        <div class="bg-[#1A1A1A] rounded-xl p-6 text-center">
                             <p class="text-gray-300">Пока нет отзывов. Будьте первым!</p>
-                        </div> --}}
+                        </div>
                     @endforelse
                 </div>
 
@@ -752,9 +761,16 @@
 
         <!-- Similar Profiles -->
         <div class="p-4">
-            <h3 class="text-xl font-semibold mb-6">Похожие проститутки</h3>
+            <h1 class="text-4xl font-semibold mb-6">Похожие проститутки</h1>
+
+            <div id="profiles-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                @include('partials.similar-profiles', ['profiles' => $profiles])
+            </div>    
         </div>
+        
     </div>
+
+   
 @endsection
 
 @push('scripts')

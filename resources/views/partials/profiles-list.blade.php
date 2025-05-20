@@ -2,6 +2,7 @@
     <div class="h-full profile-item">
         <x-ad-card
             :id="$profile->id"
+            :slug="$profile->slug"
             :new="$profile->created_at >= now()->subDays(7) ?? false"
             :vip="$profile->is_vip ?? false"
             :video="isset($profile->video->path) ?? false "

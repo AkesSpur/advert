@@ -22,6 +22,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\Admin\AdTariffController;
+use App\Http\Controllers\Admin\AdminTransactionController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -106,14 +107,19 @@ Route::delete('paid-services/{id}', [PaidServiceController::class, 'destroy'])->
 /** Ad Tariff routes */
 Route::resource('ad-tariffs', AdTariffController::class);
 
+    // Transactions
+    Route::get('transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
+
 
 /** comment routes */
 Route::get('comments', [CommentController::class, 'index'])->name('comments.index');
 Route::delete('comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
+Route::get('comments/{id}/approve', [CommentController::class, 'approve'])->name('comments.approve');
 
 /** review routes */
 Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
 Route::delete('reviews/{id}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+Route::get('reviews/{id}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
 
  // Filter Management: Age
 Route::get('filters/age', [FilterManageController::class, 'ageIndex'])->name('filters.age.index');

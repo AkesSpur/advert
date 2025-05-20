@@ -49,6 +49,18 @@ class ManageVipTariffs extends Command
             ->get();
             
             foreach ($expiredVips as $expiredVip) {
+                // Получаем пользователя профиля
+                $user = $expiredVip->profile->user;
+                
+                // // Пропускаем деактивацию VIP для профилей администратора (user_id = 1)
+                // if ($user->id == 1) {
+                //     // Продлеваем срок действия VIP на месяц для профилей администратора
+                //     $expiredVip->expires_at = Carbon::now()->addMonth();
+                //     $expiredVip->save();
+                //     $this->info("Extended VIP status for admin profile {$expiredVip->profile->id} for another month.");
+                //     continue;
+                // }
+                
                 // Use the deactivate method to properly update both the tariff and profile status
                 $expiredVip->deactivate();
                 
@@ -58,7 +70,6 @@ class ManageVipTariffs extends Command
                 $this->info("Updated is_vip status to false for profile {$expiredVip->profile->id}.");
                 
                 // Notify user about VIP expiration
-                $user = $expiredVip->profile->user;
                 try {
                     Notification::send($user, new VipExpired($expiredVip->profile));
                     $this->info("Notification sent to user {$user->id} about VIP expiration.");
