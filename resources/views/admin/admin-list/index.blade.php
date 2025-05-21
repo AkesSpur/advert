@@ -35,25 +35,29 @@
                                                     <th class="sorting" tabindex="0" aria-controls="table-2"
                                                         rowspan="1" colspan="1"
                                                         aria-label="Task Name: activate to sort column ascending">
-                                                        Name
+                                                        Имя
                                                       </th>
                                                     <th class="sorting_disabled" rowspan="1" colspan="1"
                                                         aria-label="Progress" >
-                                                        Email
+                                                        Электронная почта
+                                                      </th>
+                                                    <th class="sorting_disabled" rowspan="1" colspan="1"
+                                                        aria-label="Profiles" >
+                                                        Профили
                                                       </th>
                                                     <th class="sorting_disabled" rowspan="1" colspan="1"
                                                       aria-label="Progress" >
-                                                      Acct. Bal
+                                                      Счет. Сальдо
                                                     </th>  
                                                     <th class="sorting_disabled" tabindex="0" aria-controls="table-2"
                                                         rowspan="1" colspan="1"
                                                         aria-label="Due Date: activate to sort column ascending">
-                                                        Stauts
+                                                        Стаутс
                                                       </th>
                                                     <th class="sorting_disabled" tabindex="0" aria-controls="table-2"
                                                     rowspan="1" colspan="1"
                                                     aria-label="Status: activate to sort column ascending">
-                                                     Action
+                                                    Действие
                                                     </th>
                                                     
                                                 </tr>
@@ -69,6 +73,16 @@
 
                                                     <td>
                                                         <a href="mailto:{{$admin->email}}">{{$admin->email}}</a>
+                                                        <button class="btn btn-sm btn-info edit-email-btn" data-id="{{$admin->id}}" data-email="{{$admin->email}}"><i class="fas fa-envelope"></i></button>
+                                                    </td>
+                                                    <td class='text-center'>
+                                                        @if($admin->profiles->count() > 0)
+                                                            <button class="btn btn-sm btn-primary view-profiles-btn" data-id="{{$admin->id}}" data-name="{{$admin->name}}">
+                                                                <i class="fas fa-eye"></i> {{ $admin->profiles->count() }}
+                                                            </button>
+                                                        @else
+                                                            0
+                                                        @endif
                                                     </td>
 
                                                     <td>{{$admin->balance}}</td>
@@ -135,6 +149,69 @@
 
         </div>
     </section>
+
+    <!-- Email Edit Modal -->
+    <div class="modal fade" id="emailEditModal" tabindex="-1" role="dialog" aria-labelledby="emailEditModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailEditModalLabel">Edit Email</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="emailEditForm">
+                    <div class="modal-body">
+                        @csrf
+                        <input type="hidden" name="admin_id" id="admin_id">
+                        <div class="form-group">
+                            <label for="admin_email">Email address</label>
+                            <input type="email" class="form-control" id="admin_email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profiles Modal -->
+    <div class="modal fade" id="profilesModal" tabindex="-1" role="dialog" aria-labelledby="profilesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profilesModalLabel">Profiles for <span id="userName"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="profilesTableBody">
+                                <!-- Profiles will be loaded here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -162,6 +239,81 @@
                 })
 
             })
+
+            // Handle Edit Email button click
+            $('.edit-email-btn').on('click', function(){
+                let adminId = $(this).data('id');
+                let adminEmail = $(this).data('email');
+                $('#admin_id').val(adminId);
+                $('#admin_email').val(adminEmail);
+                $('#emailEditModal').modal('show');
+            });
+
+            // Handle Email Edit Form submission
+            $('#emailEditForm').on('submit', function(e){
+                e.preventDefault();
+                let adminId = $('#admin_id').val();
+                let newEmail = $('#admin_email').val();
+
+                $.ajax({
+                    url: "/admin/admin-list/" + adminId + "/update-email",
+                    method: 'PUT',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        email: newEmail
+                    },
+                    success: function(data){
+                        if(data.status === 'success'){
+                            toastr.success(data.message);
+                            $('#emailEditModal').modal('hide');
+                            // Optionally, refresh the page or update the email in the table
+                            location.reload(); 
+                        } else {
+                            toastr.error('An error occurred.');
+                        }
+                    },
+                    error: function(xhr, status, error){
+                        let errors = xhr.responseJSON.errors;
+                        if(errors && errors.email){
+                            toastr.error(errors.email[0]);
+                        } else {
+                            toastr.error('An error occurred: ' + error);
+                        }
+                    }
+                });
+            });
+
+            // Handle View Profiles button click
+            $('.view-profiles-btn').on('click', function(){
+                let userId = $(this).data('id');
+                let userName = $(this).data('name');
+                $('#userName').text(userName);
+                $('#profilesTableBody').empty(); // Clear previous profiles
+
+                // Fetch profiles for the user
+                // This assumes you have an endpoint to get profiles by user ID
+                // For now, we'll use the profiles data already loaded with the user
+                let admin = {!! json_encode($admins->keyBy('id')->all()) !!}[userId];
+                if(admin && admin.profiles && admin.profiles.length > 0){
+                    admin.profiles.forEach(function(profile){
+                        let profileRow = `<tr>
+                            <td>${profile.id}</td>
+                            <td>${profile.name}</td>
+                            <td>${profile.phone ? profile.phone : 'N/A'}</td>
+                            <td>${profile.is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-warning">Inactive</span>'}</td>
+                            <td>
+                                <a href="/user/profiles/${profile.id}/edit" class="btn m-1 btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="/admin/profiles/${profile.id}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>`;
+                        $('#profilesTableBody').append(profileRow);
+                    });
+                } else {
+                    $('#profilesTableBody').append('<tr><td colspan="5" class="text-center">No profiles found.</td></tr>');
+                }
+
+                $('#profilesModal').modal('show');
+            });
         })
     </script>
 @endpush

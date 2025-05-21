@@ -1090,20 +1090,21 @@
         <div class="max-w-screen-2xl mx-auto px-6">
             <div class="flex flex-col md:flex-col lg:flex-row items-stretch h-full">
                 @php
-                    $heroSetting = \App\Models\HeroSectionSetting::first();
+                    // $heroContent is now passed from PageController
+                    // $heroSetting = \App\Models\HeroSectionSetting::first(); 
                 @endphp
                 <!-- Text Content -->
                 <div class="w-full lg:w-1/2 p-5 text-white bg-[#191919] rounded-tl-3xl lg:rounded-bl-3xl rounded-tr-3xl lg:rounded-tr-none">
-                    <h1 class="text-3xl md:text-4xl font-bold mb-6">{{@$heroSetting->title ?? 'База анкет проституток, откровенные индивидуалки'}}</h1>
+                    <h1 class="text-3xl md:text-4xl font-bold mb-6">{{ $heroContent->title ?? (isset($heroSetting) ? $heroSetting->title : 'База анкет проституток, откровенные индивидуалки') }}</h1>
                     <div class="space-y-4 text-[#FFFFFFCC]">
-                        {!! @$heroSetting->text_content ?? '<p>Здравствуйте, дорогой гость нашего сайта для взрослых! Если вас интересуют лучшие проститутки из Челябинска, обязательно изучите представленную подборку анкет, и вы сможете подобрать идеальную шлюху для совместных развлечений. Девушки, страницы которых опубликованы в нашем масштабном каталоге, отличаются:</p><ul class="list-disc pl-5 space-y-1"><li>ослепительно красивой внешностью;</li><li>шикарными формами;</li><li>горячим темпераментом;</li><li>богатым опытом обслуживания мужчин;</li><li>индивидуальным подходом к каждому клиенту.</li></ul><p>Кроме того, нашим женщинам характерен широкий ассортимент практикуемых услуг. Каждая индивидуалка практикует десятки видов интимных процедур, выходя за рамки традиционного секса. Сняв обученную путану, вы сможете заказать любые виды секса, в том числе:</p><ul class="list-disc pl-5 space-y-1"><li>классику;</li><li>анал;</li><li>минет;</li><li>лесби;</li><li>БДСМ.</li></ul>' !!}
+                        {!! $heroContent->text_content ?? (isset($heroSetting) ? $heroSetting->text_content : '<p>Здравствуйте, дорогой гость нашего сайта для взрослых! Если вас интересуют лучшие проститутки из Челябинска, обязательно изучите представленную подборку анкет, и вы сможете подобрать идеальную шлюху для совместных развлечений. Девушки, страницы которых опубликованы в нашем масштабном каталоге, отличаются:</p><ul class="list-disc pl-5 space-y-1"><li>ослепительно красивой внешностью;</li><li>шикарными формами;</li><li>горячим темпераментом;</li><li>богатым опытом обслуживания мужчин;</li><li>индивидуальным подходом к каждому клиенту.</li></ul><p>Кроме того, нашим женщинам характерен широкий ассортимент практикуемых услуг. Каждая индивидуалка практикует десятки видов интимных процедур, выходя за рамки традиционного секса. Сняв обученную путану, вы сможете заказать любые виды секса, в том числе:</p><ul class="list-disc pl-5 space-y-1"><li>классику;</li><li>анал;</li><li>минет;</li><li>лесби;</li><li>БДСМ.</li></ul>') !!}
                     </div>
                 </div>
                 
                 <!-- Image -->
                 <div class="w-full lg:w-1/2 relative">
                     <div class="overflow-hidden shadow-xl bg-[#191919] rounded-bl-3xl lg:rounded-bl-none lg:rounded-tr-3xl rounded-br-3xl h-full">
-                        <img src="{{asset(@$heroSetting->image ?? 'assets/images/hero.jpg')}}" alt="Hero image" class="w-full h-full object-cover">
+                        <img src="{{ asset($heroContent->image ?? (isset($heroSetting) ? $heroSetting->image : 'assets/images/hero.jpg')) }}" alt="Hero image" class="w-full h-full object-cover">
                     </div>
                 </div>
             </div>

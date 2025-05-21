@@ -7,7 +7,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Backend\AdminListController;
 use App\Http\Controllers\Backend\ChatController;
 use App\Http\Controllers\Backend\CustomerListController;
-use App\Http\Controllers\Backend\ProfileController as AccountProfileController;
+use App\Http\Controllers\Backend\AccountProfileController;
 use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Backend\FilterManageController;
 use App\Http\Controllers\Backend\FooterMenuController;
@@ -39,9 +39,9 @@ Route::prefix('profiles')->name('profiles.')->group(function () {
 });
 
 /** Profile Routes */
-Route::get('profile', [AccountProfileController::class, 'index'])->name('profile');
-Route::post('profile/update', [AccountProfileController::class, 'updateProfile'])->name('profile.update');
-Route::post('profile/update/password', [AccountProfileController::class, 'updatePassword'])->name('password.update');
+Route::get('account', [AccountProfileController::class, 'index'])->name('account');
+Route::post('account/update', [AccountProfileController::class, 'updateProfile'])->name('account.update');
+Route::post('account/update/password', [AccountProfileController::class, 'updatePassword'])->name('password.update');
 
 
 /* verification routes */
@@ -57,10 +57,12 @@ Route::post('chat/create-conversation', [ChatController::class, 'createConversat
 
 /** customer list routes */
 Route::put('customer/status-change', [CustomerListController::class, 'changeStatus'])->name('customer.status-change');
+Route::put('customer-list/{id}/update-email', [CustomerListController::class, 'updateEmail'])->name('customer-list.update-email');
 Route::get('customer', [CustomerListController::class, 'index'])->name('customer.index');
 /** admin list routes */
 Route::get('admin-list', [AdminListController::class, 'index'])->name('admin-list.index');
 Route::put('admin-list/status-change', [AdminListController::class, 'changeStatus'])->name('admin-list.status-change');
+Route::put('admin-list/{id}/update-email', [AdminListController::class, 'updateEmail'])->name('admin-list.update-email');
 Route::delete('admin-list/{id}', [AdminListController::class, 'destroy'])->name('admin-list.destroy');
 /** Add and withdraw funds routes */
 Route::get('add-fund/{id}', [FundManagementController::class, 'addIndex'])->name('add-fund.index');
@@ -182,3 +184,7 @@ Route::put('webmoney-setting-update', [SettingController::class, 'updateWebmoney
 // Hero Section Settings
 Route::get('hero-section-setting', [SettingController::class, 'heroSectionSetting'])->name('hero-section-setting.index');
 Route::put('hero-section-setting-update', [SettingController::class, 'updateHeroSectionSetting'])->name('hero-section-setting.update');
+
+// Hero Section Override Routes
+Route::get('hero-section-override', [SettingController::class, 'heroSectionOverrideIndex'])->name('hero-section-override.index');
+Route::put('hero-section-override', [SettingController::class, 'updateHeroSectionOverride'])->name('hero-section-override.update');

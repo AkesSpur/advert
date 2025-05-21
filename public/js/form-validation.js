@@ -383,38 +383,38 @@ document.addEventListener("DOMContentLoaded", function () {
                     "Пожалуйста, выберите хотя бы один вариант стоимости (Выезд или Апартаменты).\n";
             }
 
-            // Validate paid services - ensure each checked service has a price
-            const paidServiceCheckboxes = document.querySelectorAll(
-                'input[name="paid_services[]"]'
-            );
-                        // Validate at least one paid service is selected
-                        const hasPaidService = Array.from(paidServiceCheckboxes).some(
-                            (checkbox) => checkbox.checked
-                        );
-                        if (!hasPaidService) {
-                            isValid = false;
-                            errorMessage += "Выберите хотя бы одну платную услугу\n";
-                        }
-            paidServiceCheckboxes.forEach((checkbox) => {
-                if (checkbox.checked) {
-                    const serviceId = checkbox.value;
-                    const priceInput = document.querySelector(
-                        `input[name="paid_service_prices[${serviceId}]"]`
-                    );
+            // // Validate paid services - ensure each checked service has a price
+            // const paidServiceCheckboxes = document.querySelectorAll(
+            //     'input[name="paid_services[]"]'
+            // );
+            //             // Validate at least one paid service is selected
+            //             const hasPaidService = Array.from(paidServiceCheckboxes).some(
+            //                 (checkbox) => checkbox.checked
+            //             );
+            //             if (!hasPaidService) {
+            //                 isValid = false;
+            //                 errorMessage += "Выберите хотя бы одну платную услугу\n";
+            //             }
+            // paidServiceCheckboxes.forEach((checkbox) => {
+            //     if (checkbox.checked) {
+            //         const serviceId = checkbox.value;
+            //         const priceInput = document.querySelector(
+            //             `input[name="paid_service_prices[${serviceId}]"]`
+            //         );
 
-                    if (
-                        priceInput &&
-                        (!priceInput.value || priceInput.value <= 0)
-                    ) {
-                        isValid = false;
-                        // Get the service name from the label
-                        const serviceName = checkbox
-                            .closest("label")
-                            .textContent.trim();
-                        errorMessage += `Пожалуйста, укажите цену для платной услуги: ${serviceName}\n`;
-                    }
-                }
-            });
+            //         if (
+            //             priceInput &&
+            //             (!priceInput.value || priceInput.value <= 0)
+            //         ) {
+            //             isValid = false;
+            //             // Get the service name from the label
+            //             const serviceName = checkbox
+            //                 .closest("label")
+            //                 .textContent.trim();
+            //             errorMessage += `Пожалуйста, укажите цену для платной услуги: ${serviceName}\n`;
+            //         }
+            //     }
+            // });
 
             if (!isValid) {
                 e.preventDefault();

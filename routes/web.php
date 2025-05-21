@@ -54,9 +54,13 @@ Route::get('/weight/{slug}', [PageController::class, 'index'])->name('home.weigh
 Route::get('/breast-size/{slug}', [PageController::class, 'index'])->name('home.breast-size');
 Route::get('/category/{slug}', [PageController::class, 'filterByCustomCategory'])->name('filter.custom-category');
 Route::get('/neighborhood/{slug}', [PageController::class, 'index'])->name('home.neighborhood');
-
+// profiles
 Route::get('/profiles/click/{id}', [PageController::class, 'profileClick'])->name('profiles.clicks');
 Route::get('/profiles/{slug}-{id}', [PageController::class, 'show'])->name('profiles.view');
+// likes
+Route::post('/profile/{id}/toggle-like', [LikeController::class, 'toggle'])->name('profile.toggleLike');
+Route::get('/my-likes', [LikeController::class, 'likedProfiles'])->name('profile.likedProfiles');
+
 
 // Comment and Review routes (no auth required)
 Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
@@ -90,9 +94,6 @@ Route::post('profiles/{id}/restore', [ProfileController::class, 'restore'])->nam
     Route::post('/ads/{id}/cancel', [TariffController::class, 'cancel'])->name('advert.cancel');
     Route::post('/ads/update-priority', [TariffController::class, 'updatePriority'])->name('advert.update-priority');
     Route::get('/profiles/create', [FormController::class, 'index'])->name('form.index');
-
-    Route::post('/profile/{id}/toggle-like', [LikeController::class, 'toggle'])->name('profile.toggleLike');
-    Route::get('/my-likes', [LikeController::class, 'likedProfiles'])->name('profile.likedProfiles');
 
     // Profile management (user settings)
     Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.edit');

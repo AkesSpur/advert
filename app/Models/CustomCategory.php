@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class CustomCategory extends Model
@@ -42,6 +43,14 @@ class CustomCategory extends Model
     ];
 
     /**
+     * Get the category's hero section override.
+     */
+    public function heroSectionOverride(): MorphOne
+    {
+        return $this->morphOne(HeroSectionOverride::class, 'model');
+    }
+
+    /**
      * The attributes that should be cast.
      *
      * @var array<string, string>
@@ -65,6 +74,14 @@ class CustomCategory extends Model
         'show_in_top_menu' => 'boolean',
         'show_in_footer_menu' => 'boolean',
     ];
+
+    /**
+     * Get the category's hero section override.
+     */
+    public function heroSectionOverride(): MorphOne
+    {
+        return $this->morphOne(HeroSectionOverride::class, 'model');
+    }
 
     /**
      * Get the services associated with this custom category.

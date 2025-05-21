@@ -14,6 +14,7 @@ class SeoTemplate extends Model
         'title_template',
         'meta_description_template',
         'h1_template',
+        'city_override', // Add city_override here
     ];
 
     /**
@@ -34,10 +35,10 @@ class SeoTemplate extends Model
             '{имя}' => $profile->name,
             '{возраст}' => $profile->age,
             '{цвет_волос}' => $profile->hair_color,
-            '{город}' => 'St. Petersburg', // Assuming city is fixed for now, or get from config/profile
+            '{город}' => $this->city_override ?: 'St. Petersburg', // Use city_override or default
             '{тип_профиля}' => $profile->profile_type == 'individual' ? 'Индивидуалка' : 'Интим-салон',
             '{описание}' => $profile->description,
-            '{телефон}' => round($profile->phone),
+            '{телефон}' =>$profile->phone,
             '{вес}' => $profile->weight,
             '{высота}' => $profile->height,
             '{грудь}' => $profile->size,
@@ -56,8 +57,8 @@ class SeoTemplate extends Model
         $replacements['{услуги}'] = $services ?: 'N/A';
         
         // Prices - example for one price, can be expanded
-        $replacements['{цена_1_часа_апартаментов}'] = $profile->appartamenti_1hour ?: 'N/A';
-        $replacements['{цена_1_час_отъезда}'] = $profile->vyezd_1hour ?: 'N/A';
+        $replacements['{цена_1_часа_апартаментов}'] = round($profile->appartamenti_1hour) ?: 'N/A';
+        $replacements['{цена_1_час_отъезда}'] = round($profile->vyezd_1hour) ?: 'N/A';
 
 
         return str_replace(array_keys($replacements), array_values($replacements), $template);

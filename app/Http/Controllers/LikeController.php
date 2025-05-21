@@ -11,26 +11,42 @@ class LikeController extends Controller
 {
     public function toggle($profileId)
     {
-        $user = User::findOrFail(Auth::id());
         $profile = Profile::findOrFail($profileId);
-    
-        if ($user->likedProfiles()->where('profile_id', $profileId)->exists()) {
-            // Unlike
-            $user->likedProfiles()->detach($profileId);
-            return response()->json(['status' => 'unliked']);
+
+        if (Auth::check()) {
+            $user = user::findOrFail(Auth::id());
+            if ($user->likedProfiles()->where('profile_id', $profileId)->exists()) {
+                $user->likedProfiles()->detach($profileId);
+                return response()->json(['status' => 'unliked', 'count' => $user->likedProfiles()->count()]);
+            } else {
+                $user->likedProfiles()->attach($profileId);
+                return response()->json(['status' => 'liked', 'count' => $user->likedProfiles()->count()]);
+            }
         } else {
-            // Like
-            $user->likedProfiles()->attach($profileId);
-            return response()->json(['status' => 'liked']);
+            $liked = session()->get('liked_profiles', []);
+            if (in_array($profileId, $liked)) {
+                $liked = array_diff($liked, [$profileId]);
+                session()->put('liked_profiles', $liked);
+                return response()->json(['status' => 'unliked', 'count' => count($liked)]);
+            } else {
+                $liked[] = $profileId;
+                session()->put('liked_profiles', $liked);
+                return response()->json(['status' => 'liked', 'count' => count($liked)]);
+            }
         }
     }
-    
+
     public function likedProfiles()
     {
-        $user = User::findOrFail(Auth::id());
-        $likedProfiles = $user->likedProfiles()->where('is_archived', false)->latest()->get();
-        
-    
+        if (Auth::check()) {
+            $user = user::findOrFail(Auth::id());
+
+            $likedProfiles = $user->likedProfiles()->where('is_archived', false)->latest()->get();
+        } else {
+            $likedProfileIds = session()->get('liked_profiles', []);
+            $likedProfiles = Profile::whereIn('id', $likedProfileIds)->where('is_archived', false)->latest()->get();
+        }
+
         return view('user.liked_profiles', compact('likedProfiles'));
     }
 }

@@ -42,6 +42,10 @@
                                                 почта
                                             </th>
                                             <th class="sorting_disabled" rowspan="1" colspan="1"
+                                                aria-label="Profiles" >
+                                                Профили
+                                              </th>
+                                            <th class="sorting_disabled" rowspan="1" colspan="1"
                                               aria-label="Progress" >
                                               Сальдо
                                             </th>    
@@ -68,6 +72,16 @@
 
                                             <td>
                                               <a href="mailto:{{$customer->email}}">{{$customer->email}}</a>
+                                              <button class="btn btn-sm btn-info ml-1 edit-email-btn" data-id="{{$customer->id}}" data-email="{{$customer->email}}"><i class="fas fa-envelope"></i></button>
+                                            </td>
+                                            <td>
+                                                @if($customer->profiles->count() > 0)
+                                                    <button class="btn btn-sm btn-primary view-profiles-btn" data-id="{{$customer->id}}" data-name="{{$customer->name}}">
+                                                        <i class="fas fa-eye"></i> {{ $customer->profiles->count() }}
+                                                    </button>
+                                                @else
+                                                    0
+                                                @endif
                                             </td>
 
                                             <td>{{$customer->balance}}</td>
@@ -126,6 +140,68 @@
           </div>
         </section>
 
+    <!-- Email Edit Modal -->
+    <div class="modal fade" id="emailEditModal" tabindex="-1" role="dialog" aria-labelledby="emailEditModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailEditModalLabel">Изменить Email</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="emailEditForm">
+                    <div class="modal-body">
+                        @csrf
+                        <input type="hidden" name="customer_id" id="customer_id">
+                        <div class="form-group">
+                            <label for="customer_email">Адрес электронной почты</label>
+                            <input type="email" class="form-control" id="customer_email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profiles Modal -->
+    <div class="modal fade" id="profilesModal" tabindex="-1" role="dialog" aria-labelledby="profilesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profilesModalLabel">Профили для <span id="userName"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Имя</th>
+                                    <th>Телефон</th>
+                                    <th>Статус</th>
+                                    <th>Действие</th>
+                                </tr>
+                            </thead>
+                            <tbody id="profilesTableBody">
+                                <!-- Profiles will be loaded here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -153,6 +229,77 @@
                 })
 
             })
+
+            // Handle Edit Email button click
+            $('.edit-email-btn').on('click', function(){
+                let customerId = $(this).data('id');
+                let customerEmail = $(this).data('email');
+                $('#customer_id').val(customerId);
+                $('#customer_email').val(customerEmail);
+                $('#emailEditModal').modal('show');
+            });
+
+            // Handle Email Edit Form submission
+            $('#emailEditForm').on('submit', function(e){
+                e.preventDefault();
+                let customerId = $('#customer_id').val();
+                let newEmail = $('#customer_email').val();
+
+                $.ajax({
+                    url: "/admin/customer-list/" + customerId + "/update-email", // Make sure this route exists
+                    method: 'PUT',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        email: newEmail
+                    },
+                    success: function(data){
+                        if(data.status === 'success'){
+                            toastr.success(data.message);
+                            $('#emailEditModal').modal('hide');
+                            location.reload(); 
+                        } else {
+                            toastr.error('Произошла ошибка.');
+                        }
+                    },
+                    error: function(xhr, status, error){
+                        let errors = xhr.responseJSON.errors;
+                        if(errors && errors.email){
+                            toastr.error(errors.email[0]);
+                        } else {
+                            toastr.error('Произошла ошибка: ' + error);
+                        }
+                    }
+                });
+            });
+
+            // Handle View Profiles button click
+            $('.view-profiles-btn').on('click', function(){
+                let userId = $(this).data('id');
+                let userName = $(this).data('name');
+                $('#userName').text(userName);
+                $('#profilesTableBody').empty(); 
+
+                let customer = {!! json_encode($customers->keyBy('id')->all()) !!}[userId];
+                if(customer && customer.profiles && customer.profiles.length > 0){
+                    customer.profiles.forEach(function(profile){
+                        let profileRow = `<tr>
+                            <td>${profile.id}</td>
+                            <td>${profile.name}</td>
+                            <td>${profile.phone ? profile.phone : 'N/A'}</td>
+                            <td>${profile.is_active ? '<span class="badge badge-success">Активный</span>' : '<span class="badge badge-warning">Неактивный</span>'}</td>
+                            <td>
+                                <a href="/user/profiles/${profile.id}/edit" class="btn m-1 btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="/admin/profiles/${profile.id}" class="btn btn-sm m-1 btn-primary"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>`;
+                        $('#profilesTableBody').append(profileRow);
+                    });
+                } else {
+                    $('#profilesTableBody').append('<tr><td colspan="5" class="text-center">Профили не найдены.</td></tr>');
+                }
+
+                $('#profilesModal').modal('show');
+            });
         })
     </script>
 @endpush

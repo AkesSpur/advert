@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\GeneralSetting;
 use App\Models\EmailSetting; // Assuming EmailSetting model exists
 use App\Models\HeroSectionSetting;
+use App\Models\HeroSectionOverride;
+use App\Models\CustomCategory;
+use App\Models\Service;
 use App\Models\LogoSetting;  // Assuming LogoSetting model exists
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -59,6 +62,78 @@ class SettingController extends Controller
 
         toastr()->success('Настройки обновлены успешно!');
         return redirect()->back();
+    }
+
+    public function heroSectionOverrideIndex(Request $request)
+    {
+        $modelType = $request->query('model_type');
+        $modelId = $request->query('model_id');
+        $model = null;
+        $heroOverride = null;
+
+        if ($modelType && $modelId) {
+            $modelClass = "App\\Models\\".ucfirst($modelType);
+            if (class_exists($modelClass)) {
+                $model = $modelClass::find($modelId);
+                if ($model) {
+                    $heroOverride = HeroSectionOverride::firstOrCreate(
+                        ['model_type' => get_class($model), 'model_id' => $model->id]
+                    );
+                }
+            }
+        }
+
+        // Fetch all custom categories and services for the dropdowns
+        $customCategories = CustomCategory::all();
+        $services = Service::all();
+
+        return view('admin.setting.hero-section-override', compact('heroOverride', 'model', 'modelType', 'modelId', 'customCategories', 'services'));
+    }
+
+    public function updateHeroSectionOverride(Request $request)
+    {
+        $request->validate([
+            'model_type' => ['required', 'string'],
+            'model_id' => ['required', 'integer'],
+            'title' => ['nullable', 'string', 'max:255'],
+            'text_content' => ['nullable', 'string'],
+            'image' => ['nullable', 'image', 'max:5000'], // Max 5MB
+            'is_active' => ['sometimes', 'boolean']
+        ]);
+
+        $modelClass = "App\\Models\\".ucfirst($request->model_type);
+        if (!class_exists($modelClass)) {
+            toastr()->error('Invalid model type provided.');
+            return redirect()->back();
+        }
+
+        $model = $modelClass::find($request->model_id);
+        if (!$model) {
+            toastr()->error('Model not found.');
+            return redirect()->back();
+        }
+
+        $heroOverride = HeroSectionOverride::firstOrNew(
+            ['model_type' => get_class($model), 'model_id' => $model->id]
+        );
+
+        $imagePath = $this->updateImage($request, 'image', $heroOverride->image, 'uploads/hero_overrides');
+
+        $heroOverride->title = $request->title;
+        $heroOverride->text_content = $request->text_content;
+        $heroOverride->is_active = $request->has('is_active');
+
+        if ($imagePath) {
+            $heroOverride->image = $imagePath;
+        }
+
+        $heroOverride->save();
+
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+
+        toastr()->success('Hero section override updated successfully!');
+        return redirect()->route('admin.hero-section-override.index', ['model_type' => $request->model_type, 'model_id' => $request->model_id]);
     }
 
     public function updateEmailSetting(Request $request)

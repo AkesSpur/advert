@@ -11,6 +11,8 @@ use App\Models\Profile;
 use App\Models\SeoTemplate;
 use App\Models\TopMenu;
 use App\Models\GeneralSetting;
+use App\Models\HeroSectionSetting;
+use App\Models\HeroSectionOverride;
 use App\Models\HairColor; // Added
 use App\Models\Height;    // Added
 use App\Models\Weight;    // Added
@@ -885,6 +887,31 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
 
         $sort = request('sort', 'default');
 
+        // Determine hero content
+        $heroContent = HeroSectionSetting::first(); // Default hero settings
+        $activeOverrideFound = false;
+
+        // Priority 1: Check for Service override if a service filter is active
+        if (isset($currentService) && $currentService && method_exists($currentService, 'heroSectionOverride')) {
+            $serviceOverride = $currentService->heroSectionOverride()->where('is_active', true)->first();
+            if ($serviceOverride) {
+                $heroContent = $serviceOverride;
+                $activeOverrideFound = true;
+            }
+        }
+
+        // Priority 2: Check for CustomCategory override if no service override was found and a category is active
+        if (!$activeOverrideFound && isset($category) && $category && method_exists($category, 'heroSectionOverride')) {
+            $categoryOverride = $category->heroSectionOverride()->where('is_active', true)->first();
+            if ($categoryOverride) {
+                $heroContent = $categoryOverride;
+                // $activeOverrideFound = true; // Not strictly needed here as it's the last check before default
+            }
+        }
+
+        // If $heroContent is an override, its 'title', 'text_content', 'image' will be used.
+        // If it's still the default HeroSectionSetting, its properties will be used.
+
         $topMenus = TopMenu::all();
         $footerMenus = FooterMenu::all();
 
@@ -905,7 +932,8 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
           'ages',
           'seoTitle',
           'seoMetaDescription',
-          'seoH1'
+          'seoH1',
+          'heroContent'
 
         ));
     }
@@ -913,6 +941,10 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
     public function show($slug, $id)
     {
         $profile = Profile::with(['metroStations', 'services', 'images', 'video', 'neighborhoods'])->findOrFail($id);
+
+        if($profile->is_active == false) {
+            return back()->with('error', 'Профиль неактивен.');
+        }   
 
         $profile->incrementViewCount();
         $profile->incrementClickCount();

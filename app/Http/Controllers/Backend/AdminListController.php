@@ -11,7 +11,7 @@ class AdminListController extends Controller
     //return adminlist view page
     public function index(){
 
-        $admins = User::where('role','=','admin')->get();
+        $admins = User::where('role','=','admin')->with('profiles')->get();
 
         return view('admin.admin-list.index',compact('admins'));
 
@@ -35,5 +35,19 @@ class AdminListController extends Controller
 
         return response(['status' => 'success', 'message' => 'Deleted successfully']);
 
+    }
+
+    public function updateEmail(Request $request, string $id)
+    {
+        $request->validate([
+            'email' => 'required|email|unique:users,email,'.$id
+        ]);
+
+        $admin = User::findOrFail($id);
+        $admin->email = $request->email;
+        $admin->email_verified_at = now();
+        $admin->save();
+
+        return response(['status' => 'success', 'message' => 'Email updated successfully']);
     }
 }

@@ -15,7 +15,7 @@
 
         <div class="col-12 col-md-12 col-lg-7">
           <div class="card">
-            <form method="post" class="needs-validation" novalidate="" action="{{route('admin.profile.update')}}">
+            <form method="post" class="needs-validation" novalidate="" action="{{route('admin.account.update')}}">
                 @csrf
               <div class="card-header">
                 <h4>Обновить профиль</h4>

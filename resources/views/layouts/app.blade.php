@@ -233,14 +233,7 @@
                             Войти
                         </a>
                     @else
-                        <a href="{{ route('user.profile.likedProfiles') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
-                                <path d="M12.1 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54l-1.35 1.31z" />
-                            </svg>
-                            <span class="absolute -top-1 -right-1 bg-[#6340FF] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                {{ Auth::user()->likedProfiles()->count() }}
-                            </span>
-                        </a>
+                       
                         <a href="{{ route('user.profiles.index') }}"
                            class="px-4 py-2 bg-transparent text-white border border-white-700 rounded-lg text-sm">
                             Мой кабинет

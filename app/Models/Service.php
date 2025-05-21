@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Service extends Model
@@ -30,5 +31,13 @@ class Service extends Model
     public function profiles(): BelongsToMany
     {
         return $this->belongsToMany(Profile::class);
+    }
+
+    /**
+     * Get the service's hero section override.
+     */
+    public function heroSectionOverride(): MorphOne
+    {
+        return $this->morphOne(HeroSectionOverride::class, 'model');
     }
 }

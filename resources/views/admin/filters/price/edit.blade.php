@@ -22,6 +22,15 @@
                         @enderror
                     </div>
                     <div class="form-group">
+                        <label for="value">Значение 
+                            <small class="text-danger">(Не изменяйте английские слова. Измените только цену)</small>
+                        </label>
+                        <input type="text" class="form-control" id="value" name="value" value="{{ old('value', $price->value) }}">
+                        @error('value')
+                            <p class="text-danger">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="form-group">
                         <label for="title">Title (SEO)</label>
                         <input type="text" class="form-control" id="title" name="title" value="{{ old('title', $price->title) }}">
                         @error('title')
@@ -60,7 +69,7 @@
                         @enderror
                     </div>
                     <button type="submit" class="btn btn-primary">Сохранить</button>
-                    <a href="{{ route('admin.filters.price.index') }}" class="btn btn-danger">Отмена</a>
+                    <a href="{{ route('admin.filters.price.index') }}" class="btn btn-secondary">Отмена</a>
                 </form>
             </div>
         </div>

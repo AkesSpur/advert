@@ -161,14 +161,17 @@
                         </td>
                         <td>{{ $profile->created_at->format('d.m.Y') }}</td>
                         <td>
-                          <a href="{{ route('admin.profiles.show', $profile->id) }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-eye"></i>
+                          <a href="{{route('user.profiles.edit', $profile->id)}}" class="btn m-1 btn-sm btn-primary">
+                            <i class="fas fa-edit"></i>
                           </a>
-                          
+
+                          <a href="{{ route('admin.profiles.show', $profile->id) }}" class="btn btn-primary btn-sm m-1">
+                            <i class="fas fa-eye"></i>
+                          </a>                          
                           @if($profile->trashed())
                             <form action="{{ route('admin.profiles.restore', $profile->id) }}" method="POST" class="d-inline">
                               @csrf
-                              <button type="submit" class="btn btn-success btn-sm mb-1" data-toggle="tooltip" title="Восстановить">
+                              <button type="submit" class="btn btn-success btn-sm m-1 " data-toggle="tooltip" title="Восстановить">
                                 <i class="fas fa-trash-restore"></i>
                               </button>
                             </form>
@@ -176,14 +179,14 @@
                             <form action="{{ route('admin.profiles.destroy', $profile->id) }}" method="POST" class="d-inline">
                               @csrf
                               @method('DELETE')
-                              <button type="submit" class="btn btn-danger btn-sm mb-1" data-toggle="tooltip" title="Удалить навсегда" onclick="return confirm('Вы уверены? Это действие нельзя отменить!')">
+                              <button type="submit" class="btn btn-danger btn-sm m-1 " data-toggle="tooltip" title="Удалить навсегда" onclick="return confirm('Вы уверены? Это действие нельзя отменить!')">
                                 <i class="fas fa-trash"></i>
                               </button>
                             </form>
                           @else
                             <form action="{{ route('admin.profiles.disable', $profile->id) }}" method="POST" class="d-inline">
                               @csrf
-                              <button type="submit" class="btn btn-warning btn-sm mb-1" data-toggle="tooltip" title="Отключить">
+                              <button type="submit" class="btn btn-warning btn-sm m-1 " data-toggle="tooltip" title="Отключить">
                                 <i class="fas fa-ban"></i>
                               </button>
                             </form>

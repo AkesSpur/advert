@@ -72,6 +72,14 @@
 
                 <div class="flex space-x-4">
                     @guest
+                    <a href="{{ route('profile.likedProfiles') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12.1 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54l-1.35 1.31z" />
+                        </svg>
+                        <span id="likes-count" class="absolute -top-1 -right-1 bg-[#6340FF] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                            <span id="global-likes-count">{{count(session('liked_profiles', [])) }}</span>
+                        </span>
+                    </a>
                         <a href="{{ route('register') }}"
                            class="px-4 py-2 bg-transparent text-white border border-white-700 rounded-lg text-sm">
                             Добавить анкету
@@ -81,12 +89,12 @@
                             Войти
                         </a>
                     @else
-                        <a href="{{ route('user.profile.likedProfiles') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
+                        <a href="{{ route('profile.likedProfiles') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
                                 <path d="M12.1 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54l-1.35 1.31z" />
                             </svg>
                             <span id="likes-count" class="absolute -top-1 -right-1 bg-[#6340FF] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                {{ Auth::user()->likedProfiles()->count() }}
+                                <span id="global-likes-count">{{ Auth::user()->likedProfiles()->count() }}</span>
                             </span>
                         </a>
                         @if(Auth::user()->role == 'admin')
@@ -993,6 +1001,7 @@
 
                     <div class="flex space-x-4">
                         @guest
+                      
                         <a href="{{ route('register') }}"
                            class="px-4 py-2 bg-transparent text-white border border-white-700 rounded-lg text-sm">
                             Добавить анкету
@@ -1002,14 +1011,6 @@
                             Войти
                         </a>
                     @else
-                        <a href="{{ route('user.profile.likedProfiles') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
-                                <path d="M12.1 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54l-1.35 1.31z" />
-                            </svg>
-                            <span class="absolute -top-1 -right-1 bg-[#6340FF] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                {{ Auth::user()->likedProfiles()->count() }}
-                            </span>
-                        </a>
                         @if(Auth::user()->is_admin)
                         <a href="{{ route('admin') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
@@ -1059,9 +1060,8 @@
             $('.like-button').click(function() {
                 const profileId = $(this).data('profile-id');
                 const button = $(this);
-                @auth
                 $.ajax({
-                    url: `/user/profile/${profileId}/toggle-like`,
+                    url: `/profile/${profileId}/toggle-like`,
                     type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1069,32 +1069,39 @@
                     success: function(response) {
                         // Update button appearance
                         if (response.status === 'liked') {
-                            // button.addClass('bg-red-500');
                             button.find('svg').attr('fill', 'red');
                             button.find('svg').attr('stroke', 'none');
-
-                            // Increment counter
-                            const counter = $('#likes-count');
-                            counter.text(parseInt(counter.text()) + 1);
                         } else {
-                            button.removeClass('bg-red-500');
                             button.find('svg').attr('fill', 'none');
                             button.find('svg').attr('stroke', 'white');
                             button.find('svg').attr('stroke-width', '2');
-                            // Decrement counter
-                            const counter = $('#likes-count');
-                            counter.text(parseInt(counter.text()) - 1);
                         }
+                        // Update likes count display if it exists
+                        const likesCountSpan = $('#likes-count-value'); // Assuming you have a span with this ID
+                        if(likesCountSpan.length) {
+                            likesCountSpan.text(response.count);
+                        }
+                         // Update the global likes counter in the header
+                        const globalLikesCounter = $('#global-likes-count');
+                        if(globalLikesCounter.length) {
+                            globalLikesCounter.text(response.count);
+                            if(response.count > 0) {
+                                globalLikesCounter.removeClass('hidden');
+                            } else {
+                                globalLikesCounter.addClass('hidden');
+                            }
+                        }
+                        
                     },
                     error: function(xhr) {
                         console.error('Error toggling like:', xhr.responseText);
+                        @guest
+                        // Optionally, you could inform the guest user that the like action failed
+                        // without redirecting to login, or try to store locally and sync later.
+                        alert('Произошла ошибка. Попробуйте позже.');
+                        @endguest
                     }
                 });
-
-                @else
-    // User is not logged in, redirect to login
-    window.location.href = '{{ route("login") }}';
-        @endauth
             });
         });
     </script>

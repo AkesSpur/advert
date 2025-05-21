@@ -18,6 +18,7 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Название (RU)</th>
+                                <th>Значение (Slug)</th>
                                 <th>Title</th>
                                 <th>Meta Description</th>
                                 <th>H1 Заголовок</th>
@@ -31,6 +32,7 @@
                                 <tr>
                                     <td>{{ $price->id }}</td>
                                     <td>{{ $price->name }}</td>
+                                    <td>{{ $price->value }}</td>
                                     <td>{{ $price->title }}</td>
                                     <td>{{ Str::limit($price->meta_description, 50) }}</td>
                                     <td>{{ $price->h1_header }}</td>

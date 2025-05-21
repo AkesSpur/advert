@@ -319,55 +319,55 @@ class ProfileController extends Controller
             $videoFile = $request->file('video');
             $path = $videoFile->store('profile-videos', 'public');
 
-            // Generate thumbnail from video
-            $thumbnailPath = null;
-            try {
-                // Create a thumbnail from the first frame of the video
-                $thumbnailName = Str::uuid() . '_thumbnail.jpg';
-                $thumbnailPath = 'profile-videos/thumbnails/' . $thumbnailName;
-                $fullThumbnailPath = Storage::disk('public')->path($thumbnailPath);
+            // // Generate thumbnail from video
+            // $thumbnailPath = null;
+            // try {
+            //     // Create a thumbnail from the first frame of the video
+            //     $thumbnailName = Str::uuid() . '_thumbnail.jpg';
+            //     $thumbnailPath = 'profile-videos/thumbnails/' . $thumbnailName;
+            //     $fullThumbnailPath = Storage::disk('public')->path($thumbnailPath);
 
-                // Ensure the thumbnails directory exists
-                Storage::disk('public')->makeDirectory('profile-videos/thumbnails');
+            //     // Ensure the thumbnails directory exists
+            //     Storage::disk('public')->makeDirectory('profile-videos/thumbnails');
 
-                // Use FFMpeg if available, otherwise fallback to simple method
-                if (class_exists('\FFMpeg\FFMpeg') && class_exists('\FFMpeg\Coordinate\TimeCode')) {
-                    try {
-                        $ffmpeg = \FFMpeg\FFMpeg::create();
-                        $video = $ffmpeg->open(Storage::disk('public')->path($path));
-                        $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1));
+            //     // Use FFMpeg if available, otherwise fallback to simple method
+            //     if (class_exists('\FFMpeg\FFMpeg') && class_exists('\FFMpeg\Coordinate\TimeCode')) {
+            //         try {
+            //             $ffmpeg = \FFMpeg\FFMpeg::create();
+            //             $video = $ffmpeg->open(Storage::disk('public')->path($path));
+            //             $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1));
                         
-                        // Ensure the directory exists before saving
-                        $thumbnailDir = dirname($fullThumbnailPath);
-                        if (!file_exists($thumbnailDir)) {
-                            mkdir($thumbnailDir, 0755, true);
-                        }
+            //             // Ensure the directory exists before saving
+            //             $thumbnailDir = dirname($fullThumbnailPath);
+            //             if (!file_exists($thumbnailDir)) {
+            //                 mkdir($thumbnailDir, 0755, true);
+            //             }
                         
-                        // Save the thumbnail
-                        $frame->save($fullThumbnailPath);
+            //             // Save the thumbnail
+            //             $frame->save($fullThumbnailPath);
                         
-                        // Verify the thumbnail was created
-                        if (!file_exists($fullThumbnailPath)) {
-                            Log::error('Thumbnail file was not created at: ' . $fullThumbnailPath);
-                            throw new \Exception('Failed to create thumbnail file');
-                        }
-                    } catch (\Exception $e) {
-                        Log::error('FFMpeg error: ' . $e->getMessage());
-                        // Continue with fallback method
-                        $thumbnailPath = $this->createFallbackThumbnail($thumbnailPath);
-                    }
-                } else {
-                    // Fallback method - store a placeholder thumbnail
-                    $thumbnailPath = $this->createFallbackThumbnail($thumbnailPath);
-                }
-            } catch (\Exception $e) {
-                // Log the error but continue without a thumbnail
-                Log::error('Failed to create video thumbnail: ' . $e->getMessage());
-            }
+            //             // Verify the thumbnail was created
+            //             if (!file_exists($fullThumbnailPath)) {
+            //                 Log::error('Thumbnail file was not created at: ' . $fullThumbnailPath);
+            //                 throw new \Exception('Failed to create thumbnail file');
+            //             }
+            //         } catch (\Exception $e) {
+            //             Log::error('FFMpeg error: ' . $e->getMessage());
+            //             // Continue with fallback method
+            //             $thumbnailPath = $this->createFallbackThumbnail($thumbnailPath);
+            //         }
+            //     } else {
+            //         // Fallback method - store a placeholder thumbnail
+            //         $thumbnailPath = $this->createFallbackThumbnail($thumbnailPath);
+            //     }
+            // } catch (\Exception $e) {
+            //     // Log the error but continue without a thumbnail
+            //     Log::error('Failed to create video thumbnail: ' . $e->getMessage());
+            // }
 
             $profileVideo = new ProfileVideo([
                 'path' => $path,
-                'thumbnail_path' => $thumbnailPath,
+                'thumbnail_path' => '$thumbnailPath',
             ]);
 
             $profile->video()->save($profileVideo);
@@ -432,8 +432,11 @@ class ProfileController extends Controller
      */
     public function edit(Profile $profile)
     {
+        // echo Auth::user()->isAdmin();
+        // die;
         // Ensure the user can only edit their own profile
-        if ($profile->user_id !== Auth::id()) {
+        if ($profile->user_id != Auth::id() && !Auth::user()->isAdmin()) {
+          
             abort(403, 'Unauthorized action.');
         }
 
@@ -458,7 +461,7 @@ class ProfileController extends Controller
         // var_dump($request->all());
         // die;
         // Ensure the user can only update their own profile
-        if ($profile->user_id !== Auth::id()) {
+        if ($profile->user_id != Auth::id() && !Auth::user()->isAdmin() ) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -630,51 +633,51 @@ class ProfileController extends Controller
             $videoFile = $request->file('video');
             $path = $videoFile->store('profile-videos', 'public');
             
-            // Generate thumbnail from video
-            $thumbnailPath = null;
-            try {
-                // Create a thumbnail from the first frame of the video
-                $thumbnailName = pathinfo($videoFile->getClientOriginalName(), PATHINFO_FILENAME) . '_thumbnail.jpg';
-                $thumbnailPath = 'profile-videos/thumbnails/' . $thumbnailName;
+            // // Generate thumbnail from video
+            // $thumbnailPath = null;
+            // try {
+            //     // Create a thumbnail from the first frame of the video
+            //     $thumbnailName = pathinfo($videoFile->getClientOriginalName(), PATHINFO_FILENAME) . '_thumbnail.jpg';
+            //     $thumbnailPath = 'profile-videos/thumbnails/' . $thumbnailName;
                 
-                // Ensure the thumbnails directory exists
-                Storage::disk('public')->makeDirectory('profile-videos/thumbnails');
+            //     // Ensure the thumbnails directory exists
+            //     Storage::disk('public')->makeDirectory('profile-videos/thumbnails');
                 
-                // Use FFMpeg if available, otherwise fallback to simple method
-                if (class_exists('\FFMpeg\FFMpeg') && class_exists('\FFMpeg\Coordinate\TimeCode')) {
-                    try {
-                        $ffmpeg = \FFMpeg\FFMpeg::create();
-                        $video = $ffmpeg->open(Storage::disk('public')->path($path));
-                        $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1));
-                        $frame->save(Storage::disk('public')->path($thumbnailPath));
-                    } catch (\Exception $e) {
-                        Log::error('FFMpeg error: ' . $e->getMessage());
-                        // Continue with fallback method
-                    }
-                } else {
-                    // Fallback method - store a placeholder thumbnail
-                    $placeholderPath = public_path('assets/images/video-placeholder.jpg');
-                    if (file_exists($placeholderPath)) {
-                        Storage::disk('public')->put($thumbnailPath, file_get_contents($placeholderPath));
-                    }
-                }
-            } catch (\Exception $e) {
-                // Log the error but continue without a thumbnail
-                Log::error('Failed to create video thumbnail: ' . $e->getMessage());
-            }
+            //     // Use FFMpeg if available, otherwise fallback to simple method
+            //     if (class_exists('\FFMpeg\FFMpeg') && class_exists('\FFMpeg\Coordinate\TimeCode')) {
+            //         try {
+            //             $ffmpeg = \FFMpeg\FFMpeg::create();
+            //             $video = $ffmpeg->open(Storage::disk('public')->path($path));
+            //             $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1));
+            //             $frame->save(Storage::disk('public')->path($thumbnailPath));
+            //         } catch (\Exception $e) {
+            //             Log::error('FFMpeg error: ' . $e->getMessage());
+            //             // Continue with fallback method
+            //         }
+            //     } else {
+            //         // Fallback method - store a placeholder thumbnail
+            //         $placeholderPath = public_path('assets/images/video-placeholder.jpg');
+            //         if (file_exists($placeholderPath)) {
+            //             Storage::disk('public')->put($thumbnailPath, file_get_contents($placeholderPath));
+            //         }
+            //     }
+            // } catch (\Exception $e) {
+            //     // Log the error but continue without a thumbnail
+            //     Log::error('Failed to create video thumbnail: ' . $e->getMessage());
+            // }
             
             // Delete existing video if there is one
             if ($profile->video) {
                 Storage::disk('public')->delete($profile->video->path);
-                if ($profile->video->thumbnail_path) {
-                    Storage::disk('public')->delete($profile->video->thumbnail_path);
-                }
+                // if ($profile->video->thumbnail_path) {
+                //     Storage::disk('public')->delete($profile->video->thumbnail_path);
+                // }
                 $profile->video->delete();
             }
             
             $profileVideo = new ProfileVideo([
                 'path' => $path,
-                'thumbnail_path' => $thumbnailPath,
+                'thumbnail_path' => 'thumbnailPath',
             ]);
             
             $profile->video()->save($profileVideo);
@@ -755,41 +758,41 @@ class ProfileController extends Controller
             $path = $videoFile->store('profile-videos', 'public');
 
             // Generate thumbnail from video
-            $thumbnailPath = null;
-            try {
-                // Create a thumbnail from the first frame of the video
-                $thumbnailName = pathinfo($videoFile->getClientOriginalName(), PATHINFO_FILENAME) . '_thumbnail.jpg';
-                $thumbnailPath = 'profile-videos/thumbnails/' . $thumbnailName;
+            // $thumbnailPath = null;
+            // try {
+            //     // Create a thumbnail from the first frame of the video
+            //     $thumbnailName = pathinfo($videoFile->getClientOriginalName(), PATHINFO_FILENAME) . '_thumbnail.jpg';
+            //     $thumbnailPath = 'profile-videos/thumbnails/' . $thumbnailName;
 
-                // Ensure the thumbnails directory exists
-                Storage::disk('public')->makeDirectory('profile-videos/thumbnails');
+            //     // Ensure the thumbnails directory exists
+            //     Storage::disk('public')->makeDirectory('profile-videos/thumbnails');
 
-                // Use FFMpeg if available, otherwise fallback to simple method
-                if (class_exists('\FFMpeg\FFMpeg') && class_exists('\FFMpeg\Coordinate\TimeCode')) {
-                    try {
-                        $ffmpeg = \FFMpeg\FFMpeg::create();
-                        $video = $ffmpeg->open(Storage::disk('public')->path($path));
-                        $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1));
-                        $frame->save(Storage::disk('public')->path($thumbnailPath));
-                    } catch (\Exception $e) {
-                        Log::error('FFMpeg error: ' . $e->getMessage());
-                        // Continue with fallback method
-                    }
-                } else {
-                    // Fallback method - store a placeholder thumbnail
-                    $placeholderPath = public_path('assets/images/video-placeholder.jpg');
-                    if (file_exists($placeholderPath)) {
-                        Storage::disk('public')->put($thumbnailPath, file_get_contents($placeholderPath));
-                    }
-                }
-            } catch (\Exception $e) {
-                // Log the error but continue without a thumbnail
-                Log::error('Failed to create video thumbnail: ' . $e->getMessage());
-            }
+            //     // Use FFMpeg if available, otherwise fallback to simple method
+            //     if (class_exists('\FFMpeg\FFMpeg') && class_exists('\FFMpeg\Coordinate\TimeCode')) {
+            //         try {
+            //             $ffmpeg = \FFMpeg\FFMpeg::create();
+            //             $video = $ffmpeg->open(Storage::disk('public')->path($path));
+            //             $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1));
+            //             $frame->save(Storage::disk('public')->path($thumbnailPath));
+            //         } catch (\Exception $e) {
+            //             Log::error('FFMpeg error: ' . $e->getMessage());
+            //             // Continue with fallback method
+            //         }
+            //     } else {
+            //         // Fallback method - store a placeholder thumbnail
+            //         $placeholderPath = public_path('assets/images/video-placeholder.jpg');
+            //         if (file_exists($placeholderPath)) {
+            //             Storage::disk('public')->put($thumbnailPath, file_get_contents($placeholderPath));
+            //         }
+            //     }
+            // } catch (\Exception $e) {
+            //     // Log the error but continue without a thumbnail
+            //     Log::error('Failed to create video thumbnail: ' . $e->getMessage());
+            // }
 
             $profileVideo = new ProfileVideo([
                 'path' => $path,
-                'thumbnail_path' => $thumbnailPath,
+                'thumbnail_path' => 'thumbnailPath',
             ]);
 
             $profile->video()->save($profileVideo);
@@ -833,7 +836,13 @@ class ProfileController extends Controller
             $profile->paidServices()->detach();
         }
 
-        return redirect()->route('user.profiles.index', $profile)
+        if (Auth::user()->isAdmin() && $profile->user_id != Auth::id())
+        {
+            toastr()->success( 'Профиль успешно обновлен!');
+            return redirect()->route('admin.profiles.index');
+        }
+
+        return redirect()->route('user.profiles.index')
             ->with('success', 'Профиль успешно обновлен!');
     }
 

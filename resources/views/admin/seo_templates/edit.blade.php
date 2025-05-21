@@ -51,6 +51,17 @@
                             @enderror
                         </div>
 
+                        <div class="form-group">
+                            <label for="city_override">Город для плейсхолдера <code>{город}</code> (по умолчанию: St. Petersburg)</label>
+                            <input type="text" name="city_override" id="city_override" class="form-control @error('city_override') is-invalid @enderror" value="{{ old('city_override', $template->city_override ?? 'St. Petersburg') }}">
+                            @error('city_override')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                            <small class="form-text text-muted">Если оставить пустым, будет использовано значение по умолчанию "St. Petersburg".</small>
+                        </div>
+
                         <button type="submit" class="btn btn-primary">Обновить шаблон</button>
                         <div class="mt-4">
                             <h4>Доступные плейсхолдеры:</h4>
@@ -59,7 +70,7 @@
                                 <li><code>{имя}</code> - Имя профиля</li>
                                 <li><code>{возраст}</code> - Возраст</li>
                                 <li><code>{цвет_волос}</code> - Цвет волос</li>
-                                <li><code>{город}</code> - Город (например, St. Petersburg)</li>
+                                <li><code>{город}</code> - Город (по умолчанию "St. Petersburg", можно переопределить выше)</li>
                                 <li><code>{тип_профиля}</code> - Тип профиля (Индивидуалка/Интим-салон)</li>
                                 <li><code>{описание}</code> - Описание профиля</li>
                                 <li><code>{телефон}</code> - Телефон</li>

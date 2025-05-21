@@ -76,7 +76,10 @@
         <h4>Информация об анкете</h4>
         @if (!$profile->trashed())
       <div class="card-header-action">
-        <a href="{{ route('profiles.view', $profile->id) }}" class="btn btn-icon btn-primary" target="_blank"
+        <a href="{{ route('profiles.view', [
+        'slug'=>$profile->slug,
+        'id'=>$profile->id,
+        ]) }}" class="btn btn-icon btn-primary" target="_blank"
         data-toggle="tooltip" title="Просмотреть профиль на сайте">
         <i class="fas fa-external-link-alt"></i>
         </a>

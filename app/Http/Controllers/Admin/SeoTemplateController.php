@@ -33,11 +33,12 @@ class SeoTemplateController extends Controller
             'title_template' => 'nullable|string|max:255',
             'meta_description_template' => 'nullable|string',
             'h1_template' => 'nullable|string|max:255',
+            'city_override' => 'nullable|string|max:255', // Add validation for city_override
         ]);
 
         $template = SeoTemplate::firstOrCreate(['page_type' => $pageType]);
-        $template->update($request->only(['title_template', 'meta_description_template', 'h1_template']));
+        $template->update($request->only(['title_template', 'meta_description_template', 'h1_template', 'city_override'])); // Include city_override in update
 
-        return redirect()->route('admin.seo_templates.edit', $pageType)->with('success', 'SEO templates updated successfully.');
+        return redirect()->route('admin.seo_templates.edit', $pageType)->with('success', 'SEO-шаблоны успешно обновлены.');
     }
 }

@@ -125,9 +125,10 @@ class TariffController extends Controller
             'vip_duration' => 'nullable|string|in:1_day,1_week,1_month',
         ]);
 
+        $user = Auth::user();
         // Проверяем, что профиль принадлежит текущему пользователю
         $profile = Profile::findOrFail($validated['profile_id']); 
-        if ($profile->user_id !== Auth::id()) {
+        if ($profile->user_id != $user->id) {
             return back()->with('error', 'Профиль не принадлежит вам.');
         }
 
@@ -140,7 +141,7 @@ class TariffController extends Controller
             $now = Carbon::now();
             $dailyCharge = 0;
             $expiresAt = null;
-            $isAdmin = ($user->id === 1); // Проверяем, является ли пользователь администратором
+            $isAdmin = ($user->id == 1); // Проверяем, является ли пользователь администратором
             $totalCost = 0; // Инициализируем переменную для общей стоимости
 
             // Рассчитываем стоимость и дату окончания в зависимости от типа тарифа

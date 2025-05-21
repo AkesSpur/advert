@@ -321,7 +321,7 @@
                                     :data-index="index" />
                                 <input type="number" 
                                     :name="index === 0 ? 'vyezd_night' : 'appartamenti_night'" 
-                                    placeholder="Цена за 3 часа" 
+                                    placeholder="Цена за ночь" 
                                     class="pricing-input w-full bg-[#191919] border-0 placeholder-[#FFFFFF66] text-white px-3 py-2 rounded-lg"
                                     :value="index === 0 ? `{{ old('vyezd_night') }}` : `{{ old('appartamenti_night') }}`"
                                     min="0"
@@ -373,7 +373,6 @@
 
                             <div class="p-6 rounded-xl mt-6">
                                 <h3 class="text-lg font-semibold mb-4 text-white">Услуги за доп. плату <span class="text-red-500">*</span></h3>
-                                <p class="text-sm text-[#FFFFFF99] mb-2">* Требуется выбрать хотя бы одну услугу</p>
                                 <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-y-6">
                                     <template x-for="(item, id) in {{ Js::from($paidServices) }}">
                                         <div class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between mr-3">

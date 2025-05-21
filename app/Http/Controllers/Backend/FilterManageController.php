@@ -203,6 +203,7 @@ class FilterManageController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:prices,name,' . $id,
+            'value' => 'required|string|max:255|unique:prices,value,' . $id,
             'title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'h1_header' => 'nullable|string|max:255',

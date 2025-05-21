@@ -46,7 +46,7 @@
             <div class="block md:block lg:hidden py-2 px-4">
                 <div class="flex items-center mb-1 md:mb-none">
                     <h1 class="text-3xl capitalize font-semibold text-white mr-2 relative">
-                        {{ $seoh1 ?? ($profile->name . ', ' . $profile->age) }}
+                        {{ $seoH1 ?? ($profile->name . ', ' . $profile->age) }}
                         @if ($profile->is_verified)
                             <span class="absolute -top-1 -right-5">
                                 <img src="{{ asset('assets/svg/verified.png') }}" class="w-4 h-4">
@@ -160,9 +160,9 @@
                                     <!-- Images (in carousel) -->
                                     @foreach ($profile->images as $image)
                                         <div
-                                            class="carousel-slide absolute inset-0 opacity-100 transition-opacity rounded-xl duration-300">
+                                            class="carousel-slide absolute inset-0 opacity-100 transition-opacity rounded-xl duration-300 flex items-center justify-center bg-black">
                                             <img src="{{ asset('storage/' . $image->path) }}" alt="Image {{$slide}}"
-                                                class="w-full rounded-xl h-full object-cover">
+                                                class="w-auto rounded-xl h-full object-contain max-w-full">
                                         </div>
                                         @php
                                             $slide++;
@@ -171,8 +171,8 @@
 
                                     @if (isset($profile->video->path))
                                         <!-- Video (hidden by default) -->
-                                        <div class="video-slide absolute inset-0 opacity-0 transition-opacity duration-300">
-                                            <video class="w-full h-full object-cover" controls>
+                                        <div class="video-slide absolute inset-0 opacity-0 transition-opacity duration-300 flex items-center justify-center bg-black">
+                                            <video class="w-auto h-full object-contain max-w-full" controls>
                                                 <source src="{{asset('storage/' . $profile->video->path)}}" type="video/mp4">
                                                 Your browser does not support the video tag.
                                             </video>
@@ -207,10 +207,10 @@
                                     <button 
                                         class="like-button p-2 rounded-full hover:scale-105 transition"
                                         data-profile-id="{{ $profile->id }}" name="like">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" 
-                                            fill="{{ Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $profile->id)->exists() ? 'red' : 'none' }}" 
-                                            stroke="{{ Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $profile->id)->exists() ? 'none' : 'white' }}"
-                                            stroke-width="{{ Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $profile->id)->exists() ? '0' : '2' }}"
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
+                                            fill="{{ (Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $profile->id)->exists()) || (!Auth::check() && in_array($profile->id, session('liked_profiles', []))) ? 'red' : 'none' }}"
+                                            stroke="{{ (Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $profile->id)->exists()) || (!Auth::check() && in_array($profile->id, session('liked_profiles', []))) ? 'none' : 'white' }}"
+                                            stroke-width="{{ (Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $profile->id)->exists()) || (!Auth::check() && in_array($profile->id, session('liked_profiles', []))) ? 'none' : '2' }}"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -226,7 +226,7 @@
                 <div class="lg:block lg:w-1/2 p-4 hidden">
                     <div class="flex items-center ">
                         <h1 class="text-3xl capitalize font-semibold text-white mr-2 relative">
-                            {{  $seoh1 ?? ($profile->name . ', ' . $profile->age) }}
+                            {{  $seoH1 ?? ($profile->name . ', ' . $profile->age) }}
                             @if ($profile->is_verified)
                                 <span class="absolute -top-1 -right-5">
                                     <img src="{{ asset('assets/svg/verified.png') }}" class="w-4 h-4">
@@ -970,7 +970,8 @@
 
             const fullscreenImage = document.createElement('img');
             fullscreenImage.src = imageSrc;
-            fullscreenImage.className = 'max-h-screen max-w-screen-lg object-contain';
+            // fullscreenImage.className = 'max-h-screen max-w-screen-lg object-contain';
+            fullscreenImage.className = 'w-full h-auto max-h-screen object-contain';
             fullscreenImage.id = 'fullscreen-image';
 
             const closeButton = document.createElement('button');
