@@ -17,8 +17,10 @@
                         <tr>
                             <th>ID</th>
                             <th>Пользователь</th>
-                            <th>Сумма</th>
-                            <th>Тип</th>
+                            <th>Сумма (RUB)</th>
+                            <th>Ориг. Сумма</th>
+                            <th>Ориг. Валюта</th>
+                            <th>Тип/Описание</th>
                             <th>Статус</th>
                             <th>ID платежа</th>
                             <th>Дата</th>
@@ -29,17 +31,29 @@
                         <tr>
                             <td>{{ $transaction->id }}</td>
                             <td>{{ $transaction->user?->name }} ({{ $transaction->user?->email }})</td>
-                            <td>{{ $transaction->amount }} {{ config('settings.site_currency_icon') }}</td>
+                            <td>{{ number_format($transaction->amount, 2, '.', ' ') }} {{-- Assuming RUB --}}</td>
                             <td>
+                                @if($transaction->original_payment_amount)
+                                    {{ number_format($transaction->original_payment_amount, 2, '.', ' ') }}
+                                @else
+                                    N/A
+                                @endif
+                            </td>
+                            <td>{{ $transaction->original_payment_currency ?? 'N/A' }}</td>
+                            <td>
+                                {{-- Displaying type or description --}}
                                 @if($transaction->type == 'purchase')
-                            @if(isset($transaction->description))
-                                {{ $transaction->description }}
-                            @else
-                                Оплата рекламы
-                            @endif
-                        @else
-                            Пополнение
-                        @endif
+                                    @if(!empty($transaction->description))
+                                        {{ Str::limit($transaction->description, 50) }} 
+                                    @else
+                                        Оплата рекламы
+                                    @endif
+                                @else
+                                    Пополнение
+                                    @if(!empty($transaction->description) && $transaction->description !== 'Пополнение')
+                                     - {{ Str::limit($transaction->description, 50) }}
+                                    @endif
+                                @endif
                             </td>
                             <td>
                                 @if ($transaction->status === 'completed')
@@ -51,7 +65,7 @@
                                 @elseif ($transaction->status === 'cancelled')
                                 <span class="badge badge-secondary">Отменен</span>
                                 @else
-                                {{ $transaction->status }}
+                                <span class="badge badge-light">{{ ucfirst($transaction->status) }}</span>
                                 @endif
                             </td>
                             <td>{{ $transaction->payment_id }}</td>
@@ -66,7 +80,9 @@
                 </table>
             </div>
             @if ($transactions->hasPages())
-                {{ $transactions->links() }}
+                <div class="mt-3">
+                    {{ $transactions->links() }}
+                </div>
             @endif
         </div>
     </div>

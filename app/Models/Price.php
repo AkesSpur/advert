@@ -20,4 +20,12 @@ class Price extends Model
         'sort_order',
         'status'
     ];
+
+    /**
+     * Get the price's hero section override.
+     */
+    public function heroSectionOverride(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(HeroSectionOverride::class, 'overridable');
+    }
 }

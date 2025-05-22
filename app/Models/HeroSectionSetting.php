@@ -14,4 +14,16 @@ class HeroSectionSetting extends Model
         'text_content',
         'image',
     ];
+
+    /**
+     * Get the hero section override for the setting.
+     */
+    public function heroSectionOverride()
+    {
+        return $this->morphOne(HeroSectionOverride::class, 'overridable');
+    }
+    // public function heroSectionOverride()
+    // {
+    //     return $this->morphOne(HeroSectionOverride::class, 'overridable');
+    // }
 }

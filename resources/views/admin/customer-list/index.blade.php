@@ -74,7 +74,7 @@
                                               <a href="mailto:{{$customer->email}}">{{$customer->email}}</a>
                                               <button class="btn btn-sm btn-info ml-1 edit-email-btn" data-id="{{$customer->id}}" data-email="{{$customer->email}}"><i class="fas fa-envelope"></i></button>
                                             </td>
-                                            <td>
+                                            <td class="text-center">
                                                 @if($customer->profiles->count() > 0)
                                                     <button class="btn btn-sm btn-primary view-profiles-btn" data-id="{{$customer->id}}" data-name="{{$customer->name}}">
                                                         <i class="fas fa-eye"></i> {{ $customer->profiles->count() }}

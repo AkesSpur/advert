@@ -14,7 +14,7 @@ class LikeController extends Controller
         $profile = Profile::findOrFail($profileId);
 
         if (Auth::check()) {
-            $user = user::findOrFail(Auth::id());
+            $user = User::findOrFail(Auth::id());
             if ($user->likedProfiles()->where('profile_id', $profileId)->exists()) {
                 $user->likedProfiles()->detach($profileId);
                 return response()->json(['status' => 'unliked', 'count' => $user->likedProfiles()->count()]);
@@ -39,8 +39,7 @@ class LikeController extends Controller
     public function likedProfiles()
     {
         if (Auth::check()) {
-            $user = user::findOrFail(Auth::id());
-
+            $user = User::findOrFail(Auth::id());
             $likedProfiles = $user->likedProfiles()->where('is_archived', false)->latest()->get();
         } else {
             $likedProfileIds = session()->get('liked_profiles', []);

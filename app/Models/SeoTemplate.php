@@ -38,7 +38,7 @@ class SeoTemplate extends Model
             '{город}' => $this->city_override ?: 'St. Petersburg', // Use city_override or default
             '{тип_профиля}' => $profile->profile_type == 'individual' ? 'Индивидуалка' : 'Интим-салон',
             '{описание}' => $profile->description,
-            '{телефон}' =>$profile->phone,
+            '{телефон}' => formatNumber($profile->phone),
             '{вес}' => $profile->weight,
             '{высота}' => $profile->height,
             '{грудь}' => $profile->size,

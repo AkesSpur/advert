@@ -38,6 +38,6 @@ class Service extends Model
      */
     public function heroSectionOverride(): MorphOne
     {
-        return $this->morphOne(HeroSectionOverride::class, 'model');
+        return $this->morphOne(HeroSectionOverride::class, 'overridable');
     }
 }

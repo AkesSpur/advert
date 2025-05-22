@@ -18,6 +18,8 @@ class Transaction extends Model
     protected $fillable = [
         'user_id',
         'amount',
+        'original_payment_amount',
+        'original_payment_currency',
         'type', // Could be 'deposit', 'withdrawal', 'payment', 'refund', etc.
         'status', // e.g., 'pending', 'completed', 'failed', 'cancelled'
         'reference_id', // For internal reference, if any
@@ -36,6 +38,7 @@ class Transaction extends Model
      */
     protected $casts = [
         'amount' => 'decimal:2',
+        'original_payment_amount' => 'decimal:2',
         'paid_at' => 'datetime',
     ];
 

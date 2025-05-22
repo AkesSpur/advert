@@ -9,6 +9,14 @@ use App\Models\HeroSectionSetting;
 use App\Models\HeroSectionOverride;
 use App\Models\CustomCategory;
 use App\Models\Service;
+use App\Models\MetroStation;
+use App\Models\Price;
+use App\Models\Age;
+use App\Models\HairColor;
+use App\Models\Height;
+use App\Models\Weight;
+use App\Models\Size;
+use App\Models\Neighborhood;
 use App\Models\LogoSetting;  // Assuming LogoSetting model exists
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -35,6 +43,7 @@ class SettingController extends Controller
     {
         $request->validate([
             'site_name' => ['required', 'max:200'],
+            'webmoney_usd_to_rub_rate' => ['required', 'numeric', 'min:0'],
             'cheap_threshold' => ['nullable', 'integer', 'min:0'],
             'profiles_per_page' => ['nullable', 'integer', 'min:1'],
             'default_h1_heading' => ['nullable', 'string', 'max:255'],
@@ -42,6 +51,7 @@ class SettingController extends Controller
             'default_seo_description' => ['nullable', 'string'],
             'yandex_api_key' => ['nullable', 'string', 'max:255'], // Added Yandex API Key validation
         ]);
+
 
         GeneralSetting::updateOrCreate(
             ['id' => 1], // Assuming there's only one row for general settings
@@ -53,6 +63,7 @@ class SettingController extends Controller
                 'default_seo_title' => $request->default_seo_title,
                 'default_seo_description' => $request->default_seo_description,
                 'yandex_api_key' => $request->yandex_api_key, // Added Yandex API Key saving
+                'webmoney_usd_to_rub_rate' => $request->webmoney_usd_to_rub_rate,
             ]
         );
 
@@ -64,57 +75,110 @@ class SettingController extends Controller
         return redirect()->back();
     }
 
+    private function getModelFriendlyName($modelTypeShortName)
+    {
+        $names = [
+            'Service' => 'Услуги',
+            'MetroStation' => 'Станции метро',
+            'Price' => 'Цена',
+            'Age' => 'Возраст',
+            'HairColor' => 'Цвет волос',
+            'Height' => 'Рост',
+            'Weight' => 'Вес',
+            'Size' => 'Размер',
+            'Neighborhood' => 'Район',
+            'CustomCategory' => 'Кастомная категория',
+            'HeroSectionSetting' => 'Общие настройки Hero'
+        ];
+        return $names[$modelTypeShortName] ?? $modelTypeShortName;
+    }
+
     public function heroSectionOverrideIndex(Request $request)
     {
-        $modelType = $request->query('model_type');
-        $modelId = $request->query('model_id');
-        $model = null;
-        $heroOverride = null;
+        $currentModelType = $request->query('model_type'); // Short name like "Service"
+        $currentModelId = $request->query('model_id');   // String ID from query
 
-        if ($modelType && $modelId) {
-            $modelClass = "App\\Models\\".ucfirst($modelType);
-            if (class_exists($modelClass)) {
-                $model = $modelClass::find($modelId);
-                if ($model) {
+        $heroOverride = null;
+        $displayModelInfo = ['name' => null, 'type' => $currentModelType, 'id' => $currentModelId];
+
+        $typeLevelModels = ['Service', 'MetroStation', 'Price', 'Age', 'HairColor', 'Height', 'Weight', 'Size', 'Neighborhood'];
+
+        if ($currentModelType) {
+            $fullModelClass = "App\\Models\\" . ucfirst($currentModelType);
+            if (class_exists($fullModelClass)) {
+                if (in_array($currentModelType, $typeLevelModels)) {
+                    $actualModelIdForDb = 0;
+                    $displayModelInfo['id'] = $actualModelIdForDb; // Ensure ID is 0 for display
+                    $displayModelInfo['name'] = "Тип: " . $this->getModelFriendlyName($currentModelType);
                     $heroOverride = HeroSectionOverride::firstOrCreate(
-                        ['model_type' => get_class($model), 'model_id' => $model->id]
+                        ['model_type' => $fullModelClass, 'model_id' => $actualModelIdForDb]
                     );
+                } elseif ($currentModelId !== null && $currentModelId !== '') {
+                    // Instance-level models like CustomCategory, HeroSectionSetting
+                    $modelInstance = $fullModelClass::find($currentModelId);
+                    if ($modelInstance) {
+                        $actualModelIdForDb = $modelInstance->id;
+                        $displayModelInfo['id'] = $actualModelIdForDb;
+                        $displayModelInfo['name'] = $this->getModelFriendlyName($currentModelType) . ": " . ($modelInstance->name ?? $modelInstance->title ?? "ID: " . $actualModelIdForDb);
+                        $heroOverride = HeroSectionOverride::firstOrCreate(
+                            ['model_type' => $fullModelClass, 'model_id' => $actualModelIdForDb]
+                        );
+                    }
                 }
             }
         }
 
-        // Fetch all custom categories and services for the dropdowns
+        // Data for dropdowns
         $customCategories = CustomCategory::all();
-        $services = Service::all();
+        $services = Service::all(); // Still needed if we want to allow specific service overrides in future, or for other admin areas
+        $metroStations = MetroStation::all();
+        $prices = Price::all();
+        $ages = Age::all();
+        $hairColors = HairColor::all();
+        $heights = Height::all();
+        $weights = Weight::all();
+        $sizes = Size::all();
+        $neighborhoods = Neighborhood::all();
+        $heroSectionSettings = HeroSectionSetting::all();
 
-        return view('admin.setting.hero-section-override', compact('heroOverride', 'model', 'modelType', 'modelId', 'customCategories', 'services'));
+        return view('admin.setting.hero-section-override', compact(
+            'heroOverride', 'displayModelInfo', 'currentModelType', 'currentModelId',
+            'customCategories', 'services', 'metroStations', 'prices', 'ages',
+            'hairColors', 'heights', 'weights', 'sizes', 'neighborhoods', 'heroSectionSettings',
+            'typeLevelModels'
+        ));
     }
 
     public function updateHeroSectionOverride(Request $request)
     {
         $request->validate([
-            'model_type' => ['required', 'string'],
-            'model_id' => ['required', 'integer'],
+            'model_type' => ['required', 'string'], // Short name like "Service"
+            'model_id' => ['required', 'integer'],   // 0 for type-level, or specific ID
             'title' => ['nullable', 'string', 'max:255'],
             'text_content' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'max:5000'], // Max 5MB
             'is_active' => ['sometimes', 'boolean']
         ]);
 
-        $modelClass = "App\\Models\\".ucfirst($request->model_type);
-        if (!class_exists($modelClass)) {
+        $shortModelType = $request->model_type;
+        $modelId = (int) $request->model_id;
+        $fullModelClass = "App\\Models\\".ucfirst($shortModelType);
+
+        // $typeLevelModels = ['Service', 'MetroStation', 'Price', 'Age', 'HairColor', 'Height', 'Weight', 'Size', 'Neighborhood'];
+        // No need to check if in_array here, the model_id (0 or specific) dictates behavior.
+
+        if (!class_exists($fullModelClass)) {
             toastr()->error('Invalid model type provided.');
             return redirect()->back();
         }
 
-        $model = $modelClass::find($request->model_id);
-        if (!$model) {
-            toastr()->error('Model not found.');
-            return redirect()->back();
-        }
+        // For instance-level models, we might want to verify the model_id actually exists.
+        // For type-level (model_id == 0), there's no specific instance to find.
+        // The HeroSectionOverride is uniquely identified by (fullModelClass, modelId)
+        // So, no need to $modelClass::find() if we trust the model_id is correct (0 or valid ID).
 
         $heroOverride = HeroSectionOverride::firstOrNew(
-            ['model_type' => get_class($model), 'model_id' => $model->id]
+            ['model_type' => $fullModelClass, 'model_id' => $modelId]
         );
 
         $imagePath = $this->updateImage($request, 'image', $heroOverride->image, 'uploads/hero_overrides');

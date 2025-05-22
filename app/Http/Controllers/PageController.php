@@ -40,7 +40,7 @@ class PageController extends Controller
         $pageType = 'search_results'; // Default page type for SEO
 
         $settings = GeneralSetting::firstOrFail(); // Ensure settings are loaded
-        $perPage = $settings->profiles_per_page ?? 10; // Default if not set
+        $perPage = $settings->profiles_per_page ?? 15; // Default if not set
 
         // Initialize filter variables
         $serviceSlug = $request->input('service');
@@ -52,6 +52,19 @@ class PageController extends Controller
         $weightSlug = $request->input('weight');
         $sizeSlug = $request->input('size'); // Assuming 'size' from request is a slug for breast size
         $neighborhoodSlug = $request->input('neighborhood');
+        $customCategorySlug = $request->input('custom_category'); // For custom category filter
+
+        // Initialize model variables for filters
+        $serviceModel = null;
+        $metroModel = null;
+        $priceModel = null;
+        $ageModel = null;
+        $hairColorModel = null;
+        $heightModel = null;
+        $weightModel = null;
+        $sizeModel = null;
+        $neighborhoodModel = null;
+        $customCategoryModel = null; // For custom category filter on index page
 
         // Override with route-based slugs if present
         $routeName = $request->route()->getName();
@@ -148,6 +161,27 @@ class PageController extends Controller
                         $pageType = 'neighborhood';
                     }
                     break;
+            }
+        }
+
+        // Load models based on query parameter slugs if not already loaded by a route parameter
+        if (!$serviceModel && $serviceSlug) $serviceModel = Service::where('slug', $serviceSlug)->first();
+        if (!$metroModel && $metroSlug) $metroModel = MetroStation::where('slug', $metroSlug)->first();
+        if (!$priceModel && $priceSlug) $priceModel = Price::where('value', $priceSlug)->first(); // Assuming 'value' is the lookup column
+        if (!$ageModel && $ageSlug) $ageModel = Age::where('value', $ageSlug)->first();
+        if (!$hairColorModel && $hairColorSlug) $hairColorModel = HairColor::where('value', $hairColorSlug)->first();
+        if (!$heightModel && $heightSlug) $heightModel = Height::where('value', $heightSlug)->first();
+        if (!$weightModel && $weightSlug) $weightModel = Weight::where('value', $weightSlug)->first();
+        if (!$sizeModel && $sizeSlug) $sizeModel = Size::where('value', $sizeSlug)->first();
+        if (!$neighborhoodModel && $neighborhoodSlug) $neighborhoodModel = Neighborhood::where('slug', $neighborhoodSlug)->first();
+        if (!$customCategoryModel && $customCategorySlug) {
+            $customCategoryModel = CustomCategory::where('slug', $customCategorySlug)->first();
+            // If a custom category is filtered on the index page, and no other pageType is set, consider its SEO implications
+            if ($customCategoryModel && empty($pageType)) {
+                // $seoTitle = $customCategoryModel->title; // Or appropriate SEO fields
+                // $seoMetaDescription = $customCategoryModel->meta_description;
+                // $seoH1 = $customCategoryModel->h1_header;
+                // $pageType = 'custom_category_filter'; // A page type for when index is filtered by a custom category
             }
         }
 
@@ -559,6 +593,53 @@ class PageController extends Controller
         $topMenus = TopMenu::all();
         $footerMenus = FooterMenu::all();
 
+        // Determine hero content for the index page
+$defaultHeroSettings = HeroSectionSetting::first();
+$heroContent = $defaultHeroSettings; // Initialize with default settings
+
+// Priority 1: Specific filter overrides (Service, Metro, Price, etc.)
+$activeFilterModels = array_filter([
+    $serviceModel, $metroModel, $priceModel, $ageModel, 
+    $hairColorModel, $heightModel, $weightModel, $sizeModel, $neighborhoodModel
+]);
+
+foreach ($activeFilterModels as $modelInstance) {
+    if ($modelInstance) { // No need to check for method_exists if we query HeroSectionOverride directly
+        // Fetch override based on the model TYPE, not a specific instance relationship
+        $override = HeroSectionOverride::where('model_type', get_class($modelInstance))
+                                        ->where('is_active', true)
+                                        ->first();
+                                        
+        if ($override) {
+            $heroContent = $override;
+            break; // First active specific filter override wins
+        }
+    }
+}
+
+// Priority 2: Generic override (if no specific filter override was applied)
+if ($heroContent === $defaultHeroSettings && $defaultHeroSettings && method_exists($defaultHeroSettings, 'heroSectionOverride')) {
+    // Assuming a generic override is linked to the HeroSectionSetting model itself
+    // Or a specific record in HeroSectionOverride, e.g., model_type = 'App\Models\HeroSectionSetting' and model_id = 0 or 1 for global
+    $genericOverride = HeroSectionOverride::where('model_type', get_class($defaultHeroSettings))
+                                        ->where('model_id', $defaultHeroSettings->id) // Or your specific logic for generic
+                                        ->where('is_active', true)
+                                        ->first();
+    // Fallback: Check for a truly global override if the above isn't found
+    // if (!$genericOverride) {
+    //     $genericOverride = HeroSectionOverride::where('model_type', 'App\Models\HeroSectionSetting') // Or a dedicated 'global' type
+    //                                             ->where('model_id', 0) // Or a sentinel ID for global
+    //                                             ->where('is_active', true)
+    //                                             ->first();
+    // }
+
+    if ($genericOverride) {
+        $heroContent = $genericOverride;
+    }
+}
+// At this point, $heroContent is the most specific override, or the default settings.
+
+
         // SEO Fallbacks if not set by specific filter
         if (empty($seoTitle) || empty($seoMetaDescription) || empty($seoH1)) {
             $defaultSeo = SeoTemplate::where('page_type', $pageType)->first();
@@ -601,6 +682,7 @@ class PageController extends Controller
          'prices',
          'ages',
          'seoTitle',
+         'heroContent',
          'seoMetaDescription',
          'seoH1'
         ));
@@ -851,6 +933,7 @@ $ages = Age::where('status', true)->orderBy('sort_order')->orderBy('name')->get(
 // Get active custom categories for filtering
 $customCategories = CustomCategory::where('status', 1)->orderBy('name')->get();
 
+
 // SEO Fallbacks if not set by specific filter
 if (empty($seoTitle) || empty($seoMetaDescription) || empty($seoH1)) {
     $defaultSeo = SeoTemplate::where('page_type', $pageType)->first();
@@ -887,27 +970,37 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
 
         $sort = request('sort', 'default');
 
-        // Determine hero content
-        $heroContent = HeroSectionSetting::first(); // Default hero settings
-        $activeOverrideFound = false;
+        // Determine hero content for CustomCategory page
+        $defaultHeroSettings = HeroSectionSetting::first();
+        $heroContent = $defaultHeroSettings; // Initialize with default settings
 
-        // Priority 1: Check for Service override if a service filter is active
-        if (isset($currentService) && $currentService && method_exists($currentService, 'heroSectionOverride')) {
-            $serviceOverride = $currentService->heroSectionOverride()->where('is_active', true)->first();
-            if ($serviceOverride) {
-                $heroContent = $serviceOverride;
-                $activeOverrideFound = true;
+        // Priority 1: Current CustomCategory override
+        // $customCategory is the specific category for this page, passed into the method.
+        if (isset($customCategory) && $customCategory instanceof CustomCategory && method_exists($customCategory, 'heroSectionOverride')) {
+            $override = $customCategory->heroSectionOverride()->where('is_active', true)->first();
+            if ($override) {
+                $heroContent = $override;
             }
         }
 
-        // Priority 2: Check for CustomCategory override if no service override was found and a category is active
-        if (!$activeOverrideFound && isset($category) && $category && method_exists($category, 'heroSectionOverride')) {
-            $categoryOverride = $category->heroSectionOverride()->where('is_active', true)->first();
-            if ($categoryOverride) {
-                $heroContent = $categoryOverride;
-                // $activeOverrideFound = true; // Not strictly needed here as it's the last check before default
+        // Priority 2: Generic override (if no specific CustomCategory override was applied for this category page)
+        // This applies if the current CustomCategory doesn't have its own active override.
+        if ($heroContent === $defaultHeroSettings && $defaultHeroSettings && method_exists($defaultHeroSettings, 'heroSectionOverride')) {
+            // Check for a generic override linked to the HeroSectionSetting model itself (model_type = HeroSectionSetting, model_id = $defaultHeroSettings->id)
+            // Or, if your generic override is identified differently (e.g., a specific HeroSectionOverride record not tied to any model, or tied to HeroSectionSetting with model_id=0 or 1 for global)
+            // For this example, assuming a generic override is one associated directly with the $defaultHeroSettings instance if it can have one.
+            // If HeroSectionSetting itself can have an override (e.g. for 'homepage' or 'default_filters_page')
+            $genericOverride = HeroSectionOverride::where('model_type', get_class($defaultHeroSettings))
+                                                ->where('model_id', $defaultHeroSettings->id)
+                                                ->where('is_active', true)
+                                                ->first();
+            // If your generic override is a single record in HeroSectionOverride with a special marker (e.g. model_type = 'App\Models\HeroSectionSetting' and model_id = 0 or 1 for global)
+            // $genericOverride = HeroSectionOverride::where('model_type', 'App\Models\HeroSectionSetting')->where('model_id', 0)->where('is_active', true)->first(); 
+            if ($genericOverride) {
+                $heroContent = $genericOverride;
             }
         }
+        // At this point, $heroContent is either an override, the $defaultHeroSettings, or null if $defaultHeroSettings was null and no overrides found.
 
         // If $heroContent is an override, its 'title', 'text_content', 'image' will be used.
         // If it's still the default HeroSectionSetting, its properties will be used.
@@ -1014,7 +1107,12 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
                 $sizes = Size::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
                 $prices = Price::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
                 $ages = Age::where('status', true)->orderBy('sort_order')->orderBy('name')->get(['name', 'value']);
-        
+                // Get active custom categories for filtering
+                $customCategories = CustomCategory::where('status', 1)->orderBy('name')->get();
+
+                // footer Menu
+                $footerMenus = FooterMenu::all();
+
         // Fetch SEO Template for 'profile' pages
         $seoTemplate = SeoTemplate::where('page_type', 'profile')->first();
         $seoTitle = null;
@@ -1048,7 +1146,9 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
             'sizes',
             'prices',
             'ages',
+            'customCategories',
             'profiles',
+            'footerMenus',
    'profile', 'seoTitle', 'seoMetaDescription', 'seoH1'));
     }
     

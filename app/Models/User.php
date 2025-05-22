@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -48,8 +49,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'balance' => 'decimal:2',
-        'last_active' => 'datetime',
-    ];
+   ];
 
     /**
      * Check if the user is an admin
@@ -59,6 +59,17 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    /**
+     * Update the last_active timestamp for the user.
+     *
+     * @return void
+     */
+    public function updateLastActive(): void
+    {
+        $this->last_active = Carbon::now();
+        $this->save();
     }
 
     /**

@@ -87,6 +87,22 @@ class ProcessDailyTariffCharges extends Command
                     'amount' => $tariff->daily_charge,
                     'charged_at' => $now,
                 ]);
+
+                if($tariff->daily_charge > 1){
+                    $description = "Ежедневная оплата тарифа (уровень {$tariff->priority_level}) для профиля ID№{$tariff->profile_id}";
+                }else
+                {
+                    $description = "Ежедневная оплата основной тарифа для профиля ID№{$tariff->profile_id}";
+                }
+
+                // Create a transaction record for the daily charge
+                $user->transactions()->create([
+                    'amount' => -$tariff->daily_charge, // Negative amount as it's a charge
+                    'type' => 'purchase',
+                    'status' => 'completed',
+                    'reference_id' => 'daily_charge_' . $tariff->id . '_' . $now->format('Y-m-d'),
+                    'description' => $description,
+                ]);
                 
                 $this->info("Charged user {$user->id} {$tariff->daily_charge} for {$tariff->adTariff->name} tariff.");
             

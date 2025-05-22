@@ -10,6 +10,10 @@
             </div>
             <hr>
             <div class="form-group">
+                <label for="webmoney_usd_to_rub_rate">WebMoney USD to RUB Exchange Rate</label>
+                <input type="number" step="0.0001" class="form-control" id="webmoney_usd_to_rub_rate" name="webmoney_usd_to_rub_rate" value="{{ @$generalSettings->webmoney_usd_to_rub_rate }}">
+            </div>
+            <div class="form-group">
                 <label>Дешевый порог</label>
                 <input type="number" class="form-control" name="cheap_threshold" value="{{@$generalSettings->cheap_threshold}}">
             </div>

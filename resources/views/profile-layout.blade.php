@@ -988,8 +988,66 @@
 
         <!-- Footer -->
         <footer class="pb-6 mt-auto">
-            <div class="max-w-screen-2xl mx-auto px-6">
-                <div class="flex  border-t border-[#363636] pt-6 justify-between items-center ">
+            <div class="max-w-screen-2xl border-t border-[#363636] pt-6 mx-auto px-6">
+                <!-- Filter Buttons -->
+        <div class="flex overflow-x-auto hide-scrollbar justify-center gap-3 mb-4 lg:hidden">
+            @foreach ($footerMenus as $menu)
+                @if ($menu->all_accounts == true && $menu->status == true)
+                <a href="{{ url('/') }}" 
+                class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">
+                {{$menu->name}}
+                </a>                             
+                @endif
+
+                @if ($menu->has_video == true && $menu->status == true)
+                <a href="{{ Request::url() . '?filter=video' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+                class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">
+                {{$menu->name}}
+                </a>                             
+                @endif
+
+                @if ($menu->new == true && $menu->status == true)
+                <a href="{{ Request::url() . '?filter=new' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+                class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">
+                {{$menu->name}}
+                </a>                             
+                @endif
+
+                @if ($menu->vip == true && $menu->status == true)
+                <a href="{{ Request::url() . '?filter=vip' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+                class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">
+                {{$menu->name}}
+                </a>
+                     
+                @endif
+
+                @if ($menu->cheapest == true && $menu->status == true)
+                <a href="{{ Request::url() . '?filter=cheap' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+                class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">
+                {{$menu->name}}
+                </a>                    
+                @endif
+
+                @if ($menu->verified == true && $menu->status == true)
+                <a href="{{ Request::url() . '?filter=verified' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+                class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">
+                {{$menu->name}}
+                </a>                             
+                @endif
+
+            @endforeach
+            
+            <!-- Custom Categories as Filter Buttons -->
+            @if(isset($customCategories) && count($customCategories) > 0)
+                @foreach($customCategories as $category)
+                    @if($category->status == 1 && $category->show_in_footer_menu == 1)
+                    <a href="{{ url('/category/' . $category->slug) }}" 
+                       class="capitalize px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">{{ $category->name }}</a>
+                    @endif
+                @endforeach
+            @endif
+        </div>
+                <div class="flex   justify-between items-center ">
                     <div class="mb-4 sm:mb-0">
                         <a href="/" class="text-xl font-bold">
                             <img src="{{ asset($logoSetting->logo) }}" 
@@ -998,10 +1056,67 @@
                             loading="lazy">
                         </a>
                     </div>
+<!-- Filter Buttons -->
+<div class="hidden lg:flex overflow-x-auto hide-scrollbar justify-center gap-3 mb-4 ">
+    @foreach ($footerMenus as $menu)
+        @if ($menu->all_accounts == true && $menu->status == true)
+        <a href="{{ url('/') }}" 
+        class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">
+        {{$menu->name}}
+        </a>                             
+        @endif
 
+        @if ($menu->has_video == true && $menu->status == true)
+        <a href="{{ url('/') . '?filter=video' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+        class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">
+        {{$menu->name}}
+        </a>                             
+        @endif
+
+        @if ($menu->new == true && $menu->status == true)
+        <a href="{{ url('/') . '?filter=new' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+        class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">
+        {{$menu->name}}
+        </a>                             
+        @endif
+
+        @if ($menu->vip == true && $menu->status == true)
+        <a href="{{ url('/') . '?filter=vip' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+        class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">
+        {{$menu->name}}
+        </a>
+             
+        @endif
+
+        @if ($menu->cheapest == true && $menu->status == true)
+        <a href="{{ url('/') . '?filter=cheap' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+        class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">
+        {{$menu->name}}
+        </a>                    
+        @endif
+
+        @if ($menu->verified == true && $menu->status == true)
+        <a href="{{ url('/') . '?filter=verified' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+        class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">
+        {{$menu->name}}
+        </a>                             
+        @endif
+
+    @endforeach
+    
+    <!-- Custom Categories as Filter Buttons -->
+    @if(isset($customCategories) && count($customCategories) > 0)
+        @foreach($customCategories as $category)
+            @if($category->status == 1 && $category->show_in_footer_menu == 1)
+            <a href="{{ url('/category/' . $category->slug) }}" 
+               class="capitalize px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">{{ $category->name }}</a>
+            @endif
+        @endforeach
+    @endif
+</div>
                     <div class="flex space-x-4">
                         @guest
-                      
+                        
                         <a href="{{ route('register') }}"
                            class="px-4 py-2 bg-transparent text-white border border-white-700 rounded-lg text-sm">
                             Добавить анкету
@@ -1011,6 +1126,7 @@
                             Войти
                         </a>
                     @else
+                   
                         @if(Auth::user()->is_admin)
                         <a href="{{ route('admin') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">

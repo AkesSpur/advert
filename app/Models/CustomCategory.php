@@ -76,14 +76,6 @@ class CustomCategory extends Model
     ];
 
     /**
-     * Get the category's hero section override.
-     */
-    public function heroSectionOverride(): MorphOne
-    {
-        return $this->morphOne(HeroSectionOverride::class, 'model');
-    }
-
-    /**
      * Get the services associated with this custom category.
      */
     public function getServicesAttribute()

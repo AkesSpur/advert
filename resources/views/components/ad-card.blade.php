@@ -63,7 +63,8 @@
     <template x-for="(img, index) in images" :key="index">
         <img :src="img" alt="{{ $name }}"
             class="absolute inset-0 w-full h-full object-cover object-top rounded-xl transition-opacity duration-500"
-            :class="current === index ? 'opacity-100' : 'opacity-0'">
+            :class="current === index ? 'opacity-100' : 'opacity-0'"
+            loading="lazy"> {{-- Lazy load images in ad cards --}}
     </template>
 
         <!-- Top badges -->
@@ -93,10 +94,11 @@
         </div>
 
         <!-- Like button -->
-        <button 
+        <button
             onclick="event.preventDefault(); event.stopPropagation();"
             data-profile-id="{{ $id }}" name="like"
-            class="like-button absolute top-3 right-3 p-1.5 hover:scale-105 transition z-20 rounded-full 'bg-transparent'">
+            class="like-button absolute top-3 right-3 p-1.5 hover:scale-105 transition z-20 rounded-full 'bg-transparent'"
+            aria-label="Like profile">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
                 fill="{{ (Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $id)->exists()) || (!Auth::check() && in_array($id, session('liked_profiles', []))) ? 'red' : 'none' }}"
                 stroke="{{ (Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $id)->exists()) || (!Auth::check() && in_array($id, session('liked_profiles', []))) ? 'none' : 'white' }}"
@@ -115,7 +117,7 @@
             :class="{ 'opacity-100 pointer-events-auto': isHovering, 'opacity-0 pointer-events-none': !isHovering }">
 
             <button @click.stop.prevent="prevSlide()" name="prev"
-                class="text-[#FFFFFFCC] ml-2 hover:scale-110 transition-transform duration-200">
+                class="text-[#FFFFFFCC] ml-2 hover:scale-110 transition-transform duration-200" aria-label="Previous image">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" fill="none" viewBox="0 0 24 24"
                     stroke="white">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -123,7 +125,7 @@
             </button>
 
             <button @click.stop.prevent="nextSlide()" name="next"
-                class="text-[#FFFFFFCC] mr-2 hover:scale-110 transition-transform duration-200">
+                class="text-[#FFFFFFCC] mr-2 hover:scale-110 transition-transform duration-200" aria-label="Next image">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" fill="none" viewBox="0 0 24 24"
                     stroke="white">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

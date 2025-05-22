@@ -120,11 +120,11 @@
                                 <!-- Thumbnail  -->
                                 <div class="h-[150px] rounded-xl cursor-pointer mb-2" onclick="showSlide({{$slide}})">
                                     <img src="{{ asset('storage/' . $image->path) }}" alt="Thumbnail {{$slide}}"
-                                        class="w-full h-[150px] object-cover rounded-xl">
+                                        class="w-full h-[150px] object-cover rounded-xl" loading="lazy">
                                     @php
-                                        $slide++;                                      
+                                        $slide++;
                                     @endphp
-                                </div>                        
+                                </div>
                             @endforeach
                         </div>
                         <!-- Main Image/Video Carousel on the right -->
@@ -162,7 +162,8 @@
                                         <div
                                             class="carousel-slide absolute inset-0 opacity-100 transition-opacity rounded-xl duration-300 flex items-center justify-center bg-black">
                                             <img src="{{ asset('storage/' . $image->path) }}" alt="Image {{$slide}}"
-                                                class="w-auto rounded-xl h-full object-contain max-w-full">
+                                                class="w-auto rounded-xl h-full object-contain max-w-full"
+                                                loading="{{ $slide === 1 ? 'eager' : 'lazy' }}"> {{-- Load the first image eagerly, others lazily --}}
                                         </div>
                                         @php
                                             $slide++;
@@ -183,7 +184,7 @@
                                 <!-- Carousel Controls -->
                                 <div class="absolute inset-y-0 left-0 flex items-center">
                                     <button class="p-2 text-white hover:text-gray-300 focus:outline-none"
-                                        onclick="prevSlide()" name="prev">
+                                        onclick="prevSlide()" name="prev" aria-label="Previous image">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -193,7 +194,7 @@
                                 </div>
                                 <div class="absolute inset-y-0 right-0 flex items-center">
                                     <button class="p-2 text-white hover:text-gray-300 focus:outline-none"
-                                        onclick="nextSlide()" name="next">
+                                        onclick="nextSlide()" name="next" aria-label="Next image">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -204,9 +205,9 @@
 
                                 <!-- Favorite button -->
                                 <div class="absolute top-4 right-4 z-10">
-                                    <button 
+                                    <button
                                         class="like-button p-2 rounded-full hover:scale-105 transition"
-                                        data-profile-id="{{ $profile->id }}" name="like">
+                                        data-profile-id="{{ $profile->id }}" name="like" aria-label="Favorite profile">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
                                             fill="{{ (Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $profile->id)->exists()) || (!Auth::check() && in_array($profile->id, session('liked_profiles', []))) ? 'red' : 'none' }}"
                                             stroke="{{ (Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $profile->id)->exists()) || (!Auth::check() && in_array($profile->id, session('liked_profiles', []))) ? 'none' : 'white' }}"

@@ -263,6 +263,8 @@ class="dropdown {{ setActive([
                 <ul class="dropdown-menu">
                     <li class="{{setActive(['admin.settings.*'])}}"><a class="nav-link" href="{{route('admin.settings.index')}}">Общие настройки</a></li>
                     <li class="{{setActive(['admin.hero-section-setting.*'])}}"><a class="nav-link" href="{{route('admin.hero-section-setting.index')}}">Настройки секции Hero</a></li>
+                    <li class="{{ setActive(['admin.hero-section-override.index']) }}"><a class="nav-link"
+                            href="{{ route('admin.hero-section-override.index') }}">Переопределения разделов героев</a></li>
                 </ul>
             </li>
             

@@ -1089,10 +1089,6 @@
     <div class="py-8 md:py-12 lg:py-16">
         <div class="max-w-screen-2xl mx-auto px-6">
             <div class="flex flex-col md:flex-col lg:flex-row items-stretch h-full">
-                @php
-                    // $heroContent is now passed from PageController
-                    // $heroSetting = \App\Models\HeroSectionSetting::first(); 
-                @endphp
                 <!-- Text Content -->
                 <div class="w-full lg:w-1/2 p-5 text-white bg-[#191919] rounded-tl-3xl lg:rounded-bl-3xl rounded-tr-3xl lg:rounded-tr-none">
                     <h1 class="text-3xl md:text-4xl font-bold mb-6">{{ $heroContent->title ?? (isset($heroSetting) ? $heroSetting->title : 'База анкет проституток, откровенные индивидуалки') }}</h1>
@@ -1104,16 +1100,19 @@
                 <!-- Image -->
                 <div class="w-full lg:w-1/2 relative">
                     <div class="overflow-hidden shadow-xl bg-[#191919] rounded-bl-3xl lg:rounded-bl-none lg:rounded-tr-3xl rounded-br-3xl h-full">
-                        <img src="{{ asset($heroContent->image ?? (isset($heroSetting) ? $heroSetting->image : 'assets/images/hero.jpg')) }}" alt="Hero image" class="w-full h-full object-cover">
+                        <img src="{{ asset($heroContent->image ?? (isset($heroSetting) ? $heroSetting->image : 'assets/images/hero.jpg')) }}" alt="Hero image" class="w-full h-full object-cover" loading="lazy">
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="max-w-screen-2xl px-6 mt-4 mx-auto">
-            <!-- Filter Buttons -->
-            <div class="flex overflow-x-auto hide-scrollbar justify-center gap-3 mb-4">
+ 
+
+            <footer class="pb-6 mt-auto">
+                <div class="max-w-screen-2xl border-t border-[#363636] pt-6 mx-auto px-6">
+                    <!-- Filter Buttons -->
+            <div class="flex overflow-x-auto hide-scrollbar justify-center gap-3 mb-4 lg:hidden">
                 @foreach ($footerMenus as $menu)
                     @if ($menu->all_accounts == true && $menu->status == true)
                     <a href="{{ Request::url() }}" 
@@ -1170,5 +1169,100 @@
                     @endforeach
                 @endif
             </div>
+                    <div class="flex   justify-between items-center ">
+                        <div class="mb-4 sm:mb-0">
+                            <a href="/" class="text-xl font-bold">
+                                <img src="{{ asset($logoSetting->logo) }}" 
+                                alt="SHEMK logo" 
+                                class="h-12 w-auto object-contain"
+                                loading="lazy">
+                            </a>
+                        </div>
+    <!-- Filter Buttons -->
+    <div class="hidden lg:flex overflow-x-auto hide-scrollbar justify-center gap-3 mb-4 ">
+        @foreach ($footerMenus as $menu)
+            @if ($menu->all_accounts == true && $menu->status == true)
+            <a href="{{ Request::url() }}" 
+            class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'all' || !$filter ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
+            {{$menu->name}}
+            </a>                             
+            @endif
+
+            @if ($menu->has_video == true && $menu->status == true)
+            <a href="{{ Request::url() . '?filter=video' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+            class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'video' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
+            {{$menu->name}}
+            </a>                             
+            @endif
+
+            @if ($menu->new == true && $menu->status == true)
+            <a href="{{ Request::url() . '?filter=new' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+            class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'new' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
+            {{$menu->name}}
+            </a>                             
+            @endif
+
+            @if ($menu->vip == true && $menu->status == true)
+            <a href="{{ Request::url() . '?filter=vip' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+            class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'vip' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
+            {{$menu->name}}
+            </a>
+                 
+            @endif
+
+            @if ($menu->cheapest == true && $menu->status == true)
+            <a href="{{ Request::url() . '?filter=cheap' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+            class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'cheap' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
+            {{$menu->name}}
+            </a>                    
+            @endif
+
+            @if ($menu->verified == true && $menu->status == true)
+            <a href="{{ Request::url() . '?filter=verified' . (request('sort') ? '&sort=' . request('sort') : '') }}" 
+            class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'verified' ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
+            {{$menu->name}}
+            </a>                             
+            @endif
+
+        @endforeach
+        
+        <!-- Custom Categories as Filter Buttons -->
+        @if(isset($customCategories) && count($customCategories) > 0)
+            @foreach($customCategories as $category)
+                @if($category->status == 1 && $category->show_in_footer_menu == 1)
+                <a href="{{ url('/category/' . $category->slug) }}" 
+                   class="capitalize px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ request()->is('category/' . $category->slug) ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">{{ $category->name }}</a>
+                @endif
+            @endforeach
+        @endif
     </div>
+                        <div class="flex space-x-4">
+                            @guest
+                            
+                            <a href="{{ route('register') }}"
+                               class="px-4 py-2 bg-transparent text-white border border-white-700 rounded-lg text-sm">
+                                Добавить анкету
+                            </a>
+                            <a href="{{ route('login') }}"
+                               class="px-4 py-2 bg-transparent text-white rounded-md text-sm">
+                                Войти
+                            </a>
+                        @else
+                       
+                            @if(Auth::user()->is_admin)
+                            <a href="{{ route('admin') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                            </a>
+                            @endif
+                            <a href="{{ route('user.profiles.index') }}"
+                               class="px-4 py-2 bg-transparent text-white border border-white-700 rounded-lg text-sm">
+                                Мой кабинет
+                            </a>
+                        @endguest
+                        </div>
+                    </div>
+                </div>
+            </footer>
 @endsection

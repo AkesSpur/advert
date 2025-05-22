@@ -18,9 +18,17 @@
                             <label for="model_type_selector">Тип модели</label>
                             <select name="model_type" id="model_type_selector" class="form-control select2">
                                 <option value="">-- Выберите тип --</option>
+                                <option value="HeroSectionSetting" {{ request('model_type') == 'HeroSectionSetting' ? 'selected' : '' }}>Общие настройки Hero (по умолчанию)</option>
                                 <option value="CustomCategory" {{ request('model_type') == 'CustomCategory' ? 'selected' : '' }}>Кастомная категория</option>
                                 <option value="Service" {{ request('model_type') == 'Service' ? 'selected' : '' }}>Услуга</option>
-                                <!-- Add other filterable models here if needed -->
+                                <option value="MetroStation" {{ request('model_type') == 'MetroStation' ? 'selected' : '' }}>Станция метро</option>
+                                <option value="Price" {{ request('model_type') == 'Price' ? 'selected' : '' }}>Цена</option>
+                                <option value="Age" {{ request('model_type') == 'Age' ? 'selected' : '' }}>Возраст</option>
+                                <option value="HairColor" {{ request('model_type') == 'HairColor' ? 'selected' : '' }}>Цвет волос</option>
+                                <option value="Height" {{ request('model_type') == 'Height' ? 'selected' : '' }}>Рост</option>
+                                <option value="Weight" {{ request('model_type') == 'Weight' ? 'selected' : '' }}>Вес</option>
+                                <option value="Size" {{ request('model_type') == 'Size' ? 'selected' : '' }}>Размер</option>
+                                <option value="Neighborhood" {{ request('model_type') == 'Neighborhood' ? 'selected' : '' }}>Район</option>
                             </select>
                         </div>
                     </div>
@@ -38,13 +46,13 @@
                 </div>
             </form>
 
-            @if($model && $heroOverride)
-            <h5>Настройка для: {{ $model->name ?? $model->title }} ({{ ucfirst($modelType) }} ID: {{ $modelId }})</h5>
+            @if($heroOverride)
+            <h5>Настройка для: {{ $displayModelInfo['name'] }} (Тип: {{ $displayModelInfo['type'] }}, ID для сохранения: {{ $displayModelInfo['id'] }})</h5>
             <form action="{{ route('admin.hero-section-override.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
-                <input type="hidden" name="model_type" value="{{ $modelType }}">
-                <input type="hidden" name="model_id" value="{{ $modelId }}">
+                <input type="hidden" name="model_type" value="{{ $displayModelInfo['type'] }}">
+                <input type="hidden" name="model_id" value="{{ $displayModelInfo['id'] }}">
 
                 <div class="form-group">
                     <label for="title">Заголовок (оставьте пустым для значения по умолчанию)</label>
@@ -77,10 +85,12 @@
 
                 <button type="submit" class="btn btn-primary">Обновить переопределение</button>
             </form>
-            @elseif(request('model_type') && request('model_id'))
-                <p class="text-danger">Не удалось найти указанную модель или ее переопределение.</p>
+            @elseif($currentModelType && $currentModelId !== null && $currentModelId !== '' && !$heroOverride)
+                <p class="text-danger">Не удалось найти указанную модель или ее переопределение для Тип: {{ $currentModelType }}, ID: {{ $currentModelId }}.</p>
+            @elseif($currentModelType && ($currentModelId === null || $currentModelId === ''))
+                 <p>Пожалуйста, выберите конкретную модель (или тип для общих настроек фильтра).</p>
             @else
-                <p>Пожалуйста, выберите тип модели и конкретную модель для настройки.</p>
+                <p>Пожалуйста, выберите тип модели для настройки.</p>
             @endif
         </div>
     </div>
@@ -91,23 +101,47 @@
 $(document).ready(function() {
     const modelTypeSelector = $('#model_type_selector');
     const modelIdSelector = $('#model_id_selector');
-    const initialModelType = '{{ request("model_type") }}';
-    const initialModelId = '{{ request("model_id") }}';
+    const initialModelType = '{{ $currentModelType }}';
+    const initialModelId = '{{ $currentModelId }}'; // This could be 0 for type-level or specific ID for instance-level
+    const typeLevelModels = @json($typeLevelModels);
 
     const modelsData = {
+        HeroSectionSetting: @json($heroSectionSettings->mapWithKeys(function ($item) { return [$item->id => $item->title ?: 'Основные настройки ID '.$item->id]; })->toArray()),
         CustomCategory: @json($customCategories->mapWithKeys(function ($item) { return [$item->id => $item->name]; })->toArray()),
-        Service: @json($services->mapWithKeys(function ($item) { return [$item->id => $item->name]; })->toArray()),
+        Service: { 0: 'Все услуги (тип)' }, // Type-level override
+        MetroStation: { 0: 'Все станции метро (тип)' },
+        Price: { 0: 'Все цены (тип)' },
+        Age: { 0: 'Все возрасты (тип)' },
+        HairColor: { 0: 'Все цвета волос (тип)' },
+        Height: { 0: 'Весь рост (тип)' },
+        Weight: { 0: 'Весь вес (тип)' },
+        Size: { 0: 'Все размеры (тип)' },
+        Neighborhood: { 0: 'Все районы (тип)' },
     };
 
     function populateModelIds(selectedType) {
-        modelIdSelector.empty().append('<option value="">-- Выберите модель --</option>');
-        if (selectedType && modelsData[selectedType]) {
+        modelIdSelector.empty();
+        if (!selectedType) {
+            modelIdSelector.append('<option value="">-- Сначала выберите тип --</option>');
+            modelIdSelector.prop('disabled', true);
+        } else if (typeLevelModels.includes(selectedType)) {
+            // For type-level models, only one option: ID 0
+            modelIdSelector.append($('<option></option>').attr('value', 0).text(modelsData[selectedType][0]));
+            modelIdSelector.val(0); // Pre-select it
+            modelIdSelector.prop('disabled', false); // Enable, though only one choice
+        } else if (modelsData[selectedType]) {
+            // For instance-level models (CustomCategory, HeroSectionSetting)
+            modelIdSelector.append('<option value="">-- Выберите модель --</option>');
             $.each(modelsData[selectedType], function(id, name) {
                 modelIdSelector.append($('<option></option>').attr('value', id).text(name));
             });
-            if (selectedType === initialModelType && initialModelId) {
+            modelIdSelector.prop('disabled', false);
+            if (selectedType === initialModelType && initialModelId !== '' && initialModelId !== null) {
                  modelIdSelector.val(initialModelId);
             }
+        } else {
+            modelIdSelector.append('<option value="">-- Нет данных для этого типа --</option>');
+            modelIdSelector.prop('disabled', true);
         }
         modelIdSelector.trigger('change'); // for select2 update
     }

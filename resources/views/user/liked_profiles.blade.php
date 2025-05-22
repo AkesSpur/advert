@@ -29,8 +29,13 @@
                 :weight="$profile->weight . ' кг'"
                 :height="$profile->height . ' см'"
                 :size="$profile->size . ' размер'"
-                :district="$profile->neighborhoods->isNotEmpty() ? 'р. ' . $profile->neighborhoods->first()->name : ''"
-                :metro="$profile->metroStations->isNotEmpty() ? 'м. ' . $profile->metroStations->pluck('name')->implode(', м. ') : ''"
+                :district_display="$profile->neighborhoods->map(function ($neighborhood) {
+                    return ['name' => 'р. ' . $neighborhood->name, 'slug' => $neighborhood->slug];
+                })->all()" 
+                :district_slug="null"
+                :metro_items="$profile->metroStations->isNotEmpty() ? $profile->metroStations->map(function($station) {
+                    return (object)['name' => $station->name, 'slug' => $station->slug];
+                })->all() : []"
                 :phone="$profile->phone"
                 :prices="[
                     'hour' => $profile->vyezd_1hour ?? 0,

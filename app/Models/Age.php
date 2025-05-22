@@ -21,4 +21,12 @@ class Age extends Model
         'status'
 
     ];
+
+    /**
+     * Get the age's hero section override.
+     */
+    public function heroSectionOverride(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(HeroSectionOverride::class, 'overridable');
+    }
 }

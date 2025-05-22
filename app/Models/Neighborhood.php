@@ -32,4 +32,12 @@ class Neighborhood extends Model
     {
         return $this->belongsToMany(Profile::class);
     }
+
+    /**
+     * Get the neighborhood's hero section override.
+     */
+    public function heroSectionOverride(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(HeroSectionOverride::class, 'overridable');
+    }
 }

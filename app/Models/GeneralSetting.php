@@ -17,13 +17,15 @@ class GeneralSetting extends Model
         'default_seo_title',
         'default_seo_description',
         'yandex_api_key', // Added Yandex API Key
+        'webmoney_usd_to_rub_rate', // Added WebMoney USD to RUB rate`
         // Add any other pre-existing fields from the old general_settings table here if needed
         // For example: 'contact_email', 'contact_phone', 'contact_address', 'currency_name', 'currency_icon'
     ];
 
     // If you have specific casts for these new fields, define them here
-    // protected $casts = [
-    //     'cheap_threshold' => 'integer',
-    //     'profiles_per_page' => 'integer',
-    // ];
+    protected $casts = [
+        'cheap_threshold' => 'integer',
+        'profiles_per_page' => 'integer',
+        'webmoney_usd_to_rub_rate' => 'decimal:4'
+    ];
 }

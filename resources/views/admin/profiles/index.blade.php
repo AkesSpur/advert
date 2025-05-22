@@ -62,7 +62,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('admin.profiles.index', ['filter' => 'with_t']) }}" class="nav-link {{ request('filter') == 'with_t' ? 'active' : '' }}">
+                <a href="{{ route('admin.profiles.index', ['filter' => 'with_tariffs']) }}" class="nav-link {{ request('filter') == 'with_tariffs' ? 'active' : '' }}">
                     Разместил рекламу <span class="badge badge-white">{{ $counts['with_tariffs'] }}</span>
                 </a>
               </li>

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Transaction;
+use App\Models\GeneralSetting; // Import GeneralSetting
 use Illuminate\Support\Facades\Log;
 
 class WebMoneyController extends Controller
@@ -14,180 +15,124 @@ class WebMoneyController extends Controller
     public function pay(Request $request)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:1',
+            'amount' => 'required|numeric|min:1', // This is the amount in RUB the user wants to pay
             'LMI_PAYMENT_NO' => 'required|string',
             'LMI_PAYMENT_DESC' => 'required|string',
         ]);
-
-        // $boy =config('services.webmoney.merchant_purse');
-        // echo $boy;
-        // die;
 
         // Store transaction locally before redirecting
         Transaction::create([
             'user_id' => Auth::id(),
             'payment_id' => $request->LMI_PAYMENT_NO,
-            'amount' => $request->amount,
-            'currency' => 'RUB', // Assuming RUB, adjust if necessary
+            'amount' => $request->amount, // This is the intended RUB amount
+            'currency' => 'RUB',
             'payment_method' => 'WebMoney',
             'status' => 'pending',
             'description' => $request->LMI_PAYMENT_DESC,
         ]);
 
-        // Prepare form data for WebMoney
         $formData = [
-            'LMI_PAYMENT_AMOUNT' => $request->amount,
+            'LMI_PAYMENT_AMOUNT' => $request->amount, // Sending RUB amount
             'LMI_PAYMENT_NO' => $request->LMI_PAYMENT_NO,
             'LMI_PAYMENT_DESC' => $request->LMI_PAYMENT_DESC,
             'LMI_PAYEE_PURSE' => config('services.webmoney.merchant_purse'),
-            'LMI_SIM_MODE' => config('services.webmoney.sim_mode'), // 0 for real payments, 1 for test payments
-            // Add other required fields by WebMoney if any
+            'LMI_SIM_MODE' => config('services.webmoney.sim_mode'), 
         ];
 
-        // The action URL for WebMoney Merchant service
         $webMoneyUrl = 'https://merchant.webmoney.ru/lmi/payment.asp';
 
-        // Return a view with a self-submitting form
         return view('payment.webmoney_redirect', compact('webMoneyUrl', 'formData'));
     }
 
     public function success(Request $request)
     {
-        // Handle successful payment callback from WebMoney
-        // Verify the payment signature and other parameters as per WebMoney documentation
-        // This is a simplified example. You MUST implement proper verification.
-
         $payment_no = $request->input('LMI_PAYMENT_NO');
-        $transaction = Transaction::where('payment_id', $payment_no)->where('status', 'pending')->first();
+        $transaction = Transaction::where('payment_id', $payment_no)->first(); // Check status later
 
         if (!$transaction) {
-            Log::warning('WebMoney Success: Transaction not found or not pending for LMI_PAYMENT_NO: ' . $payment_no);
-            return redirect()->route('user.transaction.index')->with('error', 'Транзакция не найдена или уже обработана.');
+            Log::warning('WebMoney Success: Transaction not found for LMI_PAYMENT_NO: ' . $payment_no);
+            return redirect()->route('user.transaction.index')->with('error', 'Транзакция не найдена.');
         }
 
-        // IMPORTANT: The success URL is for client-side redirection. 
-        // Critical payment verification (like LMI_HASH) should ideally happen in the server-to-server 'result' URL notification.
-        // However, if WebMoney sends LMI_HASH to the success URL as well, you can verify it here too.
-        // For this example, we assume the primary verification is in the 'result' method.
-        // If your WebMoney setup sends critical data to success URL and expects verification, implement it here.
-
-        $user = User::find($transaction->user_id);
-        if ($user) {
-            // Note: Balance update and transaction status to 'completed' should ideally be triggered by the 'result' URL notification
-            // to prevent manipulation if the user simply revisits the success URL.
-            // If the 'result' URL reliably updates the status, this part might only confirm or could be redundant.
-            // For now, we'll keep it, assuming 'result' is the primary source of truth.
-            if ($transaction->status === 'pending') { // Double check status before updating
-                $user->balance += $transaction->amount;
-                $user->save();
-
-                $transaction->status = 'completed';
-                // $transaction->payment_system_trans_id = $request->input('LMI_SYS_TRANS_NO'); // If available on success URL
-                // $transaction->paid_at = now(); // If available on success URL
-                $transaction->save();
-                Log::info('WebMoney Success: Payment processed via success URL. Payment_no: ' . $payment_no);
-                return redirect()->route('user.transaction.index')->with('success', 'Баланс успешно пополнен!');
-            } elseif ($transaction->status === 'completed') {
-                Log::info('WebMoney Success: Payment already completed. Payment_no: ' . $payment_no);
-                return redirect()->route('user.transaction.index')->with('success', 'Баланс уже был пополнен по этой транзакции.');
-            } else {
-                Log::warning('WebMoney Success: Transaction status is not pending or completed. Status: ' . $transaction->status . ' Payment_no: ' . $payment_no);
-                return redirect()->route('user.transaction.index')->with('error', 'Статус транзакции не позволяет завершить операцию.');
-            }
-        } else {
-            Log::error('WebMoney Success: User not found for transaction. Payment_no: ' . $payment_no);
+        // The success URL is for client-side. Primary logic is in 'result'.
+        // Here, we mostly confirm based on what 'result' should have done.
+        if ($transaction->status === 'completed') {
+            Log::info('WebMoney Success: Payment already completed based on result notification. Payment_no: ' . $payment_no);
+            return redirect()->route('user.transaction.index')->with('success', 'Баланс успешно пополнен (подтверждено).');
+        } elseif ($transaction->status === 'pending') {
+            // This case is less ideal. It means 'result' might not have been called or processed yet.
+            // Or, if 'result' failed, status might be 'failed'.
+            Log::warning('WebMoney Success: Transaction still pending for LMI_PAYMENT_NO: ' . $payment_no . '. User redirected to success page. Waiting for server notification.');
+            return redirect()->route('user.transaction.index')->with('info', 'Платеж обрабатывается. Статус будет обновлен в ближайшее время.');
+        } elseif ($transaction->status === 'failed') {
+            Log::info('WebMoney Success: User redirected to success URL, but transaction was marked as failed. Payment_no: ' . $payment_no);
+            return redirect()->route('user.transaction.index')->with('error', 'Во время обработки платежа произошла ошибка. Пожалуйста, свяжитесь со службой поддержки.');
         }
 
-        return redirect()->route('user.transaction.index')->with('error', 'Ошибка обработки платежа.');
-
+        return redirect()->route('user.transaction.index')->with('info', 'Статус вашего платежа: ' . $transaction->status);
     }
 
     public function fail(Request $request)
     {
-        // Handle failed payment callback from WebMoney
         $payment_no = $request->input('LMI_PAYMENT_NO');
         if ($payment_no) {
-            // Find the transaction by payment_id, ensuring it's not already completed.
             $transaction = Transaction::where('payment_id', $payment_no)
-                                      ->where('status', '!=', 'completed')
+                                      ->where('status', '!=', 'completed') // Avoid overwriting a completed transaction
                                       ->first();
             
-            if ($transaction) {
-                // Update status to 'failed' as WebMoney directed to the fail URL.
+            if ($transaction && $transaction->status !== 'failed') { // Only update if not already marked failed by 'result'
                 $transaction->status = 'failed';
+                $transaction->description = ($transaction->description ? $transaction->description . ' | ' : '') . 'Payment failed or cancelled by user at WebMoney.';
                 $transaction->save();
+                Log::info('WebMoney Fail: Transaction LMI_PAYMENT_NO: ' . $payment_no . ' marked as failed by fail URL.');
+            } elseif($transaction && $transaction->status === 'failed') {
+                Log::info('WebMoney Fail: Transaction LMI_PAYMENT_NO: ' . $payment_no . ' already marked as failed.');
             } else {
                 Log::warning('WebMoney Fail: Transaction not found or already completed for LMI_PAYMENT_NO: ' . $payment_no);
             }
         }
-        return redirect()->route('user.transaction.index')->with('error', 'Платеж не удался или был отменен.');
+        return redirect()->route('user.transaction.index')->with('error', 'Платеж не удался или был отменен. Если вы считаете, что это ошибка, пожалуйста, свяжитесь со службой поддержки.');
     }
 
     public function result(Request $request)
     {
-        // Handle WebMoney result/notification URL (server-to-server)
-        // This is where WebMoney sends notifications about payment status changes.
-        // You MUST implement robust verification here as per WebMoney documentation.
-        // This includes checking LMI_HASH, LMI_PREREQUEST, etc.
+        Log::info('WebMoney Result: Received notification.', $request->all());
 
-        // Example: Prerequest handling
         if ($request->has('LMI_PREREQUEST') && $request->input('LMI_PREREQUEST') == '1') {
-            // This is a pre-request. Check if payment is possible.
-            // For example, check if LMI_PAYMENT_NO is unique, if the amount is valid, etc.
-            $payment_no = $request->input('LMI_PAYMENT_NO');
             $payment_no = $request->input('LMI_PAYMENT_NO');
             $payee_purse = $request->input('LMI_PAYEE_PURSE');
             $payment_amount = $request->input('LMI_PAYMENT_AMOUNT');
 
-            // 1. Check if LMI_PAYEE_PURSE matches your configured purse
             if ($payee_purse !== config('services.webmoney.merchant_purse')) {
                 Log::error('WebMoney Prerequest: Incorrect payee purse. Expected: ' . config('services.webmoney.merchant_purse') . ', Got: ' . $payee_purse . ' for LMI_PAYMENT_NO: ' . $payment_no);
-                // WebMoney documentation suggests not outputting YES or outputting an error message.
-                // echo "Error: Incorrect payee purse."; // Or simply don't output YES
-                exit;
+                exit('ERR: INCORRECT_PAYEE_PURSE');
             }
 
-            // 2. Check if transaction (LMI_PAYMENT_NO) exists and its status
             $transaction = Transaction::where('payment_id', $payment_no)->first();
 
-            if ($transaction) {
-                // If transaction exists, check its status
-                if ($transaction->status !== 'pending') {
-                    Log::warning('WebMoney Prerequest: Transaction LMI_PAYMENT_NO: ' . $payment_no . ' already exists and status is not pending (Status: ' . $transaction->status . ').');
-                    // echo "Error: Payment already processed or in invalid state."; // Or simply don't output YES
-                    exit;
-                }
-                // Additionally, you might want to verify if $transaction->amount matches $payment_amount
-                if ((float)$transaction->amount !== (float)$payment_amount) {
-                    Log::error('WebMoney Prerequest: Amount mismatch for LMI_PAYMENT_NO: ' . $payment_no . '. Expected: ' . $transaction->amount . ', Got: ' . $payment_amount);
-                    // echo "Error: Amount mismatch.";
-                    exit;
-                }
-            } else {
-                // Transaction does not exist. This is usually okay for a prerequest if you create it upon successful payment notification.
-                // However, in this implementation, we create it in the pay() method. So, if it doesn't exist here, it's an issue.
-                // For this flow, let's assume it should exist if created in pay().
-                // If your flow is different (e.g., create transaction only on 'result' notification), adjust this logic.
-                Log::warning('WebMoney Prerequest: Transaction LMI_PAYMENT_NO: ' . $payment_no . ' not found. This might be an issue if it was expected to be created in pay().');
-                // Depending on strictness, you might exit here.
-                // For now, we'll allow it to proceed, assuming it might be created later or this is a new payment.
-                // If you create transactions in pay(), this should ideally be an error.
+            if (!$transaction) {
+                 Log::error('WebMoney Prerequest: Transaction LMI_PAYMENT_NO: ' . $payment_no . ' not found. It should have been created in pay().');
+                 exit('ERR: TRANSACTION_NOT_FOUND');
+            }
+            
+            if ($transaction->status !== 'pending') {
+                Log::warning('WebMoney Prerequest: Transaction LMI_PAYMENT_NO: ' . $payment_no . ' already exists and status is not pending (Status: ' . $transaction->status . ').');
+                exit('ERR: TRANSACTION_NOT_PENDING');
+            }
+            if ((float)$transaction->amount !== (float)$payment_amount) {
+                Log::error('WebMoney Prerequest: Amount mismatch for LMI_PAYMENT_NO: ' . $payment_no . '. Expected RUB: ' . $transaction->amount . ', Got in prerequest: ' . $payment_amount);
+                exit('ERR: AMOUNT_MISMATCH');
             }
 
-            // All checks passed for prerequest
             Log::info('WebMoney Prerequest: Valid for LMI_PAYMENT_NO: ' . $payment_no);
             echo 'YES';
             exit;
         }
 
-        // This is a payment notification (not a pre-request)
-        // Verify LMI_HASH
         $secretKey = config('services.webmoney.secret_key');
         if (empty($secretKey)) {
-            Log::error('WebMoney Result: Secret key is not configured. Cannot verify LMI_HASH.');
-            // WebMoney expects no output or a specific error message if you cannot process.
-            // For security, if secret key is missing, you should not process the payment.
-            exit; 
+            Log::critical('WebMoney Result: Secret key is not configured. Cannot verify LMI_HASH.');
+            exit('ERR: SECRET_KEY_NOT_CONFIGURED'); 
         }
 
         $stringToHash = $request->input('LMI_PAYEE_PURSE') . 
@@ -205,39 +150,69 @@ class WebMoneyController extends Controller
 
         if ($generatedHash !== $request->input('LMI_HASH')) {
             Log::error('WebMoney Result: LMI_HASH mismatch for LMI_PAYMENT_NO: ' . $request->input('LMI_PAYMENT_NO') . '. Generated: ' . $generatedHash . ', Received: ' . $request->input('LMI_HASH'));
-            // Hash mismatch, potential fraud. Do not process the payment.
-            // WebMoney expects no output or a specific error message if the hash is incorrect.
-            exit;
+            exit('ERR: HASH_MISMATCH');
         }
 
-        // Hash is correct, proceed to update transaction and user balance
         $payment_no = $request->input('LMI_PAYMENT_NO');
         $transaction = Transaction::where('payment_id', $payment_no)->where('status', 'pending')->first();
 
-        if ($transaction) {
-            $user = User::find($transaction->user_id);
-            if ($user) {
-                $user->balance += $transaction->amount;
-                $user->save();
-
-                $transaction->status = 'completed';
-                $transaction->payment_system_trans_id = $request->input('LMI_SYS_TRANS_NO'); // Store WebMoney transaction ID
-                $transaction->paid_at = now(); // Record payment time
-                $transaction->save();
-
-                Log::info('WebMoney Result: Payment successful and processed for LMI_PAYMENT_NO: ' . $payment_no . '. User ID: ' . $user->id . ', Amount: ' . $transaction->amount);
-                // WebMoney expects no output on successful processing of the notification.
-                exit;
-            } else {
-                Log::error('WebMoney Result: User not found for transaction LMI_PAYMENT_NO: ' . $payment_no . '. Transaction User ID: ' . $transaction->user_id);
+        if (!$transaction) {
+            Log::warning('WebMoney Result: Transaction not found or not pending for LMI_PAYMENT_NO: ' . $payment_no . '. It might have been already processed or is an unknown transaction.');
+            // If already processed (e.g. completed), WebMoney might send notifications multiple times. 
+            // Check if it exists with a completed status.
+            $existingTransaction = Transaction::where('payment_id', $payment_no)->first();
+            if ($existingTransaction && $existingTransaction->status === 'completed') {
+                Log::info('WebMoney Result: Received duplicate notification for already completed LMI_PAYMENT_NO: ' . $payment_no);
+                exit; // Or 'YES' if WebMoney expects it for duplicates
             }
-        } else {
-            Log::warning('WebMoney Result: Transaction not found or not in pending state for LMI_PAYMENT_NO: ' . $payment_no . '. Current status: ' . ($transaction ? $transaction->status : 'not found') );
-            // This could happen if the notification is received multiple times or if the transaction was already processed/failed via another callback.
+            exit('ERR: TRANSACTION_NOT_FOUND_OR_NOT_PENDING');
         }
-        // If something went wrong (e.g., transaction not found, user not found, hash mismatch handled above) or transaction was already processed, WebMoney expects no output or a specific error.
-        // The `exit` calls above handle these cases. If execution reaches here, it implies an unexpected state not covered.
-        Log::error('WebMoney Result: Reached end of result method unexpectedly for LMI_PAYMENT_NO: ' . $request->input('LMI_PAYMENT_NO'));
-        exit;
+
+        $user = User::find($transaction->user_id);
+        if (!$user) {
+            Log::error('WebMoney Result: User not found for transaction LMI_PAYMENT_NO: ' . $payment_no . '. User ID: ' . $transaction->user_id);
+            // Mark transaction as failed if user is missing, as balance cannot be updated.
+            $transaction->status = 'failed';
+            $transaction->description = ($transaction->description ? $transaction->description . ' | ' : '') . 'Payment failed: User account not found.';
+            $transaction->save();
+            exit('ERR: USER_NOT_FOUND');
+        }
+
+        $settings = GeneralSetting::first();
+        $usdToRubRate = $settings ? $settings->webmoney_usd_to_rub_rate : null;
+
+        if (!$usdToRubRate || $usdToRubRate <= 0) {
+            Log::error('WebMoney Result: USD to RUB exchange rate is not set or invalid for LMI_PAYMENT_NO: ' . $payment_no . '. Transaction ID: ' . $transaction->id);
+            $transaction->status = 'failed';
+            $failure_reason = 'Платеж не прошел: Неверная или отсутствующая конфигурация обменного курса. Пожалуйста, обратитесь в службу поддержки.';
+            $transaction->description = $transaction->description ? $transaction->description . ' | ' . $failure_reason : $failure_reason;
+            $transaction->save();
+            exit('ERR: WM_EXCHANGE_RATE_INVALID');
+        }
+
+        $webmoneyPaymentAmountUSD = (float)$request->input('LMI_PAYMENT_AMOUNT');
+        // It's crucial to confirm that LMI_PAYMENT_AMOUNT in the *notification* is indeed USD.
+        // WebMoney might have a field like LMI_CURRENCY or similar in the notification.
+        // Assuming LMI_PAYMENT_AMOUNT is USD as per the problem description.
+
+        $creditedRubAmount = round($webmoneyPaymentAmountUSD * $usdToRubRate, 2); // Round to 2 decimal places for currency
+
+        $user->balance += $creditedRubAmount;
+        $user->save();
+
+        $transaction->status = 'completed';
+        $transaction->payment_system_trans_id = $request->input('LMI_SYS_TRANS_NO');
+        $transaction->paid_at = now();
+        
+        $transaction->original_payment_amount = $webmoneyPaymentAmountUSD;
+        $transaction->original_payment_currency = 'USD'; // Assuming WebMoney sent USD
+        $transaction->amount = $creditedRubAmount; // The main 'amount' is now the credited RUB value
+        // $transaction->currency remains 'RUB'
+
+        $transaction->save();
+
+        Log::info('WebMoney Result: Payment successful. LMI_PAYMENT_NO: ' . $payment_no . '. User ID: ' . $user->id . '. Original: ' . $webmoneyPaymentAmountUSD . ' USD. Credited: ' . $creditedRubAmount . ' RUB. Rate: ' . $usdToRubRate);
+        // WebMoney usually expects an exit or no output on success. Some systems expect 'YES'. Check WM docs.
+        exit; // Or echo 'YES'; if required by WebMoney for successful processing acknowledgement.
     }
 }
