@@ -235,7 +235,7 @@
         `;
         
         messages.forEach(message => {
-          addMessage(message, message.sender_id === userId);
+          addMessage(message, message.sender_id == userId);
         });
         
         scrollToBottom();
@@ -248,19 +248,21 @@
     
     // Add a message to the chat
     function addMessage(message, isCurrentUser) {
-      const messageHtml = isCurrentUser ? 
-        `<div class="chat-item chat-right">
+      const alignClass = isCurrentUser ? 'chat-right' : 'chat-left';
+      
+      const messageHtml =  
+        `<div class="chat-item ${alignClass}">
           <div class="chat-details">
             <div class="chat-text" style="max-width: 75%;">${message.message}</div>
             <div class="chat-time">${formatDateTime(message.created_at)}</div>
           </div>
-        </div>` : 
-        `<div class="chat-item chat-left">
-          <div class="chat-details">
-            <div class="chat-text" style="max-width: 75%;">${message.message}</div>
-            <div class="chat-time">${formatDateTime(message.created_at)}</div>
-          </div>
-        </div>`;
+        </div>` ; 
+        // `<div class="chat-item chat-left">
+        //   <div class="chat-details">
+        //     <div class="chat-text" style="max-width: 75%;">${message.message}</div>
+        //     <div class="chat-time">${formatDateTime(message.created_at)}</div>
+        //   </div>
+        // </div>`;
       
       messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
       scrollToBottom();
@@ -378,7 +380,7 @@
       window.currentChatChannel = `chat.${conversationId}`;
       
       // Debug Echo connection
-      console.log('Setting up Echo for channel:', window.currentChatChannel);
+      // console.log('Setting up Echo for channel:', window.currentChatChannel);
       
       if (!window.Echo) {
         console.error('Echo is not initialized. Check Pusher configuration.');
@@ -388,13 +390,13 @@
       // Subscribe to new channel
       window.Echo.private(`chat.${conversationId}`)
         .listen('MessageSent', (e) => {
-          console.log('Received message event:', e);
+          // console.log('Received message event:', e);
           // Extract the message data from the event
           // The backend sends the message data in the root of the event
           const messageData = e;     
 
           // Only add message if it's from someone else
-          if (messageData.sender_id !== userId) {
+          if (messageData.sender_id != userId) {
             addMessage(messageData, false);
             
             // Play notification sound
@@ -405,7 +407,7 @@
             }
             
             // Show browser notification if supported and page is not visible
-            if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
+            if ('Notification' in window && Notification.permission == 'granted' && document.hidden) {
               new Notification('New Message', {
                 body: messageData.message,
                 icon: '/favicon.ico'
@@ -422,7 +424,7 @@
     // User must explicitly select a conversation to start chatting
     
     // Request notification permission
-    if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+    if ('Notification' in window && Notification.permission != 'granted' && Notification.permission != 'denied') {
       Notification.requestPermission();
     }
     
@@ -582,7 +584,7 @@
     
     // Ensure modal can be closed with ESC key
     $(document).on('keydown', function(e) {
-      if (e.key === 'Escape' && $('#allUsersModal').hasClass('show')) {
+      if (e.key == 'Escape' && $('#allUsersModal').hasClass('show')) {
         $('#allUsersModal').modal('hide');
       }
     });

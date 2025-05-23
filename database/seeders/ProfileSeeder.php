@@ -56,9 +56,9 @@ class ProfileSeeder extends Seeder
         for ($i = 1; $i <= 30; $i++) {
             $name = 'Профиль ' . $i;
             $slug = Str::slug($name);
-            $isActive = rand(0, 1) === 1; // 50% chance of being active
+            $isActive = rand(0, 1) == 1; // 50% chance of being active
             $isVip = $i <= 3; // First 3 profiles are VIP
-            $isVerified = rand(0, 1) === 1; // 50% chance of being verified
+            $isVerified = rand(0, 1) == 1; // 50% chance of being verified
             
             // Create profile
             $profile = Profile::create([
@@ -83,17 +83,17 @@ class ProfileSeeder extends Seeder
                 'viber' => '+7' . rand(9000000000, 9999999999),
                 'whatsapp' => '+7' . rand(9000000000, 9999999999),
                 'email' => strtolower(str_replace(' ', '.', $name)) . '@example.com',
-                'payment_wmz' => rand(0, 1) === 1,
-                'payment_card' => rand(0, 1) === 1,
-                'payment_sbp' => rand(0, 1) === 1,
+                'payment_wmz' => rand(0, 1) == 1,
+                'payment_card' => rand(0, 1) == 1,
+                'payment_sbp' => rand(0, 1) == 1,
                 'pricing' => json_encode([
                     'standard' => rand(100, 300) * 10,
                     'premium' => rand(300, 600) * 10,
                     'vip' => rand(600, 1000) * 10,
                 ]),
-                'profile_type' => rand(0, 1) === 1 ? 'individual' : 'salon',
-                'vyezd' => rand(0, 1) === 1,
-                'appartamenti' => rand(0, 1) === 1,
+                'profile_type' => rand(0, 1) == 1 ? 'individual' : 'salon',
+                'vyezd' => rand(0, 1) == 1,
+                'appartamenti' => rand(0, 1) == 1,
                 'vyezd_1hour' => rand(100, 300) * 10,
                 'vyezd_2hours' => rand(200, 500) * 10,
                 'vyezd_night' => rand(500, 1000) * 10,
@@ -128,7 +128,7 @@ class ProfileSeeder extends Seeder
                 foreach ($selectedPaidServices as $paidService) {
                     $profile->paidServices()->attach($paidService, [
                         'price' => rand(50, 300) * 10,
-                        'is_active' => rand(0, 1) === 1,
+                        'is_active' => rand(0, 1) == 1,
                     ]);
                 }
             }
@@ -139,7 +139,7 @@ class ProfileSeeder extends Seeder
                 ProfileImage::create([
                     'profile_id' => $profile->id,
                     'path' => 'images/profiles/' . $slug . '/' . $j . '.jpg',
-                    'is_primary' => $j === 1, // First image is primary
+                    'is_primary' => $j == 1, // First image is primary
                     'sort_order' => $j,
                 ]);
             }
@@ -183,7 +183,7 @@ class ProfileSeeder extends Seeder
                 'starts_at' => now()->subDays(rand(1, 30)),
                 'expires_at' => now()->addDays(rand(1, 30)),
                 'is_active' => $isActive,
-                'is_paused' => rand(0, 10) === 0, // 10% chance of being paused
+                'is_paused' => rand(0, 10) == 0, // 10% chance of being paused
                 'priority_level' => $priorityLevel,
                 'queue_position' => $queuePosition,
                 'daily_charge' => $dailyCharge,

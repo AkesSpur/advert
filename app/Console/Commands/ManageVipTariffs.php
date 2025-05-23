@@ -140,7 +140,7 @@ class ManageVipTariffs extends Command
                 $position = 1;
                 foreach ($queuedVips as $queuedVip) {
                     // Only update if the position has changed
-                    if ($queuedVip->queue_position !== $position) {
+                    if ($queuedVip->queue_position != $position) {
                         $queuedVip->queue_position = $position;
                         $queuedVip->save();
                     }

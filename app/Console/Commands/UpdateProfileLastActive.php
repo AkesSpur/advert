@@ -32,7 +32,7 @@ class UpdateProfileLastActive extends Command
         $profiles = Profile::whereNull('last_active')->get();
         $count = $profiles->count();
         
-        if ($count === 0) {
+        if ($count == 0) {
             $this->info('No profiles need updating.');
             return 0;
         }

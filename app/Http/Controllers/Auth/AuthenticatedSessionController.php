@@ -28,7 +28,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if($request->user()->status === 'inactive'){
+        if($request->user()->status == 'inactive'){
             Auth::guard('web')->logout();
 
             $request->session()->regenerateToken();
@@ -38,7 +38,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->back();
         }
 
-        if($request->user()->role === 'admin'){
+        if($request->user()->role == 'admin'){
             return redirect()->intended(route('admin.dashboard'));
         }
 

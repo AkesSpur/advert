@@ -30,7 +30,7 @@ class ManageUserController extends Controller
 
         $user = new User();
 
-        if($request->role === 'user'){
+        if($request->role == 'user'){
             $user->name = 'user';
             $user->email = $request->email;
             $user->balance = '0.00';

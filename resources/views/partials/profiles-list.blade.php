@@ -1,8 +1,9 @@
-@forelse ($profiles as $profile)
+@forelse ($profiles as $index => $profile)
     <div class="h-full profile-item">
         <x-ad-card
             :id="$profile->id"
             :slug="$profile->slug"
+            :isFirst="$index == 0"
             :new="$profile->created_at >= now()->subDays(7) ?? false"
             :vip="$profile->is_vip ?? false"
             :video="isset($profile->video->path) ?? false "

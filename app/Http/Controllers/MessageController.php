@@ -53,7 +53,7 @@ class MessageController extends Controller
         $conversation = Conversation::findOrFail($request->conversation_id);
         
         // Check if user has access to this conversation
-        if (!Auth::user()->isAdmin() && $conversation->user_id !== Auth::id()) {
+        if (!Auth::user()->isAdmin() && $conversation->user_id != Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
         
@@ -81,7 +81,7 @@ class MessageController extends Controller
         $conversation = Conversation::findOrFail($request->conversation_id);
         
         // Check if user has access to this conversation
-        if (!Auth::user()->isAdmin() && $conversation->user_id !== Auth::id()) {
+        if (!Auth::user()->isAdmin() && $conversation->user_id != Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
         

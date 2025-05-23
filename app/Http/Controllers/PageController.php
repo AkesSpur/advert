@@ -378,7 +378,7 @@ class PageController extends Controller
 
         // Apply additional filters based on filterParam (e.g., 'video', 'new', 'cheap', 'verified')
         // Note: 'vip' filter is handled differently by focusing the query on VIPs or excluding them.
-        if ($filterParam !== 'all' && $filterParam !== 'vip') {
+        if ($filterParam != 'all' && $filterParam != 'vip') {
             switch ($filterParam) {
                 case 'video':
                     $profilesQuery->hasVideo();
@@ -419,7 +419,7 @@ class PageController extends Controller
         $topVipIds = $topVips->pluck('id')->toArray();
 
         // If filterParam is 'vip', we ensure only VIPs are shown (excluding the top 3 already fetched if they match other criteria).
-        if ($filterParam === 'vip') {
+        if ($filterParam == 'vip') {
             $profilesQuery->where('is_vip', true);
         }
         // Exclude the top 3 VIPs from the main query to avoid duplication
@@ -618,7 +618,7 @@ foreach ($activeFilterModels as $modelInstance) {
 }
 
 // Priority 2: Generic override (if no specific filter override was applied)
-if ($heroContent === $defaultHeroSettings && $defaultHeroSettings && method_exists($defaultHeroSettings, 'heroSectionOverride')) {
+if ($heroContent == $defaultHeroSettings && $defaultHeroSettings && method_exists($defaultHeroSettings, 'heroSectionOverride')) {
     // Assuming a generic override is linked to the HeroSectionSetting model itself
     // Or a specific record in HeroSectionOverride, e.g., model_type = 'App\Models\HeroSectionSetting' and model_id = 0 or 1 for global
     $genericOverride = HeroSectionOverride::where('model_type', get_class($defaultHeroSettings))
@@ -724,7 +724,7 @@ if ($heroContent === $defaultHeroSettings && $defaultHeroSettings && method_exis
             ->with(['metroStations', 'services', 'images', 'video', 'activeAds.adTariff']);
 
         // Apply additional filters based on $filterParam
-        if ($filterParam !== 'all' && $filterParam !== 'vip') {
+        if ($filterParam != 'all' && $filterParam != 'vip') {
             switch ($filterParam) {
                 case 'video':
                     $profilesQuery->hasVideo();
@@ -768,7 +768,7 @@ if ($heroContent === $defaultHeroSettings && $defaultHeroSettings && method_exis
         $topVipIds = $topVips->pluck('id')->toArray();
 
         // If filterParam is 'vip', ensure only VIPs are shown (excluding the top 3 already fetched).
-        if ($filterParam === 'vip') {
+        if ($filterParam == 'vip') {
             $profilesQuery->where('is_vip', true);
         }
         // Exclude the top 3 VIPs from the main category query to avoid duplication
@@ -985,7 +985,7 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
 
         // Priority 2: Generic override (if no specific CustomCategory override was applied for this category page)
         // This applies if the current CustomCategory doesn't have its own active override.
-        if ($heroContent === $defaultHeroSettings && $defaultHeroSettings && method_exists($defaultHeroSettings, 'heroSectionOverride')) {
+        if ($heroContent == $defaultHeroSettings && $defaultHeroSettings && method_exists($defaultHeroSettings, 'heroSectionOverride')) {
             // Check for a generic override linked to the HeroSectionSetting model itself (model_type = HeroSectionSetting, model_id = $defaultHeroSettings->id)
             // Or, if your generic override is identified differently (e.g., a specific HeroSectionOverride record not tied to any model, or tied to HeroSectionSetting with model_id=0 or 1 for global)
             // For this example, assuming a generic override is one associated directly with the $defaultHeroSettings instance if it can have one.

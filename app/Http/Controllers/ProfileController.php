@@ -264,13 +264,13 @@ class ProfileController extends Controller
                         $extension = strtolower(pathinfo($originalPath, PATHINFO_EXTENSION));
                         $imageResource = null;
 
-                        if ($extension === 'jpg' || $extension === 'jpeg') {
+                        if ($extension == 'jpg' || $extension == 'jpeg') {
                             $imageResource = imagecreatefromjpeg($originalPath);
-                        } elseif ($extension === 'png') {
+                        } elseif ($extension == 'png') {
                             $imageResource = imagecreatefrompng($originalPath);
-                        } elseif ($extension === 'gif') {
+                        } elseif ($extension == 'gif') {
                             $imageResource = imagecreatefromgif($originalPath);
-                        } elseif ($extension === 'webp') {
+                        } elseif ($extension == 'webp') {
                             $imageResource = imagecreatefromwebp($originalPath);
                         }
 
@@ -574,13 +574,13 @@ class ProfileController extends Controller
                             $extension = strtolower(pathinfo($originalPath, PATHINFO_EXTENSION));
                             $imageResource = null;
 
-                            if ($extension === 'jpg' || $extension === 'jpeg') {
+                            if ($extension == 'jpg' || $extension == 'jpeg') {
                                 $imageResource = imagecreatefromjpeg($originalPath);
-                            } elseif ($extension === 'png') {
+                            } elseif ($extension == 'png') {
                                 $imageResource = imagecreatefrompng($originalPath);
-                            } elseif ($extension === 'gif') {
+                            } elseif ($extension == 'gif') {
                                 $imageResource = imagecreatefromgif($originalPath);
-                            } elseif ($extension === 'webp') {
+                            } elseif ($extension == 'webp') {
                                 $imageResource = imagecreatefromwebp($originalPath);
                             }
 
@@ -612,7 +612,7 @@ class ProfileController extends Controller
                     Storage::disk('public')->delete($tempPath);
 
                     // Check if this is the first image for the profile
-                    $isPrimary = $profile->images()->count() === 0;
+                    $isPrimary = $profile->images()->count() == 0;
 
                     $profileImage = new ProfileImage([
                         'path' => $path,
@@ -694,7 +694,7 @@ class ProfileController extends Controller
             $totalPhotosToDelete = $photosToDelete->count();
 
             // Check if user is trying to delete the only primary photo without uploading a new one
-            if ($hasPrimaryToDelete && $totalPhotos === $totalPhotosToDelete && !$newPhotosUploaded) {
+            if ($hasPrimaryToDelete && $totalPhotos == $totalPhotosToDelete && !$newPhotosUploaded) {
                 return redirect()->back()
                     ->with('error', 'Невозможно удалить единственное фото профиля. Пожалуйста, загрузите новое фото перед удалением.')
                     ->withInput();
@@ -852,7 +852,7 @@ class ProfileController extends Controller
     public function destroy(Profile $profile)
     {
         // Ensure the user can only delete their own profile
-        if ($profile->user_id !== Auth::id()) {
+        if ($profile->user_id != Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 

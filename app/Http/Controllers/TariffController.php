@@ -247,7 +247,7 @@ class TariffController extends Controller
             }
 
             // Проверяем баланс пользователя (пропускаем для администратора)
-            if ($tariff->slug === 'vip') {
+            if ($tariff->slug == 'vip') {
                 // Для VIP тарифа уже рассчитана полная стоимость выше
                 // totalCost уже установлен в соответствующем блоке switch
             } else {
@@ -261,7 +261,7 @@ class TariffController extends Controller
             }
 
             // If creating a priority ad, deactivate any existing basic ads
-            if ($tariff->slug === 'priority') {
+            if ($tariff->slug == 'priority') {
                 // Find and deactivate any active basic ads for this profile
                 $basicAds = ProfileAdTariff::whereHas('adTariff', function ($query) {
                     $query->where('slug', 'basic');
@@ -279,7 +279,7 @@ class TariffController extends Controller
             $startsAt = $now; // По умолчанию начинается сейчас
             
             // Если это VIP тариф и он в очереди, устанавливаем starts_at на время истечения соответствующего активного VIP
-            if ($tariff->slug === 'vip' && isset($queuePosition) && $queuePosition > 0) {
+            if ($tariff->slug == 'vip' && isset($queuePosition) && $queuePosition > 0) {
                 // Находим все активные VIP тарифы, отсортированные по дате истечения
                 $activeVips = ProfileAdTariff::whereHas('adTariff', function ($query) {
                     $query->where('slug', 'vip');
@@ -337,7 +337,7 @@ class TariffController extends Controller
             }
             
             // Для VIP тарифа устанавливаем статус VIP
-            if ($tariff->slug === 'vip' && isset($queuePosition) && $queuePosition === 0) {
+            if ($tariff->slug == 'vip' && isset($queuePosition) && $queuePosition == 0) {
                 $profile->is_vip = true;
                 $profile->is_active = true;
                 $profile->save();   
@@ -398,7 +398,7 @@ class TariffController extends Controller
         $profileTariff = ProfileAdTariff::findOrFail($id);
 
         // Проверяем, что тариф принадлежит текущему пользователю
-        if ($profileTariff->profile->user_id !== Auth::id()) {
+        if ($profileTariff->profile->user_id != Auth::id()) {
             return back()->with('error', 'Тариф не принадлежит вам.');
         }
 
@@ -420,7 +420,7 @@ class TariffController extends Controller
         $profileTariff = ProfileAdTariff::findOrFail($id);
 
         // Проверяем, что тариф принадлежит текущему пользователю
-        if ($profileTariff->profile->user_id !== Auth::id()) {
+        if ($profileTariff->profile->user_id != Auth::id()) {
             return back()->with('error', 'Тариф не принадлежит вам.');
         }
 
@@ -442,8 +442,12 @@ class TariffController extends Controller
     {
         $profileTariff = ProfileAdTariff::findOrFail($id);
 
+        echo $profileTariff->profile->user_id;
+        echo Auth::id();
+        die;
+
         // Проверяем, что тариф принадлежит текущему пользователю
-        if ($profileTariff->profile->user_id !== Auth::id()) {
+        if ($profileTariff->profile->user_id != Auth::id()) {
             return back()->with('error', 'Тариф не принадлежит вам.');
         }
 

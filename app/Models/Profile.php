@@ -153,7 +153,7 @@ class Profile extends Model
      */
     public function getAverageRatingAttribute()
     {
-        if ($this->reviews->count() === 0) {
+        if ($this->reviews->count() == 0) {
             return null;
         }
         

@@ -351,7 +351,7 @@
 
             // Optional: Close modal on Escape key press
             document.addEventListener('keydown', function (event) {
-                if (event.key === 'Escape' && !webmoneyModal.classList.contains('hidden')) {
+                if (event.key == 'Escape' && !webmoneyModal.classList.contains('hidden')) {
                     closeModal();
                 }
             });

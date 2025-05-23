@@ -113,7 +113,7 @@ class SettingController extends Controller
                     $heroOverride = HeroSectionOverride::firstOrCreate(
                         ['model_type' => $fullModelClass, 'model_id' => $actualModelIdForDb]
                     );
-                } elseif ($currentModelId !== null && $currentModelId !== '') {
+                } elseif ($currentModelId != null && $currentModelId != '') {
                     // Instance-level models like CustomCategory, HeroSectionSetting
                     $modelInstance = $fullModelClass::find($currentModelId);
                     if ($modelInstance) {
@@ -196,7 +196,7 @@ class SettingController extends Controller
         Artisan::call('cache:clear');
         Artisan::call('config:clear');
 
-        toastr()->success('Hero section override updated successfully!');
+        toastr()->success('Переопределение раздела героя успешно обновлено!');
         return redirect()->route('admin.hero-section-override.index', ['model_type' => $request->model_type, 'model_id' => $request->model_id]);
     }
 

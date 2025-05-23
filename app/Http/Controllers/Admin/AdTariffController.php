@@ -36,7 +36,7 @@ class AdTariffController extends Controller
             'is_active' => 'required|boolean',
         ]);
 
-        if ($adTariff->slug === 'vip') {
+        if ($adTariff->slug == 'vip') {
             $vipRules = [
                 'fixed_price' => 'required|numeric|min:0',
                 'weekly_price' => 'required|numeric|min:0',

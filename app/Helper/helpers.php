@@ -16,7 +16,7 @@ function isActiveRoute($routeName, $slug = null) {
     $targetUrl = $slug ? route($routeName, $slug) : route($routeName);
     $currentUrl = url()->current();
  
-    if ($currentUrl === $targetUrl) {
+    if ($currentUrl == $targetUrl) {
         return 'text-white bg-[#6340FF] hover:bg-[#5737e7] transition';
     }
  
@@ -27,7 +27,7 @@ function isActiveRoute($routeName, $slug = null) {
     $targetUrl = $slug ? route($routeName, $slug) : route($routeName);
     $currentUrl = url()->current();
  
-    if ($currentUrl === $targetUrl) {
+    if ($currentUrl == $targetUrl) {
         return 'text-white';
     }
  

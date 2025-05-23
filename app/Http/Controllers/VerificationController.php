@@ -122,7 +122,7 @@ class VerificationController extends Controller
         $verification = VerificationPhoto::findOrFail($id);
         $profile = Profile::findOrFail($verification->profile_id);
 
-        if ($request->action === 'approve') {
+        if ($request->action == 'approve') {
             $verification->status = 'approved';
             $profile->is_verified = true;
         } else {
@@ -134,6 +134,6 @@ class VerificationController extends Controller
         $profile->save();
 
         return redirect()->route('admin.verifications.index')
-            ->with('success', 'Верификация успешно ' . ($request->action === 'approve' ? 'одобрена' : 'отклонена'));
+            ->with('success', 'Верификация успешно ' . ($request->action == 'approve' ? 'одобрена' : 'отклонена'));
     }
 }

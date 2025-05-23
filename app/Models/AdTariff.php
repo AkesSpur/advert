@@ -50,7 +50,7 @@ class AdTariff extends Model
     public function getPriceForPriority(int $priorityLevel): float
     {
         // For Priority tariff, add the priority level to the base price
-        if ($this->slug === 'priority') {
+        if ($this->slug == 'priority') {
             return $this->base_price + $priorityLevel;
         }
         

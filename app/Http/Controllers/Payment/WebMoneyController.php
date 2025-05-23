@@ -56,15 +56,15 @@ class WebMoneyController extends Controller
 
         // The success URL is for client-side. Primary logic is in 'result'.
         // Here, we mostly confirm based on what 'result' should have done.
-        if ($transaction->status === 'completed') {
+        if ($transaction->status == 'completed') {
             Log::info('WebMoney Success: Payment already completed based on result notification. Payment_no: ' . $payment_no);
             return redirect()->route('user.transaction.index')->with('success', 'Баланс успешно пополнен (подтверждено).');
-        } elseif ($transaction->status === 'pending') {
+        } elseif ($transaction->status == 'pending') {
             // This case is less ideal. It means 'result' might not have been called or processed yet.
             // Or, if 'result' failed, status might be 'failed'.
             Log::warning('WebMoney Success: Transaction still pending for LMI_PAYMENT_NO: ' . $payment_no . '. User redirected to success page. Waiting for server notification.');
             return redirect()->route('user.transaction.index')->with('info', 'Платеж обрабатывается. Статус будет обновлен в ближайшее время.');
-        } elseif ($transaction->status === 'failed') {
+        } elseif ($transaction->status == 'failed') {
             Log::info('WebMoney Success: User redirected to success URL, but transaction was marked as failed. Payment_no: ' . $payment_no);
             return redirect()->route('user.transaction.index')->with('error', 'Во время обработки платежа произошла ошибка. Пожалуйста, свяжитесь со службой поддержки.');
         }
@@ -80,12 +80,12 @@ class WebMoneyController extends Controller
                                       ->where('status', '!=', 'completed') // Avoid overwriting a completed transaction
                                       ->first();
             
-            if ($transaction && $transaction->status !== 'failed') { // Only update if not already marked failed by 'result'
+            if ($transaction && $transaction->status != 'failed') { // Only update if not already marked failed by 'result'
                 $transaction->status = 'failed';
                 $transaction->description = ($transaction->description ? $transaction->description . ' | ' : '') . 'Payment failed or cancelled by user at WebMoney.';
                 $transaction->save();
                 Log::info('WebMoney Fail: Transaction LMI_PAYMENT_NO: ' . $payment_no . ' marked as failed by fail URL.');
-            } elseif($transaction && $transaction->status === 'failed') {
+            } elseif($transaction && $transaction->status == 'failed') {
                 Log::info('WebMoney Fail: Transaction LMI_PAYMENT_NO: ' . $payment_no . ' already marked as failed.');
             } else {
                 Log::warning('WebMoney Fail: Transaction not found or already completed for LMI_PAYMENT_NO: ' . $payment_no);
@@ -103,7 +103,7 @@ class WebMoneyController extends Controller
             $payee_purse = $request->input('LMI_PAYEE_PURSE');
             $payment_amount = $request->input('LMI_PAYMENT_AMOUNT');
 
-            if ($payee_purse !== config('services.webmoney.merchant_purse')) {
+            if ($payee_purse != config('services.webmoney.merchant_purse')) {
                 Log::error('WebMoney Prerequest: Incorrect payee purse. Expected: ' . config('services.webmoney.merchant_purse') . ', Got: ' . $payee_purse . ' for LMI_PAYMENT_NO: ' . $payment_no);
                 exit('ERR: INCORRECT_PAYEE_PURSE');
             }
@@ -115,11 +115,11 @@ class WebMoneyController extends Controller
                  exit('ERR: TRANSACTION_NOT_FOUND');
             }
             
-            if ($transaction->status !== 'pending') {
+            if ($transaction->status != 'pending') {
                 Log::warning('WebMoney Prerequest: Transaction LMI_PAYMENT_NO: ' . $payment_no . ' already exists and status is not pending (Status: ' . $transaction->status . ').');
                 exit('ERR: TRANSACTION_NOT_PENDING');
             }
-            if ((float)$transaction->amount !== (float)$payment_amount) {
+            if ((float)$transaction->amount != (float)$payment_amount) {
                 Log::error('WebMoney Prerequest: Amount mismatch for LMI_PAYMENT_NO: ' . $payment_no . '. Expected RUB: ' . $transaction->amount . ', Got in prerequest: ' . $payment_amount);
                 exit('ERR: AMOUNT_MISMATCH');
             }
@@ -148,7 +148,7 @@ class WebMoneyController extends Controller
         
         $generatedHash = strtoupper(md5($stringToHash));
 
-        if ($generatedHash !== $request->input('LMI_HASH')) {
+        if ($generatedHash != $request->input('LMI_HASH')) {
             Log::error('WebMoney Result: LMI_HASH mismatch for LMI_PAYMENT_NO: ' . $request->input('LMI_PAYMENT_NO') . '. Generated: ' . $generatedHash . ', Received: ' . $request->input('LMI_HASH'));
             exit('ERR: HASH_MISMATCH');
         }
@@ -161,7 +161,7 @@ class WebMoneyController extends Controller
             // If already processed (e.g. completed), WebMoney might send notifications multiple times. 
             // Check if it exists with a completed status.
             $existingTransaction = Transaction::where('payment_id', $payment_no)->first();
-            if ($existingTransaction && $existingTransaction->status === 'completed') {
+            if ($existingTransaction && $existingTransaction->status == 'completed') {
                 Log::info('WebMoney Result: Received duplicate notification for already completed LMI_PAYMENT_NO: ' . $payment_no);
                 exit; // Or 'YES' if WebMoney expects it for duplicates
             }

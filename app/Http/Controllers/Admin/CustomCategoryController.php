@@ -167,9 +167,9 @@ class CustomCategoryController extends Controller
         $menuType = $request->menu_type; // 'top' or 'footer'
         $status = $request->status == 'true' ? 1 : 0;
 
-        if ($menuType === 'top') {
+        if ($menuType == 'top') {
             $category->show_in_top_menu = $status;
-        } elseif ($menuType === 'footer') {
+        } elseif ($menuType == 'footer') {
             $category->show_in_footer_menu = $status;
         } else {
             return response(['message' => 'Неверный тип меню'], 400);

@@ -4,6 +4,7 @@
     'vip' => false,
     'new' => false,
     'video' => false,
+    'isFirst' => false,
     'verified' => false,
     'name' => 'Анюта',
     'age' => 23,
@@ -64,7 +65,7 @@
         <img :src="img" alt="{{ $name }}"
             class="absolute inset-0 w-full h-full object-cover object-top rounded-xl transition-opacity duration-500"
             :class="current === index ? 'opacity-100' : 'opacity-0'"
-            loading="lazy"> {{-- Lazy load images in ad cards --}}
+             loading="{{ $isFirst && $loop->first ? 'eager' : 'lazy'}}" > {{-- Lazy load images in ad cards --}}
     </template>
 
         <!-- Top badges -->

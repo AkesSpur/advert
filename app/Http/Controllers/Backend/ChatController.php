@@ -42,7 +42,7 @@ class ChatController extends Controller
         $conversationId = $request->conversation_id;
         
         // Ensure user is admin
-        if ($user->role !== 'admin') {
+        if ($user->role != 'admin') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
         
@@ -74,7 +74,7 @@ class ChatController extends Controller
         $user = Auth::user();
         
         // Ensure user is admin
-        if ($user->role !== 'admin') {
+        if ($user->role != 'admin') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
         
@@ -113,7 +113,7 @@ class ChatController extends Controller
         $admin = Auth::user();
         
         // Ensure user is admin
-        if ($admin->role !== 'admin') {
+        if ($admin->role != 'admin') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
         

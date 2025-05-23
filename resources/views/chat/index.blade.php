@@ -115,7 +115,7 @@
                 
                 // Add messages
                 messages.forEach(message => {
-                    addMessage(message, message.sender_id === userId);
+                    addMessage(message, message.sender_id == userId);
                 });
                 
                 scrollToBottom();
@@ -205,14 +205,14 @@
                         const messageData = e;
                         
                         // Only add message if it's from someone else
-                        if (messageData.sender_id !== userId) {
+                        if (messageData.sender_id != userId) {
                             addMessage(messageData, false);
                             
                             // Play notification sound
                             notificationSound.play().catch(err => console.error('Error playing sound:', err));
                             
                             // Show browser notification if supported and page is not visible
-                            if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
+                            if ('Notification' in window && Notification.permission == 'granted' && document.hidden) {
                                 new Notification('Новое сообщение', {
                                     body: messageData.message,
                                     icon: '/favicon.ico'
@@ -226,7 +226,7 @@
         }
         
         // Request notification permission
-        if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+        if ('Notification' in window && Notification.permission != 'granted' && Notification.permission != 'denied') {
             Notification.requestPermission();
         }
         

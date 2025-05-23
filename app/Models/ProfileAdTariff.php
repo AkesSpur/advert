@@ -85,7 +85,7 @@ class ProfileAdTariff extends Model
      */
     public function isVip(): bool
     {
-        return $this->adTariff->slug === 'vip';
+        return $this->adTariff->slug == 'vip';
     }
 
     /**
@@ -93,7 +93,7 @@ class ProfileAdTariff extends Model
      */
     public function isPriority(): bool
     {
-        return $this->adTariff->slug === 'priority';
+        return $this->adTariff->slug == 'priority';
     }
 
     /**
@@ -101,7 +101,7 @@ class ProfileAdTariff extends Model
      */
     public function isBasic(): bool
     {
-        return $this->adTariff->slug === 'basic';
+        return $this->adTariff->slug == 'basic';
     }
 
     /**

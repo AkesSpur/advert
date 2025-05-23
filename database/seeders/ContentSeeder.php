@@ -65,14 +65,14 @@ class ContentSeeder extends Seeder
                 }
 
                 // Alternate between sent and received messages
-                $senderId = $j % 2 === 0 ? $adminUser->id : $messageUser->id;
-                $recipientId = $j % 2 === 0 ? $messageUser->id : $adminUser->id;
+                $senderId = $j % 2 == 0 ? $adminUser->id : $messageUser->id;
+                $recipientId = $j % 2 == 0 ? $messageUser->id : $adminUser->id;
 
                 Message::create([
                     'sender_id' => $senderId,
                     'recipient_id' => $recipientId,
                     'content' => 'Это сообщение ' . $j . ' между админом и пользователем для профиля ' . $profile->name,
-                    'is_read' => rand(0, 1) === 1,
+                    'is_read' => rand(0, 1) == 1,
                     'created_at' => now()->subDays(rand(1, 30))->subHours(rand(1, 23)),
                     'updated_at' => now()->subDays(rand(1, 30))->subHours(rand(1, 23)),
                 ]);
@@ -82,8 +82,8 @@ class ContentSeeder extends Seeder
             $transactionCount = rand(1, 3);
             for ($j = 1; $j <= $transactionCount; $j++) {
                 $amount = rand(10, 100) * 10;
-                $type = rand(0, 1) === 0 ? 'topup' : 'purchase';
-                $status = rand(0, 10) <= 8 ? 'completed' : (rand(0, 1) === 0 ? 'pending' : 'failed'); // 80% completed, 10% pending, 10% failed
+                $type = rand(0, 1) == 0 ? 'topup' : 'purchase';
+                $status = rand(0, 10) <= 8 ? 'completed' : (rand(0, 1) == 0 ? 'pending' : 'failed'); // 80% completed, 10% pending, 10% failed
 
                 Transaction::create([
                     'user_id' => $adminUser->id,

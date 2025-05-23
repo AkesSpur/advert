@@ -23,17 +23,17 @@ class ProfileController extends Controller
         if ($request->has('filter')) {
             $filter = $request->filter;
             
-            if ($filter === 'verified') {
+            if ($filter == 'verified') {
                 $query->where('is_verified', true);
-            } elseif ($filter === 'unverified') {
+            } elseif ($filter == 'unverified') {
                 $query->where('is_verified', false);
-            } elseif ($filter === 'active') {
+            } elseif ($filter == 'active') {
                 $query->where('is_active', true);
-            } elseif ($filter === 'disabled') {
+            } elseif ($filter == 'disabled') {
                 $query->where('is_active', false);
-            } elseif ($filter === 'with_tariffs') {
+            } elseif ($filter == 'with_tariffs') {
                 $query->has('tariffs');
-            } elseif ($filter === 'deleted') {
+            } elseif ($filter == 'deleted') {
                 $query->onlyTrashed();
             }
         }
