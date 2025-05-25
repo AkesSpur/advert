@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CustomCategory;
+use App\Models\FooterMenu;
 use Illuminate\Http\Request;
 use App\Models\Profile;
 use App\Models\User;
@@ -45,7 +47,15 @@ class LikeController extends Controller
             $likedProfileIds = session()->get('liked_profiles', []);
             $likedProfiles = Profile::whereIn('id', $likedProfileIds)->where('is_archived', false)->latest()->get();
         }
+        $customCategories = CustomCategory::where('status', 1)->orderBy('name')->get();
 
-        return view('user.liked_profiles', compact('likedProfiles'));
+        // footer Menu
+        $footerMenus = FooterMenu::all();
+        return view('user.liked_profiles', 
+        compact(
+            'likedProfiles',
+            'footerMenus',
+            'customCategories'
+        ));
     }
 }

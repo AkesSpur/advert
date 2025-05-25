@@ -71,7 +71,7 @@
                 </a>
             <h2 class="hidden lg:block text-3xl text-white text-center">{{$seoH1 ?? 'Проститутки услуги в Санкт-Петербурге'}}</h2>     
 
-                <div class="flex space-x-4">
+                <div class="flex space-x-1 md:space-x-4">
                     @guest
                     <a href="{{ route('profile.likedProfiles') }}" class="relative p-2  hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
@@ -82,11 +82,11 @@
                                 </span>
                     </a>
                         <a href="{{ route('register') }}"
-                           class="px-4 py-2 bg-transparent text-white border border-white-700 rounded-lg text-sm">
+                           class="px-2 py-2 bg-transparent text-white border border-white-700 rounded-lg text-sm">
                             Добавить анкету
                         </a>
                         <a href="{{ route('login') }}"
-                           class="px-4 py-2 bg-transparent text-white rounded-md text-sm">
+                           class="px-1 py-2 bg-transparent text-white rounded-md text-sm">
                             Войти
                         </a>
                     @else
@@ -205,7 +205,6 @@
             });
         });
     </script>
-    @stack('scripts')
 </body>
 
 </html>

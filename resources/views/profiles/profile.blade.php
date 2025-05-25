@@ -14,7 +14,7 @@
     <div class="max-w-screen-2xl mx-auto px-1 md:px-4 py-6">
         <!-- Breadcrumbs -->
         <div class="text-sm text-gray-400 mb-4 pl-4 flex justify-between">
-            <nav class="text-sm text-[#A0A0A0] mb-4" aria-label="Breadcrumb">
+            <nav class="text-sm text-[#A0A0A0]" aria-label="Breadcrumb">
                 <ol class="list-reset flex items-center space-x-1">
                     <li>
                         <a href="/" class="hover:text-[#A0A0A0] text-[#636363]">Главная</a>
@@ -59,7 +59,7 @@
                 </div>
 
                 <!-- Attributes for small and medium screens -->
-                <div class="flex md:hidden overflow-x-auto hide-scrollbar gap-3">
+                <div class="flex md:hidden overflow-x-auto hide-scrollbar mt-4 gap-3">
                     <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{$profile->weight}}
                         кг</span>
                     <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{$profile->height}}
@@ -163,7 +163,7 @@
                                             class="carousel-slide absolute inset-0 opacity-100 transition-opacity rounded-xl duration-300 flex items-center justify-center bg-black">
                                             <img src="{{ asset('storage/' . $image->path) }}" alt="Image {{$slide}}"
                                                 class="w-auto rounded-xl h-full object-contain max-w-full"
-                                                loading="{{ $slide === 1 ? 'eager' : 'lazy' }}"> {{-- Load the first image eagerly, others lazily --}}
+                                                loading="{{ $slide == 1 ? 'eager' : 'lazy' }}"> {{-- Load the first image eagerly, others lazily --}}
                                         </div>
                                         @php
                                             $slide++;
@@ -561,10 +561,10 @@
                         <script type="text/javascript">
                             function init(){
                                 const mapContainer = document.getElementById('map');
-                                if (mapContainer && mapContainer.dataset.mapInitialized === 'true') {
+                                if (mapContainer && mapContainer.dataset.mapInitialized == 'true') {
                                     return; // Map already initialized
                                 }
-                                if (typeof ymaps === 'undefined' || typeof ymaps.Map === 'undefined') {
+                                if (typeof ymaps == 'undefined' || typeof ymaps.Map == 'undefined') {
                                     // Yandex Maps API not loaded yet, try again after a short delay
                                     setTimeout(init, 100);
                                     return;
@@ -609,8 +609,8 @@
                                 });
                             }
 
-                            if (document.readyState === 'complete' || document.readyState === 'interactive') {
-                                if (typeof ymaps !== 'undefined') {
+                            if (document.readyState == 'complete' || document.readyState == 'interactive') {
+                                if (typeof ymaps != 'undefined') {
                                     ymaps.ready(init);
                                 } else {
                                     const scriptTag = document.getElementById('yandex-maps-api-script-profile-{{ $profile->id }}');
@@ -623,7 +623,7 @@
                                 }
                             } else {
                                 document.addEventListener('DOMContentLoaded', () => {
-                                    if (typeof ymaps !== 'undefined') {
+                                    if (typeof ymaps != 'undefined') {
                                         ymaps.ready(init);
                                     } else {
                                         const scriptTag = document.getElementById('yandex-maps-api-script-profile-{{ $profile->id }}');
@@ -780,7 +780,7 @@
         // Track current slide index
         let currentSlide = 0;
         const totalSlides = document.querySelectorAll('.carousel-slide').length;
-        const hasVideo = document.querySelector('.video-slide') !== null;
+        const hasVideo = document.querySelector('.video-slide') != null;
         let isVideoActive = false;
         let touchStartX = 0;
         let touchEndX = 0;
@@ -826,7 +826,7 @@
                 isVideoActive = false;
                 currentSlide = 0;
                 showSlide(currentSlide);
-            } else if (currentSlide === totalSlides - 1) {
+            } else if (currentSlide == totalSlides - 1) {
                @if (isset($profile->video->path))
                 // If we're at the last image slide and video exists, show video
                 showVideo();
@@ -849,7 +849,7 @@
                 isVideoActive = false;
                 currentSlide = totalSlides - 1;
                 showSlide(currentSlide);
-            } else if (currentSlide === 0) {
+            } else if (currentSlide == 0) {
                 @if (isset($profile->video->path))
                 // If we're at the first slide and video exists, show video
                 showVideo();
@@ -899,7 +899,7 @@
         function updateIndicators(isVideo = false) {
             const indicators = document.querySelectorAll('.bottom-4 button');
             indicators.forEach((indicator, index) => {
-                if ((isVideo && index === indicators.length - 1) || (!isVideo && index === currentSlide)) {
+                if ((isVideo && index == indicators.length - 1) || (!isVideo && index == currentSlide)) {
                     indicator.classList.remove('opacity-50');
                     indicator.classList.add('opacity-100');
                 } else {
@@ -1005,7 +1005,7 @@
             fullscreenOverlay.appendChild(nextButton);
             
             fullscreenOverlay.onclick = function (e) {
-                if (e.target === fullscreenOverlay) {
+                if (e.target == fullscreenOverlay) {
                     document.body.removeChild(fullscreenOverlay);
                 }
             };
@@ -1032,7 +1032,7 @@
         // Navigate between images in fullscreen mode
         function navigateFullscreenImage(direction) {
             let newSlide;
-            if (direction === 'next') {
+            if (direction == 'next') {
                 newSlide = (currentSlide + 1) % document.querySelectorAll('.carousel-slide').length;
             } else {
                 newSlide = (currentSlide - 1 + document.querySelectorAll('.carousel-slide').length) % document.querySelectorAll('.carousel-slide').length;
@@ -1084,7 +1084,7 @@
             fullscreenOverlay.appendChild(fullscreenVideo);
             fullscreenOverlay.appendChild(closeButton);
             fullscreenOverlay.onclick = function (e) {
-                if (e.target === fullscreenOverlay) {
+                if (e.target == fullscreenOverlay) {
                     // Pause the video before removing
                     fullscreenVideo.pause();
                     document.body.removeChild(fullscreenOverlay);
