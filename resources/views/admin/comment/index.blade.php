@@ -30,7 +30,15 @@
                                         @foreach($comments as $comment)
                                         <tr>
                                             {{-- <td>{{$comment->id}}</td> --}}
-                                            <td>{{$comment->profile_id}}</td>
+                                            <td>
+                                                <a href="{{ route('profiles.view', [
+        'slug'=>$comment->profile->slug,
+        'id'=>$comment->profile->id,
+        ]) }}"
+        class="text-underlined"
+        >{{$comment->profile_id}}
+                                            </a>
+    </td>
                                             <td>{{$comment->name}}</td>
                                             <td>{{$comment->content}}</td>
                                             <td>

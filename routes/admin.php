@@ -59,11 +59,18 @@ Route::post('chat/create-conversation', [ChatController::class, 'createConversat
 Route::put('customer/status-change', [CustomerListController::class, 'changeStatus'])->name('customer.status-change');
 Route::put('customer-list/{id}/update-email', [CustomerListController::class, 'updateEmail'])->name('customer-list.update-email');
 Route::get('customer', [CustomerListController::class, 'index'])->name('customer.index');
+Route::post('customers/{id}/verify-email', [CustomerListController::class, 'verifyEmail'])->name('customers.verify-email');
+Route::post('customers/{id}/send-reset-link', [CustomerListController::class, 'sendResetLink'])->name('customers.send-reset-link');
+
 /** admin list routes */
 Route::get('admin-list', [AdminListController::class, 'index'])->name('admin-list.index');
 Route::put('admin-list/status-change', [AdminListController::class, 'changeStatus'])->name('admin-list.status-change');
 Route::put('admin-list/{id}/update-email', [AdminListController::class, 'updateEmail'])->name('admin-list.update-email');
 Route::delete('admin-list/{id}', [AdminListController::class, 'destroy'])->name('admin-list.destroy');
+Route::post('admins/{id}/verify-email', [AdminListController::class, 'verifyEmail'])->name('admins.verify-email');
+Route::post('admins/{id}/send-reset-link', [AdminListController::class, 'sendResetLink'])->name('admins.send-reset-link');
+
+
 /** Add and withdraw funds routes */
 Route::get('add-fund/{id}', [FundManagementController::class, 'addIndex'])->name('add-fund.index');
 Route::post('fund-user/{id}', [FundManagementController::class, 'addFund'])->name('fund-user');

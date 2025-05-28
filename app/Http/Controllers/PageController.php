@@ -303,8 +303,6 @@ class PageController extends Controller
         }
 
         if ($priceSlug) {
-            // $priceFilter = Price::where('value', $priceSlug)->first(); // Not needed
-            // if ($priceFilter) {
                 switch ($priceSlug) {
                     case 'price-under-2000':
                         $profilesQuery->where('profiles.vyezd_1hour', '<=', 2000);
@@ -335,8 +333,6 @@ class PageController extends Controller
         }
 
         if ($ageSlug) {
-            // $ageFilter = Age::where('value', $ageSlug)->first(); // Not needed
-            // if ($ageFilter) {
                 switch ($ageSlug) {
                     case 'age-under-22':
                         $profilesQuery->where('profiles.age', '<=', 22);
@@ -594,49 +590,64 @@ class PageController extends Controller
         $footerMenus = FooterMenu::all();
 
         // Determine hero content for the index page
-$defaultHeroSettings = HeroSectionSetting::first();
-$heroContent = $defaultHeroSettings; // Initialize with default settings
+        $defaultHeroSettings = HeroSectionSetting::first();
+        $heroContent = $defaultHeroSettings; // Initialize with default settings
 
-// Priority 1: Specific filter overrides (Service, Metro, Price, etc.)
-$activeFilterModels = array_filter([
-    $serviceModel, $metroModel, $priceModel, $ageModel, 
-    $hairColorModel, $heightModel, $weightModel, $sizeModel, $neighborhoodModel
-]);
+        // Collect all potential filter models with their specific IDs
+        $filterModels = [
+            'Service' => $serviceModel,
+            'MetroStation' => $metroModel,
+            'Price' => $priceModel,
+            'Age' => $ageModel,
+            'HairColor' => $hairColorModel,
+            'Height' => $heightModel,
+            'Weight' => $weightModel,
+            'Size' => $sizeModel,
+            'Neighborhood' => $neighborhoodModel,
+        ];
 
-foreach ($activeFilterModels as $modelInstance) {
-    if ($modelInstance) { // No need to check for method_exists if we query HeroSectionOverride directly
-        // Fetch override based on the model TYPE, not a specific instance relationship
-        $override = HeroSectionOverride::where('model_type', get_class($modelInstance))
-                                        ->where('is_active', true)
-                                        ->first();
-                                        
-        if ($override) {
-            $heroContent = $override;
-            break; // First active specific filter override wins
+        $foundOverride = false;
+
+        foreach ($filterModels as $modelTypeShort => $modelInstance) {
+            if ($modelInstance) {
+                $fullModelClass = "App\\Models\\" . $modelTypeShort;
+
+                // 1. Try to find an override for the specific model instance (e.g., Service ID 5)
+                $specificOverride = HeroSectionOverride::where('model_type', $fullModelClass)
+                    ->where('model_id', $modelInstance->id)
+                    ->where('is_active', true)
+                    ->first();
+
+                if ($specificOverride) {
+                    $heroContent = $specificOverride;
+                    $foundOverride = true;
+                    break; // Specific override found, use it and stop checking
+                }
+            }
         }
-    }
-}
 
-// Priority 2: Generic override (if no specific filter override was applied)
-if ($heroContent === $defaultHeroSettings && $defaultHeroSettings && method_exists($defaultHeroSettings, 'heroSectionOverride')) {
-    // Assuming a generic override is linked to the HeroSectionSetting model itself
-    // Or a specific record in HeroSectionOverride, e.g., model_type = 'App\Models\HeroSectionSetting' and model_id = 0 or 1 for global
-    $genericOverride = HeroSectionOverride::where('model_type', get_class($defaultHeroSettings))
-                                        ->where('model_id', $defaultHeroSettings->id) // Or your specific logic for generic
-                                        ->where('is_active', true)
-                                        ->first();
-    // Fallback: Check for a truly global override if the above isn't found
-    // if (!$genericOverride) {
-    //     $genericOverride = HeroSectionOverride::where('model_type', 'App\Models\HeroSectionSetting') // Or a dedicated 'global' type
-    //                                             ->where('model_id', 0) // Or a sentinel ID for global
-    //                                             ->where('is_active', true)
-    //                                             ->first();
-    // }
+        // If no specific override was found, check for 'all types' overrides (model_id = 0)
+        if (!$foundOverride) {
+            foreach ($filterModels as $modelTypeShort => $modelInstance) {
+                if ($modelInstance) { // Only check if the model type is present in the current request
+                    $fullModelClass = "App\\Models\\" . $modelTypeShort;
 
-    if ($genericOverride) {
-        $heroContent = $genericOverride;
-    }
-}
+                    // 2. Try to find an 'all types' override for this model type (e.g., Service ID 0)
+                    $allTypesOverride = HeroSectionOverride::where('model_type', $fullModelClass)
+                        ->where('model_id', 0)
+                        ->where('is_active', true)
+                        ->first();
+
+                    if ($allTypesOverride) {
+                        $heroContent = $allTypesOverride;
+                        $foundOverride = true;
+                        break; // 'All types' override found, use it and stop checking
+                    }
+                }
+            }
+        }
+
+        // If still no override found, $heroContent remains $defaultHeroSettings
 // At this point, $heroContent is the most specific override, or the default settings.
 
 
@@ -1036,7 +1047,7 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
         $profile = Profile::with(['metroStations', 'services', 'images', 'video', 'neighborhoods'])->findOrFail($id);
 
         if($profile->is_active == false) {
-            return back()->with('error', 'Профиль неактивен.');
+            abort(404, 'Профиль неактивен.');
         }   
 
         $profile->incrementViewCount();

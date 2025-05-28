@@ -19,7 +19,10 @@
           <div class="card-header">
             <h4>Информация об анкете</h4>
             <div class="card-header-action">
-              <a href="{{ route('profiles.view', $verification->profile->id) }}" class="btn btn-icon btn-primary" target="_blank" data-toggle="tooltip" title="Просмотреть профиль пользователя">
+              <a href="{{ route('profiles.view', [
+                'slug'=>$verification->profile->slug,
+                'id'=>$verification->profile->id,
+                ]) }}" class="btn btn-icon btn-primary" target="_blank" data-toggle="tooltip" title="Просмотреть профиль пользователя">
                 <i class="fas fa-user"></i> Просмотреть профиль
               </a>
             </div>

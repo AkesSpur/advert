@@ -101,36 +101,33 @@ class SettingController extends Controller
         $heroOverride = null;
         $displayModelInfo = ['name' => null, 'type' => $currentModelType, 'id' => $currentModelId];
 
-        $typeLevelModels = ['Service', 'MetroStation', 'Price', 'Age', 'HairColor', 'Height', 'Weight', 'Size', 'Neighborhood'];
-
         if ($currentModelType) {
             $fullModelClass = "App\\Models\\" . ucfirst($currentModelType);
             if (class_exists($fullModelClass)) {
-                if (in_array($currentModelType, $typeLevelModels)) {
-                    $actualModelIdForDb = 0;
-                    $displayModelInfo['id'] = $actualModelIdForDb; // Ensure ID is 0 for display
-                    $displayModelInfo['name'] = "Тип: " . $this->getModelFriendlyName($currentModelType);
-                    $heroOverride = HeroSectionOverride::firstOrCreate(
-                        ['model_type' => $fullModelClass, 'model_id' => $actualModelIdForDb]
-                    );
-                } elseif ($currentModelId != null && $currentModelId != '') {
-                    // Instance-level models like CustomCategory, HeroSectionSetting
+                $actualModelIdForDb = 0; // Default to 'all types' override
+                if ($currentModelId != null && $currentModelId != '') {
                     $modelInstance = $fullModelClass::find($currentModelId);
                     if ($modelInstance) {
                         $actualModelIdForDb = $modelInstance->id;
-                        $displayModelInfo['id'] = $actualModelIdForDb;
                         $displayModelInfo['name'] = $this->getModelFriendlyName($currentModelType) . ": " . ($modelInstance->name ?? $modelInstance->title ?? "ID: " . $actualModelIdForDb);
-                        $heroOverride = HeroSectionOverride::firstOrCreate(
-                            ['model_type' => $fullModelClass, 'model_id' => $actualModelIdForDb]
-                        );
+                    } else {
+                        // If a specific ID was requested but not found, fall back to type-level (ID 0)
+                        $displayModelInfo['name'] = "Тип: " . $this->getModelFriendlyName($currentModelType);
                     }
+                } else {
+                    $displayModelInfo['name'] = "Тип: " . $this->getModelFriendlyName($currentModelType);
                 }
+                $displayModelInfo['id'] = $actualModelIdForDb;
+                $heroOverride = HeroSectionOverride::firstOrCreate(
+                    ['model_type' => $fullModelClass, 'model_id' => $actualModelIdForDb]
+                );
             }
         }
 
         // Data for dropdowns
         $customCategories = CustomCategory::all();
-        $services = Service::all(); // Still needed if we want to allow specific service overrides in future, or for other admin areas
+        $heroSectionSettings = HeroSectionSetting::all();
+        $services = Service::all();
         $metroStations = MetroStation::all();
         $prices = Price::all();
         $ages = Age::all();
@@ -139,13 +136,11 @@ class SettingController extends Controller
         $weights = Weight::all();
         $sizes = Size::all();
         $neighborhoods = Neighborhood::all();
-        $heroSectionSettings = HeroSectionSetting::all();
 
         return view('admin.setting.hero-section-override', compact(
             'heroOverride', 'displayModelInfo', 'currentModelType', 'currentModelId',
             'customCategories', 'services', 'metroStations', 'prices', 'ages',
-            'hairColors', 'heights', 'weights', 'sizes', 'neighborhoods', 'heroSectionSettings',
-            'typeLevelModels'
+            'hairColors', 'heights', 'weights', 'sizes', 'neighborhoods', 'heroSectionSettings'
         ));
     }
 

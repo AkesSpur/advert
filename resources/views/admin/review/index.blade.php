@@ -30,7 +30,13 @@
                                         @foreach($reviews as $review)
                                         <tr>
                                             {{-- <td>{{$review->id}}</td> --}}
-                                            <td>{{$review->profile_id}}</td>
+                                            <td> <a href="{{ route('profiles.view', [
+                                                'slug'=>$review->profile->slug,
+                                                'id'=>$review->profile->id,
+                                                ]) }}"
+                                                class="text-underlined"
+                                                >{{$review->profile_id}}
+                                                                                    </a></td>
                                             <td>{{$review->name}}</td>
                                             <td>{{$review->comment}}</td>
                                             <td>

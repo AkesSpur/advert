@@ -41,15 +41,20 @@
                                                 aria-label="Progress" >
                                                 почта
                                             </th>
-                                            <th class="sorting_disabled" rowspan="1" colspan="1"
-                                                aria-label="Profiles" >
-                                                Профили
-                                              </th>
-                                            <th class="sorting_disabled" rowspan="1" colspan="1"
-                                              aria-label="Progress" >
-                                              Сальдо
-                                            </th>    
-                                            <th class="sorting_disabled" tabindex="0" aria-controls="table-2"
+                                            <th class="sorting_disabled text-center" rowspan="1" colspan="1"
+                                            aria-label="Profiles" >
+                                            Профили
+                                          </th>
+
+                                        <th class="sorting_disabled  text-center " rowspan="1" colspan="1"
+                                          aria-label="Progress" >
+                                          Подтвержден?
+                                        </th>  
+                                        <th class="sorting_disabled  text-center " rowspan="1" colspan="1"
+                                          aria-label="Progress" >
+                                          Счет. Сальдо
+                                        </th>  
+                                <th class="sorting_disabled" tabindex="0" aria-controls="table-2"
                                                 rowspan="1" colspan="1"
                                                 aria-label="Due Date: activate to sort column ascending">
                                                 Стаутс
@@ -84,7 +89,17 @@
                                                 @endif
                                             </td>
 
-                                            <td>{{$customer->balance}}</td>
+                                            <td class="text-center">
+                                                @if ($customer->email_verified_at)
+                                                    <i class="fas fa-check-circle text-success" title="Email подтвержден"></i>
+                                                @else
+                                                    <i class="fas fa-times-circle text-muted" title="Email не подтвержден"></i>
+                                                @endif
+                                            </td>
+
+                                            <td class="text-center">
+                                                {{$customer->balance}}
+                                            </td>
 
                                             <td>
                                               @if($customer->status == 'active')
@@ -101,29 +116,42 @@
                                             </td>
 
                                             <td>
-                                              <div class="dropdown d-inline">
-                                                <button class="btn btn-dark dropdown-toggle" type="button"
-                                                    id="dropdownMenuButton2" data-toggle="dropdown"
-                                                    aria-haspopup="true" aria-expanded="false">
-                                                    <i class='far fa-edit'></i>
-                                                </button>
-                                                @if (Auth::user()->id == 1)
-                                                <div class="dropdown-menu" x-placement="bottom-start"
-                                                style="position: absolute; transform: translate3d(0px, 28px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                <a class="dropdown-item has-icon"
-                                                href="{{ route('admin.add-fund.index', $customer->id) }}">
-                                                <i class="fas fa-plus"></i>
-                                                 Add funds
-                                              </a>
-                                              <a class="dropdown-item has-icon"
-                                                  href="{{ route('admin.withdraw-fund.index', $customer->id) }}">
-                                                  <i class="fas fa-wallet"></i> 
-                                                 Withdraw funds
-                                              </a>
-                                            </div>      
-                                                @endif
-                                            </div>
+                                                <div class="dropdown d-inline">
+                                                    <button class="btn btn-dark dropdown-toggle" type="button"
+                                                            id="dropdownMenuButton{{ $customer->id }}" data-toggle="dropdown"
+                                                            aria-haspopup="true" aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </button>
+                                            
+                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $customer->id }}">
+                                                        @if (Auth::id() == 1)
+                                                            <a class="dropdown-item has-icon" href="{{ route('admin.add-fund.index', $customer->id) }}">
+                                                                <i class="fas fa-plus text-success mr-2"></i> Добавить средства
+                                                            </a>
+                                                            <a class="dropdown-item has-icon" href="{{ route('admin.withdraw-fund.index', $customer->id) }}">
+                                                                <i class="fas fa-wallet text-warning mr-2"></i> Вывести средства
+                                                            </a>
+                                                        @endif
+                                            
+                                                        @if (is_null($customer->email_verified_at))
+                                                            <button class="dropdown-item has-icon verify-email-btn" data-id="{{ $customer->id }}">
+                                                                <i class="fas fa-check-circle text-success mt-1 mr-2"></i> 
+                                                                <span>
+                                                                    Подтвердить Email
+                                                                </span>
+                                                            </button>
+                                                        @endif
+                                            
+                                                        <button class="dropdown-item has-icon send-reset-link-btn" data-id="{{ $customer->id }}">
+                                                            <i class="fas fa-key text-primary mt-1 mr-2"></i> 
+                                                            <span>
+                                                                Сбросить пароль
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </td>
+                                            
                                         </tr>                                                  
                                         @endforeach
                                     </tbody>
@@ -253,7 +281,7 @@
                         email: newEmail
                     },
                     success: function(data){
-                        if(data.status === 'success'){
+                        if(data.status == 'success'){
                             toastr.success(data.message);
                             $('#emailEditModal').modal('hide');
                             location.reload(); 
@@ -280,10 +308,14 @@
                 $('#profilesTableBody').empty(); 
 
                 let customer = {!! json_encode($customers->keyBy('id')->all()) !!}[userId];
+                let profileViewUrlTemplate = "{{ route('profiles.view', ['slug' => 'SLUG_PLACEHOLDER', 'id' => 'ID_PLACEHOLDER']) }}";
                 if(customer && customer.profiles && customer.profiles.length > 0){
                     customer.profiles.forEach(function(profile){
+                        let profileSpecificUrl = profileViewUrlTemplate
+                                                    .replace('SLUG_PLACEHOLDER', profile.slug)
+                                                    .replace('ID_PLACEHOLDER', profile.id);
                         let profileRow = `<tr>
-                            <td>${profile.id}</td>
+                            <td><a href="${profileSpecificUrl}" class="text-underlined">${profile.id}</a></td>
                             <td>${profile.name}</td>
                             <td>${profile.phone ? profile.phone : 'N/A'}</td>
                             <td>${profile.is_active ? '<span class="badge badge-success">Активный</span>' : '<span class="badge badge-warning">Неактивный</span>'}</td>
@@ -299,6 +331,52 @@
                 }
 
                 $('#profilesModal').modal('show');
+            });
+
+            // Handle Verify Email button click
+            $('.verify-email-btn').on('click', function(){
+                let customerId = $(this).data('id');
+                $.ajax({
+                    url: "/admin/customers/" + customerId + "/verify-email", // Adjusted URL for customers
+                    method: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                    },
+                    success: function(data){
+                        if(data.status == 'success'){
+                            toastr.success(data.message);
+                            location.reload(); 
+                        } else {
+                            toastr.error(data.message || 'An error occurred.');
+                        }
+                    },
+                    error: function(xhr, status, error){
+                        toastr.error('An error occurred: ' + error);
+                    }
+                });
+            });
+
+            // Handle Send Reset Link button click
+            $('.send-reset-link-btn').on('click', function(){
+                let customerId = $(this).data('id');
+                $.ajax({
+                    url: "/admin/customers/" + customerId + "/send-reset-link", // Adjusted URL for customers
+                    method: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                    },
+                    success: function(data){
+                        if(data.status == 'success'){
+                            toastr.success(data.message);
+                        } else {
+                            toastr.error(data.message || 'An error occurred.');
+                        }
+                    },
+                    error: function(xhr, status, error){
+                        let response = xhr.responseJSON;
+                        toastr.error(response.message || 'An error occurred: ' + error);
+                    }
+                });
             });
         })
     </script>

@@ -103,35 +103,31 @@ $(document).ready(function() {
     const modelIdSelector = $('#model_id_selector');
     const initialModelType = '{{ $currentModelType }}';
     const initialModelId = '{{ $currentModelId }}'; // This could be 0 for type-level or specific ID for instance-level
-    const typeLevelModels = @json($typeLevelModels);
 
     const modelsData = {
         HeroSectionSetting: @json($heroSectionSettings->mapWithKeys(function ($item) { return [$item->id => $item->title ?: 'Основные настройки ID '.$item->id]; })->toArray()),
         CustomCategory: @json($customCategories->mapWithKeys(function ($item) { return [$item->id => $item->name]; })->toArray()),
-        Service: { 0: 'Все услуги (тип)' }, // Type-level override
-        MetroStation: { 0: 'Все станции метро (тип)' },
-        Price: { 0: 'Все цены (тип)' },
-        Age: { 0: 'Все возрасты (тип)' },
-        HairColor: { 0: 'Все цвета волос (тип)' },
-        Height: { 0: 'Весь рост (тип)' },
-        Weight: { 0: 'Весь вес (тип)' },
-        Size: { 0: 'Все размеры (тип)' },
-        Neighborhood: { 0: 'Все районы (тип)' },
+        Service: @json($services->mapWithKeys(function ($item) { return [$item->id => $item->name]; })->toArray()),
+        MetroStation: @json($metroStations->mapWithKeys(function ($item) { return [$item->id => $item->name]; })->toArray()),
+        Price: @json($prices->mapWithKeys(function ($item) { return [$item->id => $item->name]; })->toArray()),
+        Age: @json($ages->mapWithKeys(function ($item) { return [$item->id => $item->name]; })->toArray()),
+        HairColor: @json($hairColors->mapWithKeys(function ($item) { return [$item->id => $item->name]; })->toArray()),
+        Height: @json($heights->mapWithKeys(function ($item) { return [$item->id => $item->name]; })->toArray()),
+        Weight: @json($weights->mapWithKeys(function ($item) { return [$item->id => $item->name]; })->toArray()),
+        Size: @json($sizes->mapWithKeys(function ($item) { return [$item->id => $item->name]; })->toArray()),
+        Neighborhood: @json($neighborhoods->mapWithKeys(function ($item) { return [$item->id => $item->name]; })->toArray()),
     };
 
     function populateModelIds(selectedType) {
         modelIdSelector.empty();
+        modelIdSelector.append('<option value="">-- Выберите модель --</option>'); // Add a default "all types" option
+
         if (!selectedType) {
-            modelIdSelector.append('<option value="">-- Сначала выберите тип --</option>');
             modelIdSelector.prop('disabled', true);
-        } else if (typeLevelModels.includes(selectedType)) {
-            // For type-level models, only one option: ID 0
-            modelIdSelector.append($('<option></option>').attr('value', 0).text(modelsData[selectedType][0]));
-            modelIdSelector.val(0); // Pre-select it
-            modelIdSelector.prop('disabled', false); // Enable, though only one choice
         } else if (modelsData[selectedType]) {
-            // For instance-level models (CustomCategory, HeroSectionSetting)
-            modelIdSelector.append('<option value="">-- Выберите модель --</option>');
+            // Add the "all types" option (ID 0) for all selectable model types
+            modelIdSelector.append($('<option></option>').attr('value', 0).text('Все ' + selectedType + ' (тип)'));
+
             $.each(modelsData[selectedType], function(id, name) {
                 modelIdSelector.append($('<option></option>').attr('value', id).text(name));
             });

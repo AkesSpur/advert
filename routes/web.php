@@ -102,6 +102,18 @@ Route::post('profiles/{id}/restore', [ProfileController::class, 'restore'])->nam
 
 });
 
+Route::group(['middleware' => ['auth', 'verified', 'role:admin'], 'prefix' => 'admin', 'as' => 'admin.'], function () {
+    // Existing admin routes here (if any)
+
+    // Routes for AdminListController
+    Route::post('admins/{id}/verify-email', [\App\Http\Controllers\Backend\AdminListController::class, 'verifyEmail'])->name('admins.verify-email');
+    Route::post('admins/{id}/send-reset-link', [\App\Http\Controllers\Backend\AdminListController::class, 'sendResetLink'])->name('admins.send-reset-link');
+
+    // Routes for CustomerListController
+    Route::post('customers/{id}/verify-email', [\App\Http\Controllers\Backend\CustomerListController::class, 'verifyEmail'])->name('customers.verify-email');
+    Route::post('customers/{id}/send-reset-link', [\App\Http\Controllers\Backend\CustomerListController::class, 'sendResetLink'])->name('customers.send-reset-link');
+});
+
     
     
     // // Service routes (admin only)

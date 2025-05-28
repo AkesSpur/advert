@@ -1100,7 +1100,7 @@
                 <!-- Image -->
                 <div class="w-full lg:w-1/2 relative">
                     <div class="overflow-hidden shadow-xl bg-[#191919] rounded-bl-3xl lg:rounded-bl-none lg:rounded-tr-3xl rounded-br-3xl h-full">
-                        <img src="{{ asset($heroContent->image ?? (isset($heroSetting) ? $heroSetting->image : 'assets/images/hero.jpg')) }}" alt="Hero image" class="w-full h-full object-cover" loading="lazy">
+                        <img src="{{ asset($heroContent->image ?? (isset($heroSetting) ? $heroSetting->image : 'assets/images/hero.jpg')) }}" alt="Hero image" class="w-full h-auto object-cover max-h-96" loading="lazy">
                     </div>
                 </div>
             </div>

@@ -111,7 +111,16 @@
                   <tbody>
                     @foreach($profiles as $profile)
                       <tr>
-                        <td>{{ $profile->id }}</td>
+                        <td>
+                          <a href="{{ route('profiles.view', [
+        'slug'=>$profile->slug,
+        'id'=>$profile->id,
+        ]) }}"
+        class="text-underlined"
+        >
+        {{ $profile->id }}  
+      </a>
+                        </td>
                         <td>
                           <div class="d-flex align-items-center">
                             <div class="mr-3">

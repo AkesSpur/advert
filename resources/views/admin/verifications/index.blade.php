@@ -49,7 +49,13 @@
                             </div>
                             <div>
                               <div>{{ $verification->profile->name }}, {{ $verification->profile->age }}</div>
-                              <div class="text-muted small">ID: {{ $verification->profile->id }}</div>
+                              <div class="text-muted small">
+                              <a  href="{{ route('profiles.view', [
+        'slug'=>$verification->profile->slug,
+        'id'=>$verification->profile->id,
+        ]) }}">
+                                ID: {{ $verification->profile->id }}
+                              </a></div>
                             </div>
                           </div>
                         </td>

@@ -159,6 +159,15 @@
     <i class="fas fa-check-circle"></i>
  <span>
     Верификация
+    @php
+    $pendingVerification = \App\Models\VerificationPhoto::where('status', 'pending')->count();
+@endphp
+@if($pendingVerification > 0)
+    <span class="badge rounded-circle bg-warning text-white d-flex align-items-center justify-content-center"
+          style="width: 24px; height: 24px;">
+        {{ $pendingVerification }}
+    </span>
+@endif
 </span>   
 </a>
 </li>
@@ -264,7 +273,7 @@ class="dropdown {{ setActive([
                     <li class="{{setActive(['admin.settings.*'])}}"><a class="nav-link" href="{{route('admin.settings.index')}}">Общие настройки</a></li>
                     <li class="{{setActive(['admin.hero-section-setting.*'])}}"><a class="nav-link" href="{{route('admin.hero-section-setting.index')}}">Настройки секции Hero</a></li>
                     <li class="{{ setActive(['admin.hero-section-override.index']) }}"><a class="nav-link"
-                            href="{{ route('admin.hero-section-override.index') }}">Переопределения разделов героев</a></li>
+                            href="{{ route('admin.hero-section-override.index') }}">Замена текстов на страницах категори</a></li>
                 </ul>
             </li>
             

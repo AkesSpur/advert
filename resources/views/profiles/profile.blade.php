@@ -171,9 +171,9 @@
                                     @endforeach
 
                                     @if (isset($profile->video->path))
-                                        <!-- Video (hidden by default) -->
+                                        <!-- Video (hidden by default, initially muted) -->
                                         <div class="video-slide absolute inset-0 opacity-0 transition-opacity duration-300 flex items-center justify-center bg-black">
-                                            <video class="w-auto h-full object-contain max-w-full" controls>
+                                            <video class="w-auto h-full object-contain max-w-full" controls muted>
                                                 <source src="{{asset('storage/' . $profile->video->path)}}" type="video/mp4">
                                                 Your browser does not support the video tag.
                                             </video>
@@ -312,8 +312,11 @@
                             @endif
 
                             @if ($profile->has_telegram)
-                            <!-- Telegram -->
-                            <a href="{{$profile->telegram}}" target="_blank"
+                            @php
+    $telegramUsername = ltrim($profile->telegram, '@'); // Remove '@' if present
+@endphp
+
+<a href="https://t.me/{{ $telegramUsername }}" target="_blank"
                                 class="flex items-center text-[#C2C2C2] hover:text-[#0088cc]">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-[#0088cc]"
                                     fill="currentColor" viewBox="0 0 24 24">
@@ -453,8 +456,11 @@
                     @endif
 
                     @if ($profile->has_telegram)
-                    <!-- Telegram -->
-                    <a href="{{$profile->telegram}}" target="_blank"
+                    @php
+    $telegramUsername = ltrim($profile->telegram, '@'); // Remove '@' if present
+@endphp
+
+<a href="https://t.me/{{ $telegramUsername }}" target="_blank"
                         class="flex items-center text-[#C2C2C2] hover:text-[#0088cc]">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-[#0088cc]"
                             fill="currentColor" viewBox="0 0 24 24">
@@ -550,7 +556,7 @@
             <!-- Map Location -->
             <div class="flex lg:w-1/2 flex-col md:flex-row gap-8 mb-8">
                 <div class="w-full">
-                    <h3 class="text-3xl  w-full font-semibold mb-8 capitalize">Расположение на карте</h3>
+                    <h3 class="text-3xl w-full font-semibold mb-8 capitalize">Расположение на карте</h3>
                     @if ($profile->latitude && $profile->longitude)
                         <div id="map" class="rounded-xl overflow-hidden" style="width: 100%; height: 400px;"></div>
                         <p id="map-address" class="text-[#A0A0A0] mt-2 mb-2"></p>
@@ -762,7 +768,7 @@
 
         <!-- Similar Profiles -->
         <div class="p-4">
-            <h1 class="text-4xl font-semibold mb-6">Похожие проститутки</h1>
+            <h1 class="text-3xl font-semibold mb-6">Похожие проститутки</h1>
 
             <div id="profiles-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 @include('partials.similar-profiles', ['profiles' => $profiles])
@@ -798,12 +804,15 @@
             });
 
             @if (isset($profile->video->path))
-                  // Hide video if it's playing
-            const videoSlide = document.querySelector('.video-slide');
-            videoSlide.classList.remove('opacity-100');
-            videoSlide.classList.add('opacity-0');
-            const video = videoSlide.querySelector('video');
-            if (video) video.pause();
+                // Hide video if it's playing, ensure it's muted and paused
+                const videoSlide = document.querySelector('.video-slide');
+                const video = videoSlide.querySelector('video');
+                if (video) {
+                    video.pause();
+                    video.muted = true; // Ensure video is muted when not active
+                }
+                videoSlide.classList.remove('opacity-100');
+                videoSlide.classList.add('opacity-0');
             @endif
 
           
@@ -883,10 +892,11 @@
             // Mark video as active
             isVideoActive = true;
 
-            // Set video source if not already set and play
+            // Set video source if not already set, unmute and play
             const video = videoSlide.querySelector('video');
             if (video) {
                 // The source is already set in the HTML
+                video.muted = false; // Unmute when video becomes active
                 video.play();
             }
 
@@ -939,6 +949,24 @@
                     return; // Don't do anything if clicking on a button
                 }
 
+                // Handle multi-clicks on images to prevent unintended video play
+                if (e.detail > 1 && !isVideoActive) {
+                    // This is the second (or subsequent) click of a multi-click sequence
+                    // when an image is currently active in the carousel.
+                    // The first click (e.detail === 1) should have already handled
+                    // opening the image in fullscreen.
+                    
+                    const mainVideoElement = document.querySelector('.video-slide video');
+                    if (mainVideoElement && typeof mainVideoElement.pause == 'function' && !mainVideoElement.paused) {
+                        mainVideoElement.pause(); // Explicitly pause if it somehow started playing
+                    }
+                    
+                    // Prevent default browser actions for the second click if it's part of a dblclick (e.g., text selection)
+                    e.preventDefault(); 
+                    return; // Stop further processing for this specific click event
+                }
+
+                // Original logic for single clicks or clicks when video is active
                 if (isVideoActive) {
                     const video = document.querySelector('.video-slide video');
                     if (video) {
@@ -1060,6 +1088,7 @@
             fullscreenVideo.className = 'max-h-screen max-w-screen-lg object-contain';
             fullscreenVideo.controls = true;
             fullscreenVideo.autoplay = true;
+            fullscreenVideo.muted = false; // Ensure fullscreen video is not muted by default
 
             // Copy the source from the original video
             const originalSource = videoElement.querySelector('source');

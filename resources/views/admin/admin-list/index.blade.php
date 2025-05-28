@@ -41,11 +41,16 @@
                                                         aria-label="Progress" >
                                                         Электронная почта
                                                       </th>
-                                                    <th class="sorting_disabled" rowspan="1" colspan="1"
+                                                    <th class="sorting_disabled text-center" rowspan="1" colspan="1"
                                                         aria-label="Profiles" >
                                                         Профили
                                                       </th>
-                                                    <th class="sorting_disabled" rowspan="1" colspan="1"
+
+                                                    <th class="sorting_disabled  text-center " rowspan="1" colspan="1"
+                                                      aria-label="Progress" >
+                                                      Подтвержден?
+                                                    </th>  
+                                                    <th class="sorting_disabled  text-center " rowspan="1" colspan="1"
                                                       aria-label="Progress" >
                                                       Счет. Сальдо
                                                     </th>  
@@ -85,7 +90,17 @@
                                                         @endif
                                                     </td>
 
-                                                    <td>{{$admin->balance}}</td>
+                                                    <td class="text-center">
+                                                        @if ($admin->email_verified_at)
+                                                            <i class="fas fa-check-circle text-success" title="Email подтвержден"></i>
+                                                        @else
+                                                            <i class="fas fa-times-circle text-muted" title="Email не подтвержден"></i>
+                                                        @endif
+                                                    </td>
+
+                                                    <td class="text-center">
+                                                        {{$admin->balance}}
+                                                    </td>
 
                                                     <td>
                                                     @if ($admin->id != 1)
@@ -106,34 +121,50 @@
                                                     </td>
 
                                                     <td>
-                                                        @if ($admin->id != 1)
-                                                        <a href="{{route('admin.admin-list.destroy', $admin->id)}}" class='btn btn-danger ml-2 delete-item'>
-                                                          <i class='far fa-trash-alt'></i>
-                                                        </a>
-                                                        @endif
                                                         @if (Auth::user()->id == 1)
-                                                        <div class="dropdown d-inline">
-                                                            <button class="btn btn-dark dropdown-toggle" type="button"
-                                                                id="dropdownMenuButton2" data-toggle="dropdown"
-                                                                aria-haspopup="true" aria-expanded="false">
-                                                                <i class='far fa-edit'></i>
-                                                            </button>
-                                                            <div class="dropdown-menu" x-placement="bottom-start"
-                                                                style="position: absolute; transform: translate3d(0px, 28px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                                                <a class="dropdown-item has-icon"
-                                                                href="{{ route('admin.add-fund.index', $admin->id) }}">
-                                                                <i class="fas fa-plus"></i>
-                                                                 Add funds
-                                                              </a>
-                                                              <a class="dropdown-item has-icon"
-                                                                  href="{{ route('admin.withdraw-fund.index', $admin->id) }}">
-                                                                  <i class="fas fa-wallet"></i> 
-                                                                 Withdraw funds
-                                                              </a>
+                                                            <div class="dropdown d-inline">
+                                                                <button class="btn btn-dark dropdown-toggle" type="button"
+                                                                    id="dropdownMenuButton{{ $admin->id }}" data-toggle="dropdown"
+                                                                    aria-haspopup="true" aria-expanded="false">
+                                                                    <i class="fas fa-ellipsis-v"></i>
+                                                                </button>
+                                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $admin->id }}">
+                                                    
+                                                                    <a class="dropdown-item" href="{{ route('admin.add-fund.index', $admin->id) }}">
+                                                                        <i class="fas fa-plus mr-1"></i> Добавить средства
+                                                                    </a>
+                                                    
+                                                                    <a class="dropdown-item" href="{{ route('admin.withdraw-fund.index', $admin->id) }}">
+                                                                        <i class="fas fa-wallet mr-1"></i> Вывести средства
+                                                                    </a>
+                                                    
+                                                                    @if ($admin->email_verified_at == null)
+                                                                        <button class="dropdown-item verify-email-btn" data-id="{{ $admin->id }}">
+                                                                            <i class="fas fa-check-circle mt-1 mr-1 text-success"></i> 
+                                                                            <span>
+                                                                                Подтвердить email
+                                                                            </span>
+                                                                        </button>
+                                                                    @endif
+                                                    
+                                                                    <button class="dropdown-item send-reset-link-btn" data-id="{{ $admin->id }}">
+                                                                        <i class="fas fa-key mt-1 mr-1 text-warning"></i>
+                                                                        <span>
+                                                                            Сбросить пароль
+                                                                        </span>
+                                                                    </button>
+
+                                                                    @if ($admin->id != 1)
+                                                                    <a class="dropdown-item text-danger delete-item" href="{{ route('admin.admin-list.destroy', $admin->id) }}">
+                                                                        <i class="far fa-trash-alt mr-1"></i> Удалить
+                                                                    </a>
+                                                                @endif
+
+                                                                </div>
                                                             </div>
-                                                        </div>                                                            
                                                         @endif
                                                     </td>
+                                                    
                                                 </tr>                                                  
                                                 @endforeach
                                             </tbody>
@@ -155,7 +186,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="emailEditModalLabel">Edit Email</h5>
+                    <h5 class="modal-title" id="emailEditModalLabel">Редактировать электронную почту</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -165,13 +196,13 @@
                         @csrf
                         <input type="hidden" name="admin_id" id="admin_id">
                         <div class="form-group">
-                            <label for="admin_email">Email address</label>
+                            <label for="admin_email">Адрес электронной почты</label>
                             <input type="email" class="form-control" id="admin_email" name="email" required>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
                     </div>
                 </form>
             </div>
@@ -183,7 +214,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="profilesModalLabel">Profiles for <span id="userName"></span></h5>
+                    <h5 class="modal-title" id="profilesModalLabel">Профили для <span id="userName"></span></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -194,10 +225,10 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Phone</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
+                                    <th>Имя</th>
+                                    <th>Телефон</th>
+                                    <th>Статус</th>
+                                    <th>Действие</th>
                                 </tr>
                             </thead>
                             <tbody id="profilesTableBody">
@@ -215,7 +246,7 @@
 @endsection
 
 @push('scripts')
-    {{-- {{ $dataTable->scripts(attributes: ['type' => 'module']) }} --}}
+   
 
     <script>
         $(document).ready(function(){
@@ -263,7 +294,7 @@
                         email: newEmail
                     },
                     success: function(data){
-                        if(data.status === 'success'){
+                        if(data.status == 'success'){
                             toastr.success(data.message);
                             $('#emailEditModal').modal('hide');
                             // Optionally, refresh the page or update the email in the table
@@ -294,10 +325,14 @@
                 // This assumes you have an endpoint to get profiles by user ID
                 // For now, we'll use the profiles data already loaded with the user
                 let admin = {!! json_encode($admins->keyBy('id')->all()) !!}[userId];
+                let profileViewUrlTemplate = "{{ route('profiles.view', ['slug' => 'SLUG_PLACEHOLDER', 'id' => 'ID_PLACEHOLDER']) }}";
                 if(admin && admin.profiles && admin.profiles.length > 0){
                     admin.profiles.forEach(function(profile){
+                        let profileSpecificUrl = profileViewUrlTemplate
+                                                    .replace('SLUG_PLACEHOLDER', profile.slug)
+                                                    .replace('ID_PLACEHOLDER', profile.id);
                         let profileRow = `<tr>
-                            <td>${profile.id}</td>
+                            <td><a href="${profileSpecificUrl}" class="text-underlined">${profile.id}</a></td>
                             <td>${profile.name}</td>
                             <td>${profile.phone ? profile.phone : 'N/A'}</td>
                             <td>${profile.is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-warning">Inactive</span>'}</td>
@@ -313,6 +348,52 @@
                 }
 
                 $('#profilesModal').modal('show');
+            });
+
+            // Handle Verify Email button click
+            $('.verify-email-btn').on('click', function(){
+                let adminId = $(this).data('id');
+                $.ajax({
+                    url: "/admin/admins/" + adminId + "/verify-email",
+                    method: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                    },
+                    success: function(data){
+                        if(data.status == 'success'){
+                            toastr.success(data.message);
+                            location.reload(); 
+                        } else {
+                            toastr.error(data.message || 'An error occurred.');
+                        }
+                    },
+                    error: function(xhr, status, error){
+                        toastr.error('An error occurred: ' + error);
+                    }
+                });
+            });
+
+            // Handle Send Reset Link button click
+            $('.send-reset-link-btn').on('click', function(){
+                let adminId = $(this).data('id');
+                $.ajax({
+                    url: "/admin/admins/" + adminId + "/send-reset-link",
+                    method: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                    },
+                    success: function(data){
+                        if(data.status == 'success'){
+                            toastr.success(data.message);
+                        } else {
+                            toastr.error(data.message || 'An error occurred.');
+                        }
+                    },
+                    error: function(xhr, status, error){
+                        let response = xhr.responseJSON;
+                        toastr.error(response.message || 'An error occurred: ' + error);
+                    }
+                });
             });
         })
     </script>
