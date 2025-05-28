@@ -48,6 +48,11 @@ class SettingsController extends Controller
 
         $user = $request->user();
 
+        // Explicitly delete conversations before deleting the user
+        // This is a safeguard in case the database cascade doesn't work as expected
+        $user->conversations()->delete();
+        $user->adminConversations()->delete();
+
         Auth::logout();
 
         $user->delete();
