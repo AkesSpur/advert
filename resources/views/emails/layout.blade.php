@@ -35,7 +35,7 @@
         .email-footer {
             text-align: center;
             padding: 20px 0;
-            color: #8B8B8B;
+            color: white;
             font-size: 14px;
         }
         h1, h2, h3, h4, h5, h6 {

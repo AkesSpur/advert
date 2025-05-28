@@ -347,11 +347,11 @@
                             toastr.success(data.message);
                             location.reload(); 
                         } else {
-                            toastr.error(data.message || 'An error occurred.');
+                            toastr.error(data.message || 'Произошла ошибка.');
                         }
                     },
                     error: function(xhr, status, error){
-                        toastr.error('An error occurred: ' + error);
+                        toastr.error('Произошла ошибка: ' + error);
                     }
                 });
             });
@@ -367,14 +367,15 @@
                     },
                     success: function(data){
                         if(data.status == 'success'){
-                            toastr.success(data.message);
+                            let message = 'Ссылка для сброса пароля успешно отправлена';
+                            toastr.success(message);
                         } else {
-                            toastr.error(data.message || 'An error occurred.');
+                            toastr.error(data.message || 'Произошла ошибка.');
                         }
                     },
                     error: function(xhr, status, error){
                         let response = xhr.responseJSON;
-                        toastr.error(response.message || 'An error occurred: ' + error);
+                        toastr.error(response.message || 'Произошла ошибка: ' + error);
                     }
                 });
             });

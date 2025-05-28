@@ -93,26 +93,26 @@
                             @if (isset($profile->video->path))
                                 <!-- Video Thumbnail (shown first) -->
                                 <div class="h-full rounded-xl cursor-pointer mb-2" onclick="showVideo()">
-                                    <div class="relative w-full h-full">
-                                        <video
-                                            src="{{ asset('storage/' . $profile->video->path) }}"
-                                            class="w-full h-[150px] object-cover opacity-75 rounded-xl"
-                                            muted
-                                            autoplay
-                                            loop
-                                            playsinline
-                                        ></video>
-                                        <div class="absolute inset-0 flex items-center justify-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
+                                     <div class="relative w-full h-full">
+                                         <video
+                                             src="{{ asset('storage/' . $profile->video->path) }}"
+                                             class="w-full h-[150px] object-cover opacity-75 rounded-xl"
+                                             muted
+                                             autoplay
+                                             loop
+                                             playsinline
+                                         ></video>
+                                         <div class="absolute inset-0 flex items-center justify-center">
+                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none"
+                                                 viewBox="0 0 24 24" stroke="currentColor">
+                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                     d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                     d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                             </svg>
+                                         </div>
+                                     </div>
+                                 </div>
                                 
                             @endif
 
@@ -160,7 +160,8 @@
                                     <!-- Images (in carousel) -->
                                     @foreach ($profile->images as $image)
                                         <div
-                                            class="carousel-slide absolute inset-0 opacity-100 transition-opacity rounded-xl duration-300 flex items-center justify-center bg-black">
+                                            class="carousel-slide absolute inset-0 opacity-100 transition-opacity rounded-xl duration-300 flex items-center justify-center bg-black"
+                                            onclick="openFullscreenImage('{{ asset('storage/' . $image->path) }}', {{ $loop->index }})">
                                             <img src="{{ asset('storage/' . $image->path) }}" alt="Image {{$slide}}"
                                                 class="w-auto rounded-xl h-full object-contain max-w-full"
                                                 loading="{{ $slide == 1 ? 'eager' : 'lazy' }}"> {{-- Load the first image eagerly, others lazily --}}
@@ -172,12 +173,13 @@
 
                                     @if (isset($profile->video->path))
                                         <!-- Video (hidden by default, initially muted) -->
-                                        <div class="video-slide absolute inset-0 opacity-0 transition-opacity duration-300 flex items-center justify-center bg-black">
-                                            <video class="w-auto h-full object-contain max-w-full" controls muted>
-                                                <source src="{{asset('storage/' . $profile->video->path)}}" type="video/mp4">
-                                                Your browser does not support the video tag.
-                                            </video>
-                                        </div>
+                                     <div class="video-slide absolute inset-0 opacity-0 transition-opacity duration-300 flex items-center justify-center bg-black pointer-events-none"
+                                         ondblclick="openVideoFullscreen(this.querySelector('video'))">
+                                         <video class="w-auto h-full object-contain max-w-full vidss" controls muted>
+                                             <source src="{{asset('storage/' . $profile->video->path)}}" type="video/mp4">
+                                             Your browser does not support the video tag.
+                                         </video>
+                                     </div>
                                     @endif
                                 </div>
 
@@ -812,7 +814,7 @@
                     video.muted = true; // Ensure video is muted when not active
                 }
                 videoSlide.classList.remove('opacity-100');
-                videoSlide.classList.add('opacity-0');
+                videoSlide.classList.add('opacity-0', 'pointer-events-none');
             @endif
 
           
@@ -822,6 +824,12 @@
                 slides[index].classList.remove('opacity-0');
                 slides[index].classList.add('opacity-100');
                 currentSlide = index;
+            }
+
+            // Remove pointer-events-none from active video slide
+            const activeVideoSlide = document.querySelector('.video-slide.opacity-100');
+            if (activeVideoSlide) {
+                activeVideoSlide.classList.remove('pointer-events-none');
             }
 
             // Update mobile indicators
@@ -1077,10 +1085,26 @@
             
             // Also update the main carousel
             showSlide(newSlide);
+
+            // Pause and reset video if it's not the current slide
+            const videoSlide = document.querySelector('.video-slide');
+            if (videoSlide && videoSlide.classList.contains('opacity-100') && newSlide != document.querySelectorAll('.carousel-slide').length - 1) {
+                const video = videoSlide.querySelector('video');
+                if (video) {
+                    video.pause();
+                    video.currentTime = 0;
+                }
+            }
         }
 
         // Open video in fullscreen
         function openVideoFullscreen(videoElement) {
+            // Ensure the video in the carousel is paused and reset when opening fullscreen
+            const carouselVideo = document.querySelector('.vidss');
+            if (carouselVideo) {
+                carouselVideo.pause();
+                carouselVideo.currentTime = 0;
+            }
             const fullscreenOverlay = document.createElement('div');
             fullscreenOverlay.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center';
 
@@ -1119,10 +1143,12 @@
                     document.body.removeChild(fullscreenOverlay);
                 }
             };
+            
 
             document.body.appendChild(fullscreenOverlay);
         }
-    </script>
+
+</script>
     <!-- Tab Functionality Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {

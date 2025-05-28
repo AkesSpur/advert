@@ -14,7 +14,7 @@
             -webkit-text-size-adjust: none;
             text-size-adjust: none;
             -webkit-font-smoothing: antialiased;
-            color: #ffffff;
+            color: white !important;
         }
         .email-wrapper {
             max-width: 600px;
@@ -45,7 +45,7 @@
             justify-content: center;
         }
         .email-hero-text {
-            color: #ffffff;
+            color: white;
             font-size: 28px;
             font-weight: 600;
             text-align: center;
@@ -60,12 +60,12 @@
         .email-footer {
             text-align: center;
             padding: 20px;
-            color: #8B8B8B;
+            color: white;
             font-size: 14px;
             background-color: #121212;
         }
         h1, h2, h3, h4, h5, h6 {
-            color: #ffffff;
+            color: white;
             margin-top: 0;
         }
         p {
@@ -79,7 +79,7 @@
         .btn {
             display: inline-block;
             background-color: #6340FF;
-            color: #ffffff !important;
+            color: white !important;
             padding: 12px 24px;
             border-radius: 8px;
             text-decoration: none;
