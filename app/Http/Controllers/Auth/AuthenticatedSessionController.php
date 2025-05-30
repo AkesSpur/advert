@@ -28,6 +28,9 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Update last_active timestamp on successful login
+        $request->user()->updateLastActive();
+
         if($request->user()->status == 'inactive'){
             Auth::guard('web')->logout();
 

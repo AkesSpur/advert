@@ -68,7 +68,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function updateLastActive(): void
     {
-        $this->last_active = Carbon::now();
+        $this->last_active = now();
         $this->save();
     }
 
