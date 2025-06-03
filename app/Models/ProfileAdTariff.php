@@ -117,8 +117,21 @@ class ProfileAdTariff extends Model
         $this->is_paused = true;
         $this->save();
         
-        // Update the profile's is_active status
-        $this->profile->update(['is_active' => false]);
+                // Check if the profile has any other active tariffs before setting is_active to false
+                $hasOtherActiveTariffs = $this->profile->activeAds()
+                ->where('id', '!=', $this->id)
+                ->where('is_active', true)
+                ->where('is_paused', false)
+                ->where('queue_position', '==', 0)
+                ->exists();
+                
+            if (!$hasOtherActiveTariffs) {
+                // Only update the profile's is_active status if there are no other active tariffs
+                $this->profile->update(['is_active' => false]);
+            } else {
+                // Ensure profile is_active is true if it has other active tariffs
+                $this->profile->update(['is_active' => true]);
+            }
     }
 
     /**

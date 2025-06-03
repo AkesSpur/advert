@@ -57,6 +57,12 @@
                 </a>
               </li>
               <li class="nav-item">
+                <a href="{{ route('admin.profiles.index', ['filter' => 'vip']) }}" class="nav-link {{ request('filter') == 'vip' ? 'active' : '' }}">
+                  VIP Анкеты <span class="badge badge-white">{{ $counts['vip'] }}</span>
+                </a>
+              </li>
+
+              <li class="nav-item">
                 <a href="{{ route('admin.profiles.index', ['filter' => 'disabled']) }}" class="nav-link {{ request('filter') == 'disabled' ? 'active' : '' }}">
                     Не активный <span class="badge badge-white">{{ $counts['disabled'] }}</span>
                 </a>

@@ -89,6 +89,9 @@
         <li class="{{ setActive(['admin.profiles.index', ['filter' => 'active']]) }}"><a class="nav-link"
                 href="{{ route('admin.profiles.index', ['filter' => 'active']) }}">Активные профили</a>
         </li>
+        <li class="{{ setActive(['admin.profiles.index', ['filter' => 'vip']]) }}"><a class="nav-link"
+                href="{{ route('admin.profiles.index', ['filter' => 'vip']) }}" class="nav-link {{ request('filter') == 'vip' ? 'active' : '' }}">VIP профили</a>
+        </li>
         <li class="{{ setActive(['admin.profiles.index', ['filter' => 'disabled']]) }}"><a class="nav-link"
                 href="{{ route('admin.profiles.index', ['filter' => 'disabled']) }}">Отключенные профили</a>
         </li>

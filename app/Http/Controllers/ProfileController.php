@@ -25,12 +25,6 @@ class ProfileController extends Controller
     {
         $profile = Profile::where("user_id", Auth::id())->findOrFail($id);
         
-        // Only inactive profiles can be archived
-        if ($profile->is_active) {
-            return redirect()->route('user.profiles.index')
-                ->with('error', 'Только неактивные анкеты могут быть архивированы.');
-        }        
-        
         $profile->is_archived = true;
         $profile->save();
         
@@ -118,7 +112,6 @@ class ProfileController extends Controller
     public function index(Request $request)
     {
         $profiles = Profile::where("user_id", Auth::id())
-            ->where("is_archived", false)
             ->with(['primaryImage', 'services', 'metroStations', 'neighborhoods', 'tariffs'])
             ->withCount('tariffs')
             ->orderBY('created_at', 'desc')

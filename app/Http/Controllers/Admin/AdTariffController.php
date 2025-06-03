@@ -73,7 +73,7 @@ class AdTariffController extends Controller
                           ->orWhere('is_paused', true);
                 })
                 ->each(function ($profileAdTariff) use ($validatedData) {
-                    $newDailyCharge = $profileAdTariff->priority_level * $validatedData['base_price'] + $validatedData['base_price'];
+                    $newDailyCharge = $profileAdTariff->priority_level * $validatedData['base_price'];
                     $profileAdTariff->update(['daily_charge' => $newDailyCharge]);
                 });
         }

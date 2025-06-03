@@ -81,19 +81,25 @@
                         class="h-12 w-auto object-contain"
                         loading="lazy">
                     </a>
-                    <div class="flex items-center gap-4">
+                    <div class="block md:flex  items-center gap-4">
+
                         <div class="text-white">
+                            <div class="text-end ">Привет, {{Auth::user()->name}}  </div>
+                        </div>
+                        <div class="flex items-center gap-4 text-white">
                             <span>Баланс: </span>
                             <span class="font-medium">{{Auth::user()->balance}} ₽</span>
                             <a href="#" id="topUpBalance" class="text-white underline ml-2 text-sm">Пополнить</a>
+
+                            @if(Auth::user()->role == 'admin')
+                            <a href="{{ route('admin.dashboard') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 0s18 0z" />
+                                </svg>
+                            </a>
+                            @endif
+    
                         </div>
-                        @if(Auth::user()->role == 'admin')
-                        <a href="{{ route('admin.dashboard') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
-                                <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                            </svg>
-                        </a>
-                        @endif
                     </div>
                 </div>
             </header>
@@ -288,7 +294,7 @@
                             {{-- <form id="pay" action="https://merchant.webmoney.com/lmi/payment.asp" method="POST" accept-charset="windows-1251"> --}}
                                 @csrf
                                 <div class="mb-4">
-                                    <label for="amount" class="block text-sm font-medium text-gray-300">Сумма пополнения (₽)</label>
+                                    <label for="amount" class="block text-sm font-medium text-gray-300">Сумма пополнения (WMZ)</label>
                                     <input type="number" name="amount" id="amount" class="w-full px-3 py-2 mt-1 text-gray-300 bg-[#2a2a2a] border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required min="1" placeholder="Введите сумму">
                                 </div>
                                 <input type="hidden" name="LMI_PAYMENT_NO" value="{{ time() }}_{{ Auth::id() }}">

@@ -35,6 +35,8 @@ class ProfileController extends Controller
                 $query->has('tariffs');
             } elseif ($filter == 'deleted') {
                 $query->onlyTrashed();
+            } elseif ($filter == 'vip') {
+                $query->where('is_vip', true);
             }
         }
 
@@ -62,9 +64,12 @@ class ProfileController extends Controller
             'disabled' => Profile::where('is_active', false)->count(),
             'with_tariffs' => Profile::has('tariffs')->count(),
             'deleted' => Profile::onlyTrashed()->count(),
+            'vip' => Profile::where('is_vip', true)->count(),
         ];
 
-        return view('admin.profiles.index', compact('profiles', 'counts'));
+        $vipProfiles = Profile::where('is_vip', true)->orderBy('created_at', 'desc')->get();
+
+        return view('admin.profiles.index', compact('profiles', 'counts', 'vipProfiles'));
     }
 
     /**

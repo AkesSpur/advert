@@ -2,7 +2,7 @@
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
         <h1 class="text-2xl font-bold">Рекламные тарифы</h1>
         <div class="mt-3 sm:mt-0">
-            <a href="#" class="inline-flex items-center px-4 py-2 bg-[#191919] hover:bg-[#252525] text-white rounded-md transition">
+            <a href="{{route('user.transaction.index')}}" class="inline-flex items-center px-4 py-2 bg-[#191919] hover:bg-[#252525] text-white rounded-md transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -165,7 +165,7 @@
                                     >
                                         <span x-text="priorityLevel" class="text-white font-bold text-lg min-w-[30px] text-center"></span>
                                     </div>
-                                    <p class="text-xs text-[#C2C2C2] mt-1">Стоимость: <span x-text="{{$priorityPrice}} + parseInt(priorityLevel*{{$priorityPrice}}) + ' ₽/день'"></span></p>
+                                    <p class="text-xs text-[#C2C2C2] mt-1">Стоимость: <span x-text=" parseInt(priorityLevel*{{$priorityPrice}}) + ' ₽/день'"></span></p>
                                 </div>
                                 
                                 <div class="space-y-3 max-h-[300px] overflow-y-auto custom-scrollbar mt-4">
@@ -499,7 +499,7 @@
                                                 </div>
                                             
                                                 <p class="text-xs text-[#C2C2C2] mt-1">
-                                                    Стоимость: <span x-text="{{$priorityPrice}} + parseInt(priorityLevel*{{$priorityPrice}}) + ' ₽/день'"></span>
+                                                    Стоимость: <span x-text=" parseInt(priorityLevel*{{$priorityPrice}}) + ' ₽/день'"></span>
                                                 </p>
                                             </div>
                                             

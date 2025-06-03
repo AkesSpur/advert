@@ -41,153 +41,152 @@
       </thead>
       <tbody>
         @foreach ($profiles as $profile)
-
-      <tr class="border-b border-gray-800">
-      <!-- Profile cell -->
-      <td class="p-4 align-top">
-        <div class="flex items-center">
-        <div class="w-12 h-12 rounded-full overflow-hidden mr-3 bg-gray-800">
-        <img src="{{ asset('storage/' . $profile->primaryImage->path) }}" alt="Profile"
-        class="w-full h-full object-cover">
-        </div>
-        <div>
-        <div class="flex items-center gap-2">
-        <span class="font-medium text-white capitalize">{{$profile->name}}, {{$profile->age}}</span>
-        @if ($profile->is_active)
-      <span class="text-xs bg-[#5FD013] text-black px-2 py-0.5 rounded-md">Активна</span>
-    @else
-    <span class="text-xs bg-[#49494999] text-white px-2 py-0.5 rounded-md">Неактивна</span>
-  @endif
-        </div>
-        <div class="text-xs text-gray-400">Анкета добавлена {{$profile->created_at->format('d.m.Y')}}</div>
-        </div>
-        </div>
-      </td>
-
-                <!-- Location cell -->
-                <td class="p-4 text-sm text-[#C2C2C2] align-top">
-                  <div class="flex items-center mb-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
-                      <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099" font-family="Arial, sans-serif">M</text>
-                    </svg>
-                    @foreach ($profile->neighborhoods->take(2) as $key => $neighborhood)
-                      {{ $neighborhood->name}}
-                      @if ($key < 1 && count($profile->neighborhoods) > 1 )
-                        ,
-                      @endif
-                    @endforeach
-                    @if (count($profile->neighborhoods) > 2 && count($profile->neighborhoods->take(2)) < count($profile->neighborhoods))
-                      ...
-                    @endif
-                  </div>
-                  <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
-                      <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099" font-family="Arial, sans-serif">M</text>
-                    </svg>
-                    @foreach ($profile->metroStations->take(2) as $key => $metroStation)
-                      м. {{ $metroStation->name }}
-                      @if ($key < 1 && count($profile->metroStations) > 1 )
-                        ,
-                      @endif
-                    @endforeach
-                    @if (count($profile->metroStations) > 2 && count($profile->metroStations->take(2)) < count($profile->metroStations))
-                      ...
-                    @endif
-                  </div>
-                </td>
-
-      <!-- Views cell -->
-      <td class="p-4 text-sm text-[#C2C2C2] text-center align-top">
-        {{$profile->views_count}}
-      </td>
-
-      <!-- Clicks cell -->
-      <td class="p-4 text-sm text-[#C2C2C2] text-center align-top">
-        {{$profile->clicks_count}}
-      </td>
-      
-
-      <!-- Actions cell -->
-      <td class="p-4 align-top">
-        <div class="flex items-center justify-end space-x-3">
-          @if ($profile->is_vip)
-          <a  href="{{route('user.advert.index')}}" class="px-2 py-1 text-sm text-gray-400">
-            Премиум
-          </a>
-          @else          
-          <a  href="{{route('user.advert.index')}}" class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs">
-            Рекламировать
-          </a>
-          @endif
+        @if (!$profile->is_archived)
+        <tr class="border-b border-gray-800">
+          <!-- Profile cell -->
+          <td class="p-4 align-top">
+            <div class="flex items-center">
+            <div class="w-12 h-12 rounded-full overflow-hidden mr-3 bg-gray-800">
+            <img src="{{ asset('storage/' . $profile->primaryImage->path) }}" alt="Profile"
+            class="w-full h-full object-cover">
+            </div>
+            <div>
+            <div class="flex items-center gap-2">
+            <span class="font-medium text-white capitalize">{{$profile->name}}, {{$profile->age}}</span>
+            @if ($profile->is_active)
+          <span class="text-xs bg-[#5FD013] text-black px-2 py-0.5 rounded-md">Активна</span>
+        @else
+        <span class="text-xs bg-[#49494999] text-white px-2 py-0.5 rounded-md">Неактивна</span>
+      @endif
+            </div>
+            <div class="text-xs text-gray-400">Анкета добавлена {{$profile->created_at->format('d.m.Y')}}</div>
+            </div>
+            </div>
+          </td>
+    
+                    <!-- Location cell -->
+                    <td class="p-4 text-sm text-[#C2C2C2] align-top">
+                      <div class="flex items-center mb-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
+                          <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099" font-family="Arial, sans-serif">M</text>
+                        </svg>
+                        @foreach ($profile->neighborhoods->take(2) as $key => $neighborhood)
+                          {{ $neighborhood->name}}
+                          @if ($key < 1 && count($profile->neighborhoods) > 1 )
+                            ,
+                          @endif
+                        @endforeach
+                        @if (count($profile->neighborhoods) > 2 && count($profile->neighborhoods->take(2)) < count($profile->neighborhoods))
+                          ...
+                        @endif
+                      </div>
+                      <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
+                          <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099" font-family="Arial, sans-serif">M</text>
+                        </svg>
+                        @foreach ($profile->metroStations->take(2) as $key => $metroStation)
+                          м. {{ $metroStation->name }}
+                          @if ($key < 1 && count($profile->metroStations) > 1 )
+                            ,
+                          @endif
+                        @endforeach
+                        @if (count($profile->metroStations) > 2 && count($profile->metroStations->take(2)) < count($profile->metroStations))
+                          ...
+                        @endif
+                      </div>
+                    </td>
+    
+          <!-- Views cell -->
+          <td class="p-4 text-sm text-[#C2C2C2] text-center align-top">
+            {{$profile->views_count}}
+          </td>
+    
+          <!-- Clicks cell -->
+          <td class="p-4 text-sm text-[#C2C2C2] text-center align-top">
+            {{$profile->clicks_count}}
+          </td>
           
-          <button onclick="document.getElementById('adStatsModal-{{ $profile->id }}').classList.remove('hidden')" class="text-[#C2C2C2] hover:text-white p-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </button>
-          <!-- Dropdown menu -->
-          <div x-data="{ open: false }">
-            <button @click="open = !open" class="text-[#C2C2C2] hover:text-white">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-              </svg>
-            </button>
-            <div x-show="open" x-transition @click.away="open = false" class="absolute right-0 mt-2 mr-8 w-48 bg-[#191919] rounded-md shadow-lg z-50" style="z-index: 9999;">
-              <div class="py-1">
-                <a href="{{route('user.profiles.edit', $profile->id)}}" class="block px-4 py-2 text-sm text-[#C2C2C2] hover:bg-gray-800 hover:text-white">
-                  Редактировать
-                </a>
-                
-                @php
-                  $verification = \App\Models\VerificationPhoto::where('profile_id', $profile->id)->first();
-                @endphp
-                
-                @if (!$profile->is_verified)
-                  @if(isset($verification) && $verification->status === 'rejected')
-                  <a href="{{route('user.profiles.verification.reapply', $profile->id)}}" class="block px-4 py-2 text-sm text-red-500 hover:bg-gray-800 hover:text-white">
-                    Повторная верификация
-                  </a>
-                  @else
-                  <a href="{{route('user.profiles.verification.form', $profile->id)}}" class="block px-4 py-2 text-sm text-[#C2C2C2] hover:bg-gray-800 hover:text-white">
-                    Верифицировать фото
-                  </a>
-                  @endif
-                @else
-                <span class="block px-4 py-2 text-sm text-green-500">
-                  Фото верифицировано ✓
-                </span>
-                @endif
-                
-                @if (!$profile->is_active)
-                <a href="{{ route('user.profiles.archive', $profile->id) }}" class="block px-4 py-2 text-sm text-[#C2C2C2] hover:bg-gray-800 hover:text-white">
-                  Архивировать
-                </a>
-                @endif
-                
-                <form action="{{ route('user.profiles.destroy', $profile->id) }}" method="POST" class="block"
-                  x-data="{}"
-                  @submit.prevent="if (confirm('Вы уверены, что хотите удалить этот профиль?')) $el.submit();">
-                  @csrf
-                  @method('DELETE')
-                  <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-800 hover:text-red-400">
-                    Удалить
-                  </button>
-                </form>
+    
+          <!-- Actions cell -->
+          <td class="p-4 align-top">
+            <div class="flex items-center justify-end space-x-3">
+              @if ($profile->is_vip)
+              <a  href="{{route('user.advert.index')}}" class="px-2 py-1 text-sm text-gray-400">
+                Премиум
+              </a>
+              @else          
+              <a  href="{{route('user.advert.index')}}" class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs">
+                Рекламировать
+              </a>
+              @endif
+              
+              <button onclick="document.getElementById('adStatsModal-{{ $profile->id }}').classList.remove('hidden')" class="text-[#C2C2C2] hover:text-white p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </button>
+              <!-- Dropdown menu -->
+              <div x-data="{ open: false }">
+                <button @click="open = !open" class="text-[#C2C2C2] hover:text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                  </svg>
+                </button>
+                <div x-show="open" x-transition @click.away="open = false" class="absolute right-0 mt-2 mr-8 w-48 bg-[#191919] rounded-md shadow-lg z-50" style="z-index: 9999;">
+                  <div class="py-1">
+                    <a href="{{route('user.profiles.edit', $profile->id)}}" class="block px-4 py-2 text-sm text-[#C2C2C2] hover:bg-gray-800 hover:text-white">
+                      Редактировать
+                    </a>
+                    
+                    @php
+                      $verification = \App\Models\VerificationPhoto::where('profile_id', $profile->id)->first();
+                    @endphp
+                    
+                    @if (!$profile->is_verified)
+                      @if(isset($verification) && $verification->status === 'rejected')
+                      <a href="{{route('user.profiles.verification.reapply', $profile->id)}}" class="block px-4 py-2 text-sm text-red-500 hover:bg-gray-800 hover:text-white">
+                        Повторная верификация
+                      </a>
+                      @else
+                      <a href="{{route('user.profiles.verification.form', $profile->id)}}" class="block px-4 py-2 text-sm text-[#C2C2C2] hover:bg-gray-800 hover:text-white">
+                        Верифицировать фото
+                      </a>
+                      @endif
+                    @else
+                    <span class="block px-4 py-2 text-sm text-green-500">
+                      Фото верифицировано ✓
+                    </span>
+                    @endif
+                    
+                    <a href="{{ route('user.profiles.archive', $profile->id) }}" class="block px-4 py-2 text-sm text-[#C2C2C2] hover:bg-gray-800 hover:text-white">
+                      Архивировать
+                    </a>
+                    
+                    <form action="{{ route('user.profiles.destroy', $profile->id) }}" method="POST" class="block"
+                      x-data="{}"
+                      @submit.prevent="if (confirm('Вы уверены, что хотите удалить этот профиль?')) $el.submit();">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-800 hover:text-red-400">
+                        Удалить
+                      </button>
+                    </form>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </td>
-      </tr>
+          </td>
+          </tr>              
+        @endif
 
     @endforeach
       </tbody>
       </table>
 
       <!-- Archived Profiles Section -->
-      @if(count($archivedProfiles) > 0)
+      @if($archivedCount > 0)
       <div  x-data="{ showArchive: false }" class="mt-5"> 
         <a href="#" 
      @click.prevent="showArchive = !showArchive" 
@@ -210,88 +209,155 @@
               <th class="w-1/3 p-4 text-sm text-white text-left">Локация</th>
               <th class="w-1/6 p-4 text-sm text-white text-center">Просмотры</th>
               <th class="w-1/6 p-4 text-sm text-white text-center">Клики</th>
-              <th class="w-1/6 p-4 text-sm text-white text-left">Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach ($archivedProfiles as $profile)
+              <th class="w-1/6 p-4 text-sm text-white text-left">Реклама</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach ($profiles as $profile)
+              @if ($profile->is_archived)
               <tr class="border-b border-gray-800 opacity-70 hover:opacity-100 transition-opacity">
                 <!-- Profile cell -->
                 <td class="p-4 align-top">
                   <div class="flex items-center">
-                    <div class="w-12 h-12 rounded-full overflow-hidden mr-3 bg-gray-800">
-                      <img src="{{ asset('storage/' . $profile->primaryImage->path) }}" alt="Profile" class="w-full h-full object-cover">
-                    </div>
-                    <div>
-                      <div class="flex items-center gap-2">
-                        <span class="font-medium text-white capitalize">{{$profile->name}}, {{$profile->age}}</span>
-                        <span class="text-xs bg-gray-700 text-white px-2 py-0.5 rounded-md">Архив</span>
-                      </div>
-                    </div>
+                  <div class="w-12 h-12 rounded-full overflow-hidden mr-3 bg-gray-800">
+                  <img src="{{ asset('storage/' . $profile->primaryImage->path) }}" alt="Profile"
+                  class="w-full h-full object-cover">
+                  </div>
+                  <div>
+                  <div class="flex items-center gap-2">
+                  <span class="font-medium text-white capitalize">{{$profile->name}}, {{$profile->age}}</span>
+                  @if ($profile->is_active)
+                <span class="text-xs bg-[#5FD013] text-black px-2 py-0.5 rounded-md">Активна</span>
+              @else
+              <span class="text-xs bg-[#49494999] text-white px-2 py-0.5 rounded-md">Неактивна</span>
+            @endif
+                  </div>
+                  <div class="text-xs text-gray-400">Анкета добавлена {{$profile->created_at->format('d.m.Y')}}</div>
+                  </div>
                   </div>
                 </td>
-
-                <!-- Location cell -->
-                <td class="p-4 text-sm text-[#C2C2C2] align-top">
-                  <div class="flex items-center mb-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
-                      <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099" font-family="Arial, sans-serif">M</text>
-                    </svg>
-                    @foreach ($profile->neighborhoods->take(2) as $key => $neighborhood)
-                      {{ $neighborhood->name}}
-                      @if ($key < 1 && count($profile->neighborhoods) > 1 && count($profile->neighborhoods) <= 2)
-                        ,
-                      @elseif ($key < 1 && count($profile->neighborhoods) > 2)
-                        ...
-                      @endif
-                    @endforeach
-                    @if (count($profile->neighborhoods) > 2 && count($profile->neighborhoods->take(2)) < count($profile->neighborhoods))
-                      ...
-                    @endif
-                  </div>
-                  <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
-                      <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099" font-family="Arial, sans-serif">M</text>
-                    </svg>
-                    @foreach ($profile->metroStations->take(2) as $key => $metroStation)
-                      м. {{ $metroStation->name }}
-                      @if ($key < 1 && count($profile->metroStations) > 1 && count($profile->metroStations) <= 2)
-                        ,
-                      @elseif ($key < 1 && count($profile->metroStations) > 2)
-                        ...
-                      @endif
-                    @endforeach
-                    @if (count($profile->metroStations) > 2 && count($profile->metroStations->take(2)) < count($profile->metroStations))
-                      ...
-                    @endif
-                  </div>
-                </td>
-
+          
+                          <!-- Location cell -->
+                          <td class="p-4 text-sm text-[#C2C2C2] align-top">
+                            <div class="flex items-center mb-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
+                                <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099" font-family="Arial, sans-serif">M</text>
+                              </svg>
+                              @foreach ($profile->neighborhoods->take(2) as $key => $neighborhood)
+                                {{ $neighborhood->name}}
+                                @if ($key < 1 && count($profile->neighborhoods) > 1 )
+                                  ,
+                                @endif
+                              @endforeach
+                              @if (count($profile->neighborhoods) > 2 && count($profile->neighborhoods->take(2)) < count($profile->neighborhoods))
+                                ...
+                              @endif
+                            </div>
+                            <div class="flex items-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
+                                <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099" font-family="Arial, sans-serif">M</text>
+                              </svg>
+                              @foreach ($profile->metroStations->take(2) as $key => $metroStation)
+                                м. {{ $metroStation->name }}
+                                @if ($key < 1 && count($profile->metroStations) > 1 )
+                                  ,
+                                @endif
+                              @endforeach
+                              @if (count($profile->metroStations) > 2 && count($profile->metroStations->take(2)) < count($profile->metroStations))
+                                ...
+                              @endif
+                            </div>
+                          </td>
+          
                 <!-- Views cell -->
                 <td class="p-4 text-sm text-[#C2C2C2] text-center align-top">
                   {{$profile->views_count}}
                 </td>
-
+          
                 <!-- Clicks cell -->
                 <td class="p-4 text-sm text-[#C2C2C2] text-center align-top">
                   {{$profile->clicks_count}}
                 </td>
-
+                
+          
                 <!-- Actions cell -->
                 <td class="p-4 align-top">
                   <div class="flex items-center justify-end space-x-3">
-                    <form action="{{ route('user.profiles.restore', $profile->id) }}" method="POST">
-                      @csrf
-                      <button type="submit" class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs">
-                        Восстановить
+                    @if ($profile->is_vip)
+                    <a  href="{{route('user.advert.index')}}" class="px-2 py-1 text-sm text-gray-400">
+                      Премиум
+                    </a>
+                    @else          
+                    <a  href="{{route('user.advert.index')}}" class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs">
+                      Рекламировать
+                    </a>
+                    @endif
+                    
+                    <button onclick="document.getElementById('adStatsModal-{{ $profile->id }}').classList.remove('hidden')" class="text-[#C2C2C2] hover:text-white p-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                    </button>
+                    <!-- Dropdown menu -->
+                    <div x-data="{ open: false }">
+                      <button @click="open = !open" class="text-[#C2C2C2] hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                        </svg>
                       </button>
-                    </form>
+                      <div x-show="open" x-transition @click.away="open = false" class="absolute right-0 mt-2 mr-8 w-48 bg-[#191919] rounded-md shadow-lg z-50" style="z-index: 9999;">
+                        <div class="py-1">
+                          <a href="{{route('user.profiles.edit', $profile->id)}}" class="block px-4 py-2 text-sm text-[#C2C2C2] hover:bg-gray-800 hover:text-white">
+                            Редактировать
+                          </a>
+                          
+                          @php
+                            $verification = \App\Models\VerificationPhoto::where('profile_id', $profile->id)->first();
+                          @endphp
+                          
+                          @if (!$profile->is_verified)
+                            @if(isset($verification) && $verification->status === 'rejected')
+                            <a href="{{route('user.profiles.verification.reapply', $profile->id)}}" class="block px-4 py-2 text-sm text-red-500 hover:bg-gray-800 hover:text-white">
+                              Повторная верификация
+                            </a>
+                            @else
+                            <a href="{{route('user.profiles.verification.form', $profile->id)}}" class="block px-4 py-2 text-sm text-[#C2C2C2] hover:bg-gray-800 hover:text-white">
+                              Верифицировать фото
+                            </a>
+                            @endif
+                          @else
+                          <span class="block px-4 py-2 text-sm text-green-500">
+                            Фото верифицировано ✓
+                          </span>
+                          @endif
+                          
+                            <form action="{{ route('user.profiles.restore', $profile->id) }}" method="POST">
+                              @csrf
+                              <button type="submit" class="block px-4 py-2 text-sm text-left text-[#C2C2C2] hover:bg-gray-800 hover:text-white w-full">
+                                Разархивировать
+                              </button>
+                            </form>        
+                          
+                          <form action="{{ route('user.profiles.destroy', $profile->id) }}" method="POST" class="block"
+                            x-data="{}"
+                            @submit.prevent="if (confirm('Вы уверены, что хотите удалить этот профиль?')) $el.submit();">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-800 hover:text-red-400">
+                              Удалить
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </td>
-              </tr>
-            @endforeach
+                </tr>              
+              @endif
+      
+          @endforeach
           </tbody>
         </table>
       </div>
@@ -463,14 +529,10 @@
     @endforeach
   @endif
 
-<!-- JavaScript for Modal Functionality -->
-
-
     <!-- Profiles list - Mobile -->
     <div class="lg:hidden space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-4">
-
     @foreach ($profiles as $profile)
-
+      @if (!$profile->is_archived)
     <div class="bg-[#191919] rounded-2xl overflow-hidden">
       <div class="p-5">
       <div class="flex items-start justify-between">
@@ -580,11 +642,9 @@
       Редактировать
       </a>
       
-      @if (!$profile->is_active)
       <a href="{{ route('user.profiles.archive', $profile->id) }}" class="block w-full py-3 text-[#C2C2C2] hover:text-white text-center">
         Архивировать анкету
       </a>
-      @endif
       
       <form action="{{ route('user.profiles.destroy', $profile->id) }}" method="POST" class="w-full" x-data="{}"
       @submit.prevent="if (confirm('Вы уверены, что хотите удалить этот профиль?')) $el.submit();">
@@ -597,13 +657,13 @@
       </div>
       </div>
     </div>
-
+      
+      @endif
     @endforeach
-
     </div>
 
     <!-- Archived Profiles Section - Mobile -->
-    @if(count($archivedProfiles) > 0)
+    @if($archivedCount > 0)
     <div  x-data="{ showArchive: false }" class="mt-5 lg:hidden"> 
       <a href="#" 
    @click.prevent="showArchive = !showArchive" 
@@ -620,73 +680,138 @@ x-transition:enter="transition-opacity duration-300"
     x-transition:leave-end="opacity-0"
 class="mt-8 lg:hidden">
       <div class="space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-4">
-        @foreach ($archivedProfiles as $profile)
-        <div class="bg-[#191919] rounded-2xl overflow-hidden opacity-70 hover:opacity-100 transition-opacity">
-          <div class="p-5">
-            <div class="flex items-start justify-between">
-              <div class="flex items-center">
-                <div class="w-16 h-16 rounded-full overflow-hidden mr-3 bg-gray-800">
-                  <img src="{{ asset('storage/' . $profile->primaryImage->path) }}" alt="Profile" class="w-full h-full object-cover">
-                </div>
-                <div>
-                  <div class="flex items-center gap-2">
-                    <span class="font-medium text-lg">{{$profile->name}}, {{$profile->age}}</span>
-                    <span class="text-xs bg-gray-700 text-white px-2 py-0.5 rounded-md">Архив</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-4 space-y-2 text-sm">
-              <div class="flex items-center text-[#C2C2C2]">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
-                  <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099" font-family="Arial, sans-serif">M</text>
-                </svg>
-                @foreach ($profile->neighborhoods as $key => $neighborhood)
-                <span>
-                  {{$neighborhood->name}}{{$key < count($profile->neighborhoods) - 1 ? ',' : '' ;}}
-                </span>
-                @endforeach
-              </div>
-              <div class="flex items-center text-[#C2C2C2]">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
-                  <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099" font-family="Arial, sans-serif">M</text>
-                </svg>
-                @foreach ($profile->metroStations as $key => $metroStation)
-                м. {{ $metroStation->name }}
-                @if ($key < count($profile->metroStations) - 1)
-                ,
-                @endif
-                @endforeach
-              </div>
-            </div>
-
-            <!-- Stats -->
-            <div class="text-center mt-5 pb-5 border-b border-gray-800">
-              <div class="flex justify-between mb-2">
-                <div class="text-white">Просмотры</div>
-                <div class="text-sm text-gray-400">{{$profile->views_count}}</div>
-              </div>
-              <div class="flex justify-between mb-2">
-                <div class="text-white">Клики</div>
-                <div class="text-sm text-gray-400">{{$profile->clicks_count}}</div>
-              </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="py-3">
-              <form action="{{ route('user.profiles.restore', $profile->id) }}" method="POST">
-                @csrf
-                <button type="submit" class="block w-full py-3 bg-[#6340FF] hover:bg-[#5737e7] rounded-xl text-white transition text-center">
-                  Восстановить
-                </button>
-              </form>
-            </div>
-          </div>
+        @foreach ($profiles as $profile)
+        @if ($profile->is_archived)
+      <div class="bg-[#191919] rounded-2xl overflow-hidden opacity-70 hover:opacity-100 transition-opacity">
+        <div class="p-5">
+        <div class="flex items-start justify-between">
+        <div class="flex items-center">
+        <div class="w-16 h-16 rounded-full overflow-hidden mr-3 bg-gray-800">
+          <img src="{{ asset('storage/' . $profile->primaryImage->path) }}" alt="Profile"
+          class="w-full h-full object-cover">
         </div>
-        @endforeach
+        <div>
+          <div class="flex items-center gap-2">
+          <span class="font-medium text-lg capitalize">{{$profile->name}}, {{$profile->age}}</span>
+          @if ($profile->is_active)
+        <span class="text-xs bg-[#5FD013] text-black px-2 py-0.5 rounded-md">Активна</span>
+      @else
+      <span class="text-xs bg-[#49494999] text-white px-2 py-0.5 rounded-md">Неактивна</span>
+    @endif
+          </div>
+          <div class="text-xs text-gray-400">Анкета добавлена {{$profile->created_at->format('d.m.Y')}}</div>
+        </div>
+        </div>
+        <!-- Ad Stats Button -->
+        <button onclick="document.getElementById('adStatsModal-{{ $profile->id }}').classList.remove('hidden')" class="text-[#C2C2C2] hover:text-white p-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </button>
+        </div>
+  
+        <div class="mt-4 space-y-2 text-sm">
+        <div class="flex items-center text-[#C2C2C2]">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
+          <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099"
+          font-family="Arial, sans-serif">M</text>
+        </svg>
+        @foreach ($profile->neighborhoods as $key => $neighborhood)
+       <span>
+        {{$neighborhood->name}}{{$key < count($profile->neighborhoods) - 1 ? ',' : '' ;}}
+       </span>
+      @endforeach
+        </div>
+        <div class="flex items-center text-[#C2C2C2]">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
+          <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099"
+          font-family="Arial, sans-serif">M</text>
+        </svg>
+        @foreach ($profile->metroStations as $key => $metroStation)
+        м. {{ $metroStation->name }}
+        @if ($key < count($profile->metroStations) - 1)
+        ,
+      @endif
+      @endforeach
+        </div>
+        </div>
+  
+        <!-- Stats -->
+        <div class="text-center mt-5 pb-5 border-b border-gray-800">
+        <div class="flex justify-between mb-2">
+        <div class="text-white">Просмотры</div>
+        <div class="text-sm text-gray-400">{{$profile->views_count}}</div>
+        </div>
+        <div class="flex justify-between mb-2">
+        <div class="text-white">Клики</div>
+        <div class="text-sm text-gray-400">{{$profile->clicks_count}}</div>
+        </div>
+        <div class="flex justify-between mb-2">
+        <div class="text-white">Реклама</div>
+        @if ($profile->is_vip)
+            <a href="{{route('user.advert.index')}}" class="text-sm text-gray-400">
+              Премиум
+            </a>
+            @else          
+            <a href="{{route('user.advert.index')}}" class="px-2 py-1 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded text-xs">
+              Рекламировать
+            </a>
+            @endif
+        </div>
+        </div>
+  
+  
+        <!-- Actions -->
+        <div class="">
+          @php
+          $verification = \App\Models\VerificationPhoto::where('profile_id', $profile->id)->first();
+        @endphp
+        <!-- Verification status/button -->
+        @if ($profile->is_verified)
+        <div class="w-full py-3 text-center text-green-500 mb-2">
+          <span>Фото верифицировано ✓</span>
+        </div>
+        @else
+        @if(isset($verification) && $verification->status === 'rejected')
+        <a href="{{route('user.profiles.verification.reapply', $profile->id)}}" class="block w-full py-3 transition hover:text-gray-400 text-red-500 mb-2 text-center">
+          Повторная верификация
+        </a>
+        @else
+        <a href="{{route('user.profiles.verification.form', $profile->id)}}"
+          class="block w-full py-3 transition hover:text-gray-400 text-white mb-2 text-center">
+            Верифицировать фото
+          </a>
+        @endif
+        @endif
+        
+        <a href="{{route('user.profiles.edit', $profile->id)}}"
+        class="block w-full py-3 bg-[#6340FF] hover:bg-[#5737e7] rounded-xl text-white transition text-center mb-2">
+        Редактировать
+        </a>
+        
+        <form action="{{ route('user.profiles.restore', $profile->id) }}" method="POST">
+          @csrf
+          <button type="submit" class="block w-full py-3 hover:text-gray-400 rounded-xl text-white transition text-center">
+            Разархивировать
+          </button>
+        </form>
+        
+        <form action="{{ route('user.profiles.destroy', $profile->id) }}" method="POST" class="w-full" x-data="{}"
+        @submit.prevent="if (confirm('Вы уверены, что хотите удалить этот профиль?')) $el.submit();">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="w-full py-3 text-red-500 hover:text-red-400">
+          Удалить анкету
+        </button>
+        </form>
+        </div>
+        </div>
+      </div> 
+        @endif
+      @endforeach
+
       </div>
     </div>
     @endif

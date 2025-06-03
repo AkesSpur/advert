@@ -153,7 +153,7 @@ class TariffController extends Controller
 
                 case 'priority':
                     $priorityLevel = $validated['priority_level'] ?? 1;
-                    $dailyCharge = ($tariff->base_price * $priorityLevel) + $tariff->base_price; // Базовая цена + уровень приоритета
+                    $dailyCharge = $tariff->base_price * $priorityLevel; // Базовая цена + уровень приоритета
 
                     // Проверяем, есть ли уже активный приоритетный тариф для этого профиля
                     $existingPriorityTariff = ProfileAdTariff::where('profile_id', $profile->id)
@@ -180,28 +180,34 @@ class TariffController extends Controller
 
                         // Создаем запись о списании (пропускаем для администратора)
                         if (!$isAdmin) {
-                            $priorityUser = USer::find($user->id);
 
-                            $priorityUser->balance -= $dailyCharge;
-                            $priorityUser->save();
-            
-                            AdTariffCharge::create([
-                                'profile_ad_tariff_id' => $existingPriorityTariff->id,
-                                'user_id' => $priorityUser->id,
-                                'amount' => $dailyCharge,
-                                'charged_at' => $now,
-                            ]);
+                            if($oldPriorityLevel < $priorityLevel)
+                            {
+                                $priorityUser = User::find($user->id);
 
-                            // Создаем транзакцию с подробным описанием
-                            $description = "Изменение уровня приоритета с {$oldPriorityLevel} на {$existingPriorityTariff->priority_level} для профиля ID№{$profile->id}";
-
-                            $priorityUser->transactions()->create([
-                                'amount' => -$dailyCharge,
-                                'type' => 'purchase',
-                                'status' => 'completed',
-                                'reference_id' => $tariff->slug . '_tariff_' . $existingPriorityTariff->id,
-                                'description' => $description,
-                            ]);
+                                $charge = $tariff->base_price * ($priorityLevel - $oldPriorityLevel);
+                                $priorityUser->balance -= $charge;
+                                $priorityUser->save();
+                
+                                AdTariffCharge::create([
+                                    'profile_ad_tariff_id' => $existingPriorityTariff->id,
+                                    'user_id' => $priorityUser->id,
+                                    'amount' => $charge,
+                                    'charged_at' => $now,
+                                ]);
+    
+                                // Создаем транзакцию с подробным описанием
+                                $description = "Изменение уровня приоритета с {$oldPriorityLevel} на {$existingPriorityTariff->priority_level} для профиля ID№{$profile->id}";
+    
+                                $priorityUser->transactions()->create([
+                                    'amount' => -$charge,
+                                    'type' => 'purchase',
+                                    'status' => 'completed',
+                                    'reference_id' => $tariff->slug . '_tariff_' . $existingPriorityTariff->id,
+                                    'description' => $description,
+                                ]);
+    
+                            }
                         } else {
                             // Для администратора просто логируем информацию без финансовых операций
                             info("Admin (ID: 1) activated {$tariff->slug} tariff for profile ID№{$profile->id} without charge.");

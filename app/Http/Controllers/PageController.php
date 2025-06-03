@@ -390,7 +390,8 @@ class PageController extends Controller
                     break;
             }
 
-                    }            // Fetch top 3 active VIPs separately
+                    }
+        // Fetch top 3 active VIPs separately
         $topVipsQuery = Profile::where('is_active', true)
             ->where('is_vip', true)
             ->whereHas('activeAds', function ($query) {
@@ -464,66 +465,87 @@ class PageController extends Controller
             $profilesQuery->orderByDesc('profiles.created_at');
         }
 
-        // Get the current page number.
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
-
-        // Get the main profiles, adjusting perPage if on the first page to account for top VIPs.
-        $adjustedPerPage = $perPage;
+        $vipCount = $topVips->count();
+        
+        $normalProfilesShownOnPage1 = max(0, min($perPage - $vipCount, $perPage));
+        $totalNormalProfiles = $profilesQuery->count();
+        $total = $totalNormalProfiles + $vipCount;
+        
         if ($currentPage == 1) {
-            $adjustedPerPage = max(0, $perPage - $topVips->count());
+            $adjustedPerPage = max(0, $perPage - $vipCount);
+            $skip = 0;
+        } else {
+            $skip = $normalProfilesShownOnPage1 + $perPage * ($currentPage - 2);
+            $adjustedPerPage = $perPage;
         }
-
-        $otherProfiles = collect();
-        if ($adjustedPerPage > 0) {
-            $otherProfiles = $profilesQuery->paginate($adjustedPerPage);
-        }
-
-        // Merge top VIPs with other profiles for the first page.
-        // For subsequent pages, only $otherProfiles are used.
-        $mergedProfiles = collect();
+        
+        $normalProfiles = $profilesQuery
+            ->skip($skip)
+            ->take($adjustedPerPage)
+            ->get();
+        
         if ($currentPage == 1) {
-            $mergedProfiles = $topVips->merge($otherProfiles->items());
-            // Create a new Paginator instance for the merged results
+            $mergedProfiles = $topVips->merge($normalProfiles);
             $profiles = new LengthAwarePaginator(
                 $mergedProfiles,
-                $otherProfiles->total() + $topVips->count(), // Total items including top VIPs
+                $total,
                 $perPage,
                 $currentPage,
                 ['path' => LengthAwarePaginator::resolveCurrentPath()]
             );
         } else {
-            // For pages other than the first, $otherProfiles is already paginated correctly
-            // but we need to adjust its pagination data to reflect the true total and current page context
             $profiles = new LengthAwarePaginator(
-                $otherProfiles->items(),
-                $otherProfiles->total() + $topVips->count(), // Total items including top VIPs
+                $normalProfiles,
+                $total,
                 $perPage,
                 $currentPage,
                 ['path' => LengthAwarePaginator::resolveCurrentPath()]
             );
         }
+        
 
+   // Increment view count for displayed profiles
+   if (!$request->ajax()) {
+       foreach ($profiles as $profile) {
+           if (method_exists($profile, 'incrementViewCount')) {
+               $profile->incrementViewCount();
+           } else {
+               $profile->increment('views_count');
+           }
+       }
+   }
 
-        // Increment view count for displayed profiles
-        if (!$request->ajax()) {
-            foreach ($profiles as $profile) {
-                if (method_exists($profile, 'incrementViewCount')) {
-                    $profile->incrementViewCount();
-                } else {
-                    $profile->increment('views_count');
-                }
-            }
-        }
+   if ($request->ajax()) {
+       if ($profiles->isEmpty() && $request->input('page', 1) > 1) {
+           return response()->json(['html' => '', 'has_more_pages' => false]);
+       }
+       return response()->json([
+           'html' => view('partials.profiles-list', compact('profiles'))->render(),
+           'has_more_pages' => $profiles->hasMorePages()
+       ]);
+   }
+   
+        // // Increment view count for displayed profiles
+        // if (!$request->ajax()) {
+        //     foreach ($profiles as $profile) {
+        //         if (method_exists($profile, 'incrementViewCount')) {
+        //             $profile->incrementViewCount();
+        //         } else {
+        //             $profile->increment('views_count');
+        //         }
+        //     }
+        // }
 
-        if ($request->ajax()) {
-            if ($profiles->isEmpty() && $request->input('page', 1) > 1) {
-                return response()->json(['html' => '', 'has_more_pages' => false]);
-            }
-            return response()->json([
-                'html' => view('partials.profiles-list', compact('profiles'))->render(),
-                'has_more_pages' => $profiles->hasMorePages()
-            ]);
-        }
+        // if ($request->ajax()) {
+        //     if ($profiles->isEmpty() && $request->input('page', 1) > 1) {
+        //         return response()->json(['html' => '', 'has_more_pages' => false]);
+        //     }
+        //     return response()->json([
+        //         'html' => view('partials.profiles-list', compact('profiles'))->render(),
+        //         'has_more_pages' => $profiles->hasMorePages()
+        //     ]);
+        // }
 
         // Sidebar: Services
         $services = Service::where('status', true)
@@ -826,37 +848,43 @@ class PageController extends Controller
         }
 
         // Get the current page number.
+
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
-
-        // Get the main profiles, adjusting perPage if on the first page to account for top VIPs.
-        $adjustedPerPage = $perPage;
+        $vipCount = $topVips->count();
+        
+        $normalProfilesShownOnPage1 = max(0, min($perPage - $vipCount, $perPage));
+        $totalNormalProfiles = $profilesQuery->count();
+        $total = $totalNormalProfiles + $vipCount;
+        
         if ($currentPage == 1) {
-            $adjustedPerPage = max(0, $perPage - $topVips->count());
+            $adjustedPerPage = max(0, $perPage - $vipCount);
+            $skip = 0;
+        } else {
+            $skip = $normalProfilesShownOnPage1 + $perPage * ($currentPage - 2);
+            $adjustedPerPage = $perPage;
         }
-
-        $otherProfiles = collect();
-        if ($adjustedPerPage > 0) {
-            $otherProfiles = $profilesQuery->paginate($adjustedPerPage);
-        }
-
-        // Merge top VIPs with other profiles for the first page.
-        $mergedProfiles = collect();
+        
+        $normalProfiles = $profilesQuery
+            ->skip($skip)
+            ->take($adjustedPerPage)
+            ->get();
+        
         if ($currentPage == 1) {
-            $mergedProfiles = $topVips->merge($otherProfiles->items());
+            $mergedProfiles = $topVips->merge($normalProfiles);
             $profiles = new LengthAwarePaginator(
                 $mergedProfiles,
-                $otherProfiles->total() + $topVips->count(),
+                $total,
                 $perPage,
                 $currentPage,
-                ['path' => LengthAwarePaginator::resolveCurrentPath(), 'query' => $request->query()]
+                ['path' => LengthAwarePaginator::resolveCurrentPath()]
             );
         } else {
             $profiles = new LengthAwarePaginator(
-                $otherProfiles->items(),
-                $otherProfiles->total() + $topVips->count(),
+                $normalProfiles,
+                $total,
                 $perPage,
                 $currentPage,
-                ['path' => LengthAwarePaginator::resolveCurrentPath(), 'query' => $request->query()]
+                ['path' => LengthAwarePaginator::resolveCurrentPath()]
             );
         }
 
