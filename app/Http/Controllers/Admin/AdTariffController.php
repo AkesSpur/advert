@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdTariff;
+use App\Models\ProfileAdTariff;
 use Illuminate\Http\Request;
 
 class AdTariffController extends Controller
@@ -53,6 +54,29 @@ class AdTariffController extends Controller
         
 
         $adTariff->update($validatedData);
+
+        // Update daily charges for associated profile ads if basic ad price changes
+        if ($adTariff->slug == 'basic' && isset($validatedData['base_price'])) {
+            ProfileAdTariff::where('ad_tariff_id', $adTariff->id)
+                ->where(function ($query) {
+                    $query->where('is_active', true)
+                          ->orWhere('is_paused', true);
+                })
+                ->update(['daily_charge' => $validatedData['base_price']]);
+        }
+
+        // Update daily charges for associated profile ads if priority price changes
+        if ($adTariff->slug == 'priority' && isset($validatedData['base_price'])) {
+            ProfileAdTariff::where('ad_tariff_id', $adTariff->id)
+                ->where(function ($query) {
+                    $query->where('is_active', true)
+                          ->orWhere('is_paused', true);
+                })
+                ->each(function ($profileAdTariff) use ($validatedData) {
+                    $newDailyCharge = $profileAdTariff->priority_level * $validatedData['base_price'] + $validatedData['base_price'];
+                    $profileAdTariff->update(['daily_charge' => $newDailyCharge]);
+                });
+        }
 
         return redirect()->route('admin.ad-tariffs.index')->with('success', 'Тариф успешно обновлен');
     }

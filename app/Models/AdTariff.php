@@ -20,6 +20,9 @@ class AdTariff extends Model
         'slug',
         'description',
         'base_price',
+        'fixed_price',
+        'weekly_price',
+        'monthly_price',
         'billing_period',
         'is_active',
         'status'
@@ -32,6 +35,9 @@ class AdTariff extends Model
      */
     protected $casts = [
         'base_price' => 'decimal:2',
+        'fixed_price' => 'decimal:2',
+        'weekly_price' => 'decimal:2',
+        'monthly_price' => 'decimal:2',
         'is_active' => 'boolean',
         'status' => 'boolean',
     ];

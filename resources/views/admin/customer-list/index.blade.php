@@ -77,7 +77,7 @@
 
                                             <td>
                                               <a href="mailto:{{$customer->email}}">{{$customer->email}}</a>
-                                              <button class="btn btn-sm btn-info ml-1 edit-email-btn" data-id="{{$customer->id}}" data-email="{{$customer->email}}"><i class="fas fa-envelope"></i></button>
+                                              <button class="btn btn-sm btn-info ml-1 edit-email-btn" data-id="{{$customer->id}}" data-email="{{$customer->email}}">Edit </button>
                                             </td>
                                             <td class="text-center">
                                                 @if($customer->profiles->count() > 0)

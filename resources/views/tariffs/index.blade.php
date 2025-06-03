@@ -26,7 +26,7 @@
                     <p class="text-[#C2C2C2] mb-6 text-sm font-medium">
                        {{$type->description}}
                     </p>
-                    <div class="flex justify-between items-center mt-auto">
+                    <div class="flex justify-between items-center mt-auto">                        
                         <span class="text-white">от {{round($type->base_price, 0)}} ₽/день</span>
                         <button @click="showModal = true"
                                 class="px-4 py-2 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded-2xl transition">
@@ -126,6 +126,9 @@
                     {{$type->description}}
                 </p>
                 <div class="flex justify-between items-center mt-auto">
+                    @php
+                         $priorityPrice = $type->base_price;
+                        @endphp
                     <span class="text-white">от {{round($type->base_price, 0)}} ₽/день</span>
                     <button @click="showModal = true"
                             class="px-4 py-2 bg-[#6340FF] hover:bg-[#5737e7] text-white rounded-2xl transition">
@@ -162,7 +165,7 @@
                                     >
                                         <span x-text="priorityLevel" class="text-white font-bold text-lg min-w-[30px] text-center"></span>
                                     </div>
-                                    <p class="text-xs text-[#C2C2C2] mt-1">Стоимость: <span x-text="1 + parseInt(priorityLevel) + ' ₽/день'"></span></p>
+                                    <p class="text-xs text-[#C2C2C2] mt-1">Стоимость: <span x-text="{{$priorityPrice}} + parseInt(priorityLevel*{{$priorityPrice}}) + ' ₽/день'"></span></p>
                                 </div>
                                 
                                 <div class="space-y-3 max-h-[300px] overflow-y-auto custom-scrollbar mt-4">
@@ -451,8 +454,7 @@
                                     </svg>
                                 </button>
                             </form>
-                            @endif
-                            
+
                             @if($activeTariff->isPriority())
                             <!-- Change Priority button -->
                             <button onclick="document.getElementById('priorityChangeModal-{{ $activeTariff->id }}').classList.remove('hidden')" class="p-2 bg-[#323232] hover:bg-[#3d3d3d] text-white rounded-full transition" title="Изменить приоритет">
@@ -497,7 +499,7 @@
                                                 </div>
                                             
                                                 <p class="text-xs text-[#C2C2C2] mt-1">
-                                                    Стоимость: <span x-text="1 + parseInt(priorityLevel) + ' ₽/день'"></span>
+                                                    Стоимость: <span x-text="{{$priorityPrice}} + parseInt(priorityLevel*{{$priorityPrice}}) + ' ₽/день'"></span>
                                                 </p>
                                             </div>
                                             
@@ -510,6 +512,9 @@
                                 </div>
                             </div>
                             @endif
+                            
+                            @endif
+                            
                         
                             <!-- Deactivate button (⏹️) -->
                             <form x-data @submit.prevent="if (confirm('Вы уверены, что хотите остановить рекламу?')) $el.submit()" action="{{ route('user.advert.cancel', $activeTariff->id) }}" method="POST">

@@ -1113,7 +1113,7 @@
             <footer class="pb-6 mt-auto">
                 <div class="max-w-screen-2xl border-t border-[#363636] pt-6 mx-auto px-6">
                     <!-- Filter Buttons -->
-            <div class="flex overflow-x-auto hide-scrollbar justify-center gap-3 mb-4 lg:hidden">
+            <div class="flex flex-wrap justify-center gap-3 mb-4 lg:hidden">
                 @foreach ($footerMenus as $menu)
                     @if ($menu->all_accounts == true && $menu->status == true)
                     <a href="{{ Request::url() }}" 
@@ -1180,7 +1180,7 @@
                             </a>
                         </div>
     <!-- Filter Buttons -->
-    <div class="hidden lg:flex overflow-x-auto hide-scrollbar justify-center gap-3 mb-4 ">
+    <div class="hidden lg:flex flex-wrap justify-center gap-3 mb-4 ">
         @foreach ($footerMenus as $menu)
             @if ($menu->all_accounts == true && $menu->status == true)
             <a href="{{ Request::url() }}" 
@@ -1241,7 +1241,7 @@
                             @guest
                             
                             <a href="{{ route('register') }}"
-                               class="px-4 py-2 bg-transparent text-white border border-white-700 rounded-lg text-sm">
+                               class="px-4 py-2 bg-transparent flex text-white shrink-0 border border-white-700 rounded-lg text-sm">
                                 Добавить анкету
                             </a>
                             <a href="{{ route('login') }}"
@@ -1249,16 +1249,8 @@
                                 Войти
                             </a>
                         @else
-                       
-                            @if(Auth::user()->is_admin)
-                            <a href="{{ route('admin') }}" class="relative p-2 mr-2 hover:scale-110 transition-transform">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
-                                    <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
-                            </a>
-                            @endif
                             <a href="{{ route('user.profiles.index') }}"
-                               class="px-4 py-2 bg-transparent text-white border border-white-700 rounded-lg text-sm">
+                               class="shrink-0 px-4 py-2 bg-transparent text-white border border-white-700 rounded-lg text-sm">
                                 Мой кабинет
                             </a>
                         @endguest

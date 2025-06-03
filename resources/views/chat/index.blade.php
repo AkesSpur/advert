@@ -134,7 +134,7 @@
             const messageHtml = `
                 <div class="flex items-start gap-2 ${alignClass}">
                     <div class="max-w-[75%] ${bgClass} p-3 rounded-lg">
-                        <p class="text-sm">${message.message}</p>
+                        <p class="text-sm text-white">${message.message}</p>
                         <div class="text-right text-xs text-gray-500 dark:text-gray-400 mt-1">${formatDateTime(message.created_at)}</div>
                     </div>
                 </div>

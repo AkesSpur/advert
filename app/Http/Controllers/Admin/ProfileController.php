@@ -96,9 +96,11 @@ class ProfileController extends Controller
         
         // Disable all associated tariffs
         foreach ($profile->tariffs as $ad) {
-            $ad->is_paused = false;
-            $ad->is_active = false;
-            $ad->save();
+            if($ad->is_active == true){
+                $ad->is_paused = true;
+                $ad->is_active = false;
+                $ad->save();    
+            }
         }
 
         return redirect()->route('admin.profiles.index')
@@ -114,6 +116,22 @@ class ProfileController extends Controller
         
         // Restore the profile
         $profile->restore();
+
+        // Reactivate the profile's latest ad tariff if it exists
+        // Reactivate all paused ad tariffs for the profile
+        $pausedAdTariffs = $profile->tariffs()->where('is_paused', true)->get();
+
+        foreach ($pausedAdTariffs as $adTariff) {
+            $adTariff->update(['is_active' => true, 'is_paused' => false]);
+            if ($adTariff->ad_tariff_id == 3) {
+                $profile->is_vip = true;
+                $profile->is_active = true;
+                $profile->save();
+            }else{
+                $profile->is_active = true;
+                $profile->save();
+            }
+        }
         
         return redirect()->route('admin.profiles.index')
             ->with('success', 'Анкета успешно восстановлена');

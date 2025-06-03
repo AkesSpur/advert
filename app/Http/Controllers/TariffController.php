@@ -127,7 +127,7 @@ class TariffController extends Controller
 
         $user = Auth::user();
         // Проверяем, что профиль принадлежит текущему пользователю
-        $profile = Profile::findOrFail($validated['profile_id']); 
+        $profile = Profile::findOrFail($validated['profile_id']);
         if ($profile->user_id != $user->id) {
             return back()->with('error', 'Профиль не принадлежит вам.');
         }
@@ -147,14 +147,14 @@ class TariffController extends Controller
             // Рассчитываем стоимость и дату окончания в зависимости от типа тарифа
             switch ($tariff->slug) {
                 case 'basic':
-                    $dailyCharge = $tariff->base_price ; // 1 рубль в день
+                    $dailyCharge = $tariff->base_price; // 1 рубль в день
                     // Базовый тариф не имеет даты окончания, списывается ежедневно
                     break;
 
                 case 'priority':
                     $priorityLevel = $validated['priority_level'] ?? 1;
-                    $dailyCharge = $tariff->base_price + $priorityLevel; // Базовая цена + уровень приоритета
-                    
+                    $dailyCharge = ($tariff->base_price * $priorityLevel) + $tariff->base_price; // Базовая цена + уровень приоритета
+
                     // Проверяем, есть ли уже активный приоритетный тариф для этого профиля
                     $existingPriorityTariff = ProfileAdTariff::where('profile_id', $profile->id)
                         ->whereHas('adTariff', function ($query) {
@@ -163,14 +163,49 @@ class TariffController extends Controller
                         ->where('is_active', true)
                         ->where('is_paused', false)
                         ->first();
-                    
+
                     // Если уже есть активный приоритетный тариф, обновляем его вместо создания нового
                     if ($existingPriorityTariff) {
                         // Обновляем уровень приоритета и дневную плату
+                        $oldPriorityLevel = $existingPriorityTariff->priority_level;
+
+                        // If the new priority level is the same as the old one, return an error
+                        if ($oldPriorityLevel == $priorityLevel) {
+                            return redirect()->back()->with('error', 'Выбранный уровень приоритета уже активен.');
+                        }
+
                         $existingPriorityTariff->priority_level = $priorityLevel;
                         $existingPriorityTariff->daily_charge = $dailyCharge;
                         $existingPriorityTariff->save();
-                        
+
+                        // Создаем запись о списании (пропускаем для администратора)
+                        if (!$isAdmin) {
+                            $priorityUser = USer::find($user->id);
+
+                            $priorityUser->balance -= $dailyCharge;
+                            $priorityUser->save();
+            
+                            AdTariffCharge::create([
+                                'profile_ad_tariff_id' => $existingPriorityTariff->id,
+                                'user_id' => $priorityUser->id,
+                                'amount' => $dailyCharge,
+                                'charged_at' => $now,
+                            ]);
+
+                            // Создаем транзакцию с подробным описанием
+                            $description = "Изменение уровня приоритета с {$oldPriorityLevel} на {$existingPriorityTariff->priority_level} для профиля ID№{$profile->id}";
+
+                            $priorityUser->transactions()->create([
+                                'amount' => -$dailyCharge,
+                                'type' => 'purchase',
+                                'status' => 'completed',
+                                'reference_id' => $tariff->slug . '_tariff_' . $existingPriorityTariff->id,
+                                'description' => $description,
+                            ]);
+                        } else {
+                            // Для администратора просто логируем информацию без финансовых операций
+                            info("Admin (ID: 1) activated {$tariff->slug} tariff for profile ID№{$profile->id} without charge.");
+                        }
                         // Возвращаем успешный результат
                         return redirect()->route('user.advert.index')
                             ->with('success', 'Уровень приоритета успешно обновлен для вашего профиля.');
@@ -199,7 +234,7 @@ class TariffController extends Controller
                             $expiresAt = $now->copy()->addMonth();
                             break;
                     }
-                    
+
                     // Для администратора устанавливаем срок действия VIP на 1 год
                     // if ($isAdmin) {
                     //     $expiresAt = $now->copy()->addYear();
@@ -220,12 +255,12 @@ class TariffController extends Controller
                     $activeVipProfilesCount = ProfileAdTariff::whereHas('adTariff', function ($query) {
                         $query->where('slug', 'vip');
                     })
-                    ->where('is_active', true)
-                    ->where('is_paused', false)
-                    ->where('expires_at', '>', $now)
-                    ->where('queue_position', 0)
-                    ->distinct('profile_id')
-                    ->count('profile_id');
+                        ->where('is_active', true)
+                        ->where('is_paused', false)
+                        ->where('expires_at', '>', $now)
+                        ->where('queue_position', 0)
+                        ->distinct('profile_id')
+                        ->count('profile_id');
 
                     // Определяем позицию в очереди
                     if ($profileHasActiveVip || $activeVipProfilesCount >= 3) {
@@ -233,11 +268,11 @@ class TariffController extends Controller
                         $maxQueuePosition = ProfileAdTariff::whereHas('adTariff', function ($query) {
                             $query->where('slug', 'vip');
                         })
-                        ->where('is_active', true) // Учитываем и те, что в очереди, но активны
-                        // ->where('is_paused', false) // Пауза не должна влиять на позицию в очереди
-                        ->where('queue_position', '>', 0)
-                        ->max('queue_position') ?? 0;
-                        
+                            ->where('is_active', true) // Учитываем и те, что в очереди, но активны
+                            // ->where('is_paused', false) // Пауза не должна влиять на позицию в очереди
+                            ->where('queue_position', '>', 0)
+                            ->max('queue_position') ?? 0;
+
                         $queuePosition = $maxQueuePosition + 1;
                     } else {
                         // Если у профиля нет активного VIP и есть свободные слоты, позиция в очереди = 0 (активный VIP)
@@ -266,37 +301,37 @@ class TariffController extends Controller
                 $basicAds = ProfileAdTariff::whereHas('adTariff', function ($query) {
                     $query->where('slug', 'basic');
                 })
-                ->where('profile_id', $profile->id)
-                ->where('is_active', true)
-                ->get();
-                
+                    ->where('profile_id', $profile->id)
+                    ->where('is_active', true)
+                    ->get();
+
                 foreach ($basicAds as $basicAd) {
                     $basicAd->deactivateBasic();
                 }
             }
-            
+
             // Создаем запись о тарифе для профиля
             $startsAt = $now; // По умолчанию начинается сейчас
-            
+
             // Если это VIP тариф и он в очереди, устанавливаем starts_at на время истечения соответствующего активного VIP
             if ($tariff->slug == 'vip' && isset($queuePosition) && $queuePosition > 0) {
                 // Находим все активные VIP тарифы, отсортированные по дате истечения
                 $activeVips = ProfileAdTariff::whereHas('adTariff', function ($query) {
                     $query->where('slug', 'vip');
                 })
-                ->where('is_active', true)
-                ->where('is_paused', false)
-                ->where('queue_position', 0)
-                ->where('expires_at', '>', $now)
-                ->orderBy('expires_at', 'asc')
-                ->get();
-                
+                    ->where('is_active', true)
+                    ->where('is_paused', false)
+                    ->where('queue_position', 0)
+                    ->where('expires_at', '>', $now)
+                    ->orderBy('expires_at', 'asc')
+                    ->get();
+
                 // Определяем, какой VIP будет заменен этим (на основе позиции в очереди)
                 $vipIndex = min($queuePosition - 1, $activeVips->count() - 1);
                 if (isset($activeVips[$vipIndex])) {
                     $startsAt = $activeVips[$vipIndex]->expires_at;
 
-                    
+
                     switch ($duration) {
                         case '1_day':
                             $expiresAt = $startsAt->copy()->addDay();
@@ -308,12 +343,9 @@ class TariffController extends Controller
                             $expiresAt = $startsAt->copy()->addMonth();
                             break;
                     }
-
                 }
-
-             
             }
-            
+
             $profileTariff = ProfileAdTariff::create([
                 'profile_id' => $profile->id,
                 'ad_tariff_id' => $tariff->id,
@@ -329,18 +361,18 @@ class TariffController extends Controller
 
             // Получаем свежий экземпляр модели User для списания средств с баланса
             $freshUser = User::find($user->id);
-            
+
             // Пропускаем списание средств для администратора
             if (!$isAdmin) {
                 $freshUser->balance -= $totalCost;
                 $freshUser->save();
             }
-            
+
             // Для VIP тарифа устанавливаем статус VIP
             if ($tariff->slug == 'vip' && isset($queuePosition) && $queuePosition == 0) {
                 $profile->is_vip = true;
                 $profile->is_active = true;
-                $profile->save();   
+                $profile->save();
             }
 
             if ($tariff->slug == 'basic' || $tariff->slug == 'priority') {
@@ -370,7 +402,7 @@ class TariffController extends Controller
                         $description = "VIP-покупка для профиля ID№{$profile->id}";
                         break;
                 }
-                
+
                 $freshUser->transactions()->create([
                     'amount' => -$totalCost,
                     'type' => 'purchase',
@@ -382,12 +414,10 @@ class TariffController extends Controller
                 // Для администратора просто логируем информацию без финансовых операций
                 info("Admin (ID: 1) activated {$tariff->slug} tariff for profile ID№{$profile->id} without charge.");
             }
-        
-    
-            return redirect()->route('user.advert.index')->with('success', 'Тариф успешно активирован для вашего профиля.');          
- 
-        });
 
+
+            return redirect()->route('user.advert.index')->with('success', 'Тариф успешно активирован для вашего профиля.');
+        });
     }
 
     /**
@@ -442,9 +472,6 @@ class TariffController extends Controller
     {
         $profileTariff = ProfileAdTariff::findOrFail($id);
 
-        echo $profileTariff->profile->user_id;
-        echo Auth::id();
-        die;
 
         // Проверяем, что тариф принадлежит текущему пользователю
         if ($profileTariff->profile->user_id != Auth::id()) {
