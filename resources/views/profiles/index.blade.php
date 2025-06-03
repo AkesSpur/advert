@@ -64,35 +64,39 @@
         </div>
       </td>
 
-      <!-- Location cell -->
-      <td class="p-4 text-sm text-[#C2C2C2] align-top">
-        <div class="flex items-center mb-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
-        <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099"
-        font-family="Arial, sans-serif">M</text>
-        </svg>
-        @foreach ($profile->neighborhoods as $key => $neighborhood)
-      {{ $neighborhood->name}}
-      @if ($key < count($profile->neighborhoods) - 1)
-      ,
-    @endif
-    @endforeach
-        </div>
-        <div class="flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
-        <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099"
-        font-family="Arial, sans-serif">M</text>
-        </svg>
-        @foreach ($profile->metroStations as $key => $metroStation)
-      м. {{ $metroStation->name }}
-      @if ($key < count($profile->metroStations) - 1)
-      ,
-    @endif
-    @endforeach
-        </div>
-      </td>
+                <!-- Location cell -->
+                <td class="p-4 text-sm text-[#C2C2C2] align-top">
+                  <div class="flex items-center mb-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
+                      <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099" font-family="Arial, sans-serif">M</text>
+                    </svg>
+                    @foreach ($profile->neighborhoods->take(2) as $key => $neighborhood)
+                      {{ $neighborhood->name}}
+                      @if ($key < 1 && count($profile->neighborhoods) > 1 )
+                        ,
+                      @endif
+                    @endforeach
+                    @if (count($profile->neighborhoods) > 2 && count($profile->neighborhoods->take(2)) < count($profile->neighborhoods))
+                      ...
+                    @endif
+                  </div>
+                  <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
+                      <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099" font-family="Arial, sans-serif">M</text>
+                    </svg>
+                    @foreach ($profile->metroStations->take(2) as $key => $metroStation)
+                      м. {{ $metroStation->name }}
+                      @if ($key < 1 && count($profile->metroStations) > 1 )
+                        ,
+                      @endif
+                    @endforeach
+                    @if (count($profile->metroStations) > 2 && count($profile->metroStations->take(2)) < count($profile->metroStations))
+                      ...
+                    @endif
+                  </div>
+                </td>
 
       <!-- Views cell -->
       <td class="p-4 text-sm text-[#C2C2C2] text-center align-top">
@@ -234,24 +238,34 @@
                       <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
                       <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099" font-family="Arial, sans-serif">M</text>
                     </svg>
-                    @foreach ($profile->neighborhoods as $key => $neighborhood)
+                    @foreach ($profile->neighborhoods->take(2) as $key => $neighborhood)
                       {{ $neighborhood->name}}
-                      @if ($key < count($profile->neighborhoods) - 1)
+                      @if ($key < 1 && count($profile->neighborhoods) > 1 && count($profile->neighborhoods) <= 2)
                         ,
+                      @elseif ($key < 1 && count($profile->neighborhoods) > 2)
+                        ...
                       @endif
                     @endforeach
+                    @if (count($profile->neighborhoods) > 2 && count($profile->neighborhoods->take(2)) < count($profile->neighborhoods))
+                      ...
+                    @endif
                   </div>
                   <div class="flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 flex-shrink-0" viewBox="0 0 24 24">
                       <circle cx="12" cy="12" r="10" fill="none" stroke="#FF000099" stroke-width="2" />
                       <text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#FF000099" font-family="Arial, sans-serif">M</text>
                     </svg>
-                    @foreach ($profile->metroStations as $key => $metroStation)
+                    @foreach ($profile->metroStations->take(2) as $key => $metroStation)
                       м. {{ $metroStation->name }}
-                      @if ($key < count($profile->metroStations) - 1)
+                      @if ($key < 1 && count($profile->metroStations) > 1 && count($profile->metroStations) <= 2)
                         ,
+                      @elseif ($key < 1 && count($profile->metroStations) > 2)
+                        ...
                       @endif
                     @endforeach
+                    @if (count($profile->metroStations) > 2 && count($profile->metroStations->take(2)) < count($profile->metroStations))
+                      ...
+                    @endif
                   </div>
                 </td>
 

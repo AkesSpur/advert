@@ -148,6 +148,12 @@
                                                                 Сбросить пароль
                                                             </span>
                                                         </button>
+                                                        <a class="dropdown-item has-icon delete-item" href="{{ route('admin.customers.destroy', $customer->id) }}">
+                                                            <i class="fas fa-trash text-danger mr-2"></i> 
+                                                            <span>
+                                                                Удалить пользователя
+                                                            </span>
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </td>
@@ -259,7 +265,7 @@
             })
 
             // Handle Edit Email button click
-            $('.edit-email-btn').on('click', function(){
+            $('body').on('click', '.edit-email-btn', function(){
                 let customerId = $(this).data('id');
                 let customerEmail = $(this).data('email');
                 $('#customer_id').val(customerId);
@@ -301,7 +307,7 @@
             });
 
             // Handle View Profiles button click
-            $('.view-profiles-btn').on('click', function(){
+            $('body').on('click', '.view-profiles-btn', function(){
                 let userId = $(this).data('id');
                 let userName = $(this).data('name');
                 $('#userName').text(userName);
@@ -334,7 +340,7 @@
             });
 
             // Handle Verify Email button click
-            $('.verify-email-btn').on('click', function(){
+            $('body').on('click', '.verify-email-btn', function(){
                 let customerId = $(this).data('id');
                 $.ajax({
                     url: "/admin/customers/" + customerId + "/verify-email", // Adjusted URL for customers
@@ -357,7 +363,7 @@
             });
 
             // Handle Send Reset Link button click
-            $('.send-reset-link-btn').on('click', function(){
+            $('body').on('click', '.send-reset-link-btn', function(){
                 let customerId = $(this).data('id');
                 $.ajax({
                     url: "/admin/customers/" + customerId + "/send-reset-link", // Adjusted URL for customers

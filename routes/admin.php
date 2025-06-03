@@ -61,6 +61,7 @@ Route::put('customer-list/{id}/update-email', [CustomerListController::class, 'u
 Route::get('customer', [CustomerListController::class, 'index'])->name('customer.index');
 Route::post('customers/{id}/verify-email', [CustomerListController::class, 'verifyEmail'])->name('customers.verify-email');
 Route::post('customers/{id}/send-reset-link', [CustomerListController::class, 'sendResetLink'])->name('customers.send-reset-link');
+Route::delete('customers/{id}', [CustomerListController::class, 'destroy'])->name('customers.destroy');
 
 /** admin list routes */
 Route::get('admin-list', [AdminListController::class, 'index'])->name('admin-list.index');

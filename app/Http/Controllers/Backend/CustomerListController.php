@@ -64,4 +64,12 @@ class CustomerListController extends Controller
             return response(['status' => 'error', 'message' => __($status)], 422);
         }
     }
+
+    public function destroy(string $id)
+    {
+        $customer = User::findOrFail($id);
+        $customer->delete();
+
+        return response(['status' => 'success', 'message' => 'Пользователь успешно удален']);
+    }
 }
