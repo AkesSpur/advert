@@ -96,7 +96,6 @@
 
         <!-- Like button -->
         <button
-            onclick="event.preventDefault(); event.stopPropagation();"
             data-profile-id="{{ $id }}" name="like"
             class="like-button absolute top-3 right-3 p-1.5 hover:scale-105 transition z-20 rounded-full 'bg-transparent'"
             aria-label="Like profile">

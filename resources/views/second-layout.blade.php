@@ -152,7 +152,10 @@
     @stack('scripts')
     <script>
         $(document).ready(function() {
-            $('.like-button').click(function() {
+            // $('body').on('click', '.like-button', function(){
+            $(document).on('click', '.like-button', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
                 const profileId = $(this).data('profile-id');
                 const button = $(this);
                 $.ajax({
