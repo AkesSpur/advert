@@ -42,10 +42,10 @@ class LikeController extends Controller
     {
         if (Auth::check()) {
             $user = User::findOrFail(Auth::id());
-            $likedProfiles = $user->likedProfiles()->where('is_archived', false)->latest()->get();
+            $likedProfiles = $user->likedProfiles()->latest()->get();
         } else {
             $likedProfileIds = session()->get('liked_profiles', []);
-            $likedProfiles = Profile::whereIn('id', $likedProfileIds)->where('is_archived', false)->latest()->get();
+            $likedProfiles = Profile::whereIn('id', $likedProfileIds)->latest()->get();
         }
         $customCategories = CustomCategory::where('status', 1)->orderBy('name')->get();
 
