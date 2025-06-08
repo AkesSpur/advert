@@ -152,7 +152,6 @@
     @stack('scripts')
     <script>
         $(document).ready(function() {
-            // $('body').on('click', '.like-button', function(){
             $(document).on('click', '.like-button', function(event) {
                 event.preventDefault();
                 event.stopPropagation();
