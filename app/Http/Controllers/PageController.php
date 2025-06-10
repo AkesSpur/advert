@@ -1047,6 +1047,15 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
         $topMenus = TopMenu::all();
         $footerMenus = FooterMenu::all();
 
+        if (isset($heroContent) && ($heroContent->title || $heroContent->text_content || $heroContent->image))
+        {
+            $shouldNotDisplayHeroSection = null;
+        }else
+        {
+            $shouldNotDisplayHeroSection = true;
+        }
+
+
         return view('home.index', compact('services',
          'metroStations', 
          'neighborhoods',
@@ -1065,7 +1074,8 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
           'seoTitle',
           'seoMetaDescription',
           'seoH1',
-          'heroContent'
+          'heroContent',
+          'shouldNotDisplayHeroSection'
 
         ));
     }

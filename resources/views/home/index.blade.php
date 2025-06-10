@@ -929,7 +929,7 @@
                         @foreach($customCategories as $category)
                             @if($category->status == 1 && $category->show_in_top_menu == 1)
                             <a href="{{ url('/category/' . $category->slug) }}" 
-                               class="capitalize px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ request()->is('category/' . $category->slug) ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">{{ $category->name }}</a>
+                               class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ request()->is('category/' . $category->slug) ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">{{ $category->name }}</a>
                             @endif
                         @endforeach
                     @endif
@@ -1086,6 +1086,9 @@
 
 
       <!-- Hero Section -->
+      @if (isset($shouldNotDisplayHeroSection) && $shouldNotDisplayHeroSection != null) 
+      
+     @else
     <div class="py-8 md:py-12 lg:py-16">
         <div class="max-w-screen-2xl mx-auto px-6">
             <div class="flex flex-col md:flex-col lg:flex-row items-stretch h-full">
@@ -1106,6 +1109,7 @@
             </div>
         </div>
     </div>
+    @endif
 
     
  
@@ -1165,7 +1169,7 @@
                     @foreach($customCategories as $category)
                         @if($category->status == 1 && $category->show_in_footer_menu == 1)
                         <a href="{{ url('/category/' . $category->slug) }}" 
-                           class="capitalize px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ request()->is('category/' . $category->slug) ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">{{ $category->name }}</a>
+                           class=" px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ request()->is('category/' . $category->slug) ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">{{ $category->name }}</a>
                         @endif
                     @endforeach
                 @endif
@@ -1232,7 +1236,7 @@
             @foreach($customCategories as $category)
                 @if($category->status == 1 && $category->show_in_footer_menu == 1)
                 <a href="{{ url('/category/' . $category->slug) }}" 
-                   class="capitalize px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ request()->is('category/' . $category->slug) ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">{{ $category->name }}</a>
+                   class=" px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ request()->is('category/' . $category->slug) ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">{{ $category->name }}</a>
                 @endif
             @endforeach
         @endif

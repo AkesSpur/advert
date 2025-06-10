@@ -1042,7 +1042,7 @@
                 @foreach($customCategories as $category)
                     @if($category->status == 1 && $category->show_in_footer_menu == 1)
                     <a href="{{ url('/category/' . $category->slug) }}" 
-                       class="capitalize px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">{{ $category->name }}</a>
+                       class=" px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">{{ $category->name }}</a>
                     @endif
                 @endforeach
             @endif
@@ -1109,7 +1109,7 @@
         @foreach($customCategories as $category)
             @if($category->status == 1 && $category->show_in_footer_menu == 1)
             <a href="{{ url('/category/' . $category->slug) }}" 
-               class="capitalize px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">{{ $category->name }}</a>
+               class=" px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]">{{ $category->name }}</a>
             @endif
         @endforeach
     @endif

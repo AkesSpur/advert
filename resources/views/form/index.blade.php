@@ -107,7 +107,7 @@
                         <span class="w-24 hidden md:block text-[#FFFFFFCC]">Телеграм</span>
                         <input name="telegram" id="telegram"
                             class="block w-full px-4 py-3 rounded-xl bg-[#191919] border-0 text-white placeholder-[#FFFFFF66] focus:ring-0"
-                            type="text" placeholder="Введите свой ник" value="{{ old('telegram') }}">
+                            type="text" placeholder="Введите ник Telegram" value="{{ old('telegram') }}">
                     </div>
                     <div class="flex items-center gap-3">
                         <input type="hidden" name="has_viber" value="0">
@@ -117,7 +117,7 @@
                         <span class="w-24 hidden md:block text-[#FFFFFFCC]">Viber</span>
                         <input name="viber" id="viber"
                             class="block w-full px-4 py-3 rounded-xl bg-[#191919] border-0 text-white placeholder-[#FFFFFF66] focus:ring-0"
-                            type="text" placeholder="Введите свой ник" value="{{ old('viber') }}">
+                            type="text" placeholder="Введите номер Viber" value="{{ old('viber') }}">
                     </div>
                     <div class="flex items-center gap-3">
                         <input type="hidden" name="has_whatsapp" value="0">
@@ -127,7 +127,7 @@
                         <span class="w-24 hidden md:block text-[#FFFFFFCC]">WhatsApp</span>
                         <input name="whatsapp" id="whatsapp" 
                             class="block w-full px-4 py-3 rounded-xl bg-[#191919] border-0 text-white placeholder-[#FFFFFF66] focus:ring-0"
-                            type="text" placeholder="Введите свой ник" value="{{ old('whatsapp') }}">
+                            type="text" placeholder="Введите номер WhatsApp" value="{{ old('whatsapp') }}">
                     </div>
                     <input name="phone" required
                         class="block w-full px-4 py-3 rounded-xl bg-[#191919] border-0 text-white placeholder-[#FFFFFF66] focus:ring-0"

@@ -4,11 +4,15 @@
     <style>
         /* Hide scrollbar but maintain functionality */
         .hide-scrollbar {
-            -ms-overflow-style: none; /* IE and Edge */
-            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
         }
+
         .hide-scrollbar::-webkit-scrollbar {
-            display: none; /* Chrome, Safari and Opera */
+            display: none;
+            /* Chrome, Safari and Opera */
         }
     </style>
     <div class="max-w-screen-2xl mx-auto px-1 md:px-4 py-6">
@@ -30,13 +34,13 @@
                         </a>
                     </li>
                     <li><span>/</span></li>
-                    <li class="text-[#6340FF] font-medium capitalize" aria-current="page">{{$profile->name}}</li>
+                    <li class="text-[#6340FF] font-medium capitalize" aria-current="page">{{ $profile->name }}</li>
                 </ol>
             </nav>
 
             <div>
                 <span class="text-[#636363] text-sm hidden md:block">Анкета добавлена
-                    {{$profile->created_at->format('d.m.Y')}}</span>
+                    {{ $profile->created_at->format('d.m.Y') }}</span>
             </div>
         </div>
 
@@ -46,7 +50,7 @@
             <div class="block md:block lg:hidden py-2 px-4">
                 <div class="flex items-center mb-1 md:mb-none">
                     <h1 class="text-3xl capitalize font-semibold text-white mr-2 relative">
-                        {{ $seoH1 ?? ($profile->name . ', ' . $profile->age) }}
+                        {{ $seoH1 ?? $profile->name . ', ' . $profile->age }}
                         @if ($profile->is_verified)
                             <span class="absolute -top-1 -right-5">
                                 <img src="{{ asset('assets/svg/verified.png') }}" class="w-4 h-4">
@@ -55,22 +59,24 @@
                     </h1>
                 </div>
                 <div class="mb-2 hidden md:block lg:hidden">
-                    <span class="text-[#636363] text-sm">Была активна {{formatLastActive($profile->user->last_active) }}</span>
+                    <span class="text-[#636363] text-sm">Была активна
+                        {{ formatLastActive($profile->user->last_active) }}</span>
                 </div>
 
                 <!-- Attributes for small and medium screens -->
                 <div class="flex md:hidden overflow-x-auto hide-scrollbar mt-4 gap-3">
-                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{$profile->weight}}
+                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{ $profile->weight }}
                         кг</span>
-                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{$profile->height}}
+                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{ $profile->height }}
                         см</span>
-                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{$profile->size}}
+                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{ $profile->size }}
                         размер</span>
                     <span
-                        class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{$profile->hair_color}}</span>
+                        class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">{{ $profile->hair_color }}</span>
                     {{-- <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">Славянка</span>
                     --}}
-                    <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white capitalize">{{$profile->tattoo}}
+                    <span
+                        class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white capitalize">{{ $profile->tattoo }}
                         тату</span>
                     {{-- <span class="bg-[#FFFFFF33] shrink-0 rounded-lg px-3 py-1.5 text-base text-white">Интимная
                         стрижка</span> --}}
@@ -80,7 +86,7 @@
 
             <div class="flex flex-col lg:flex-row">
                 <span class="text-[#636363] px-4 text-sm md:hidden">Анкета добавлена
-                    {{$profile->created_at->format('d.m.Y')}}</span>
+                    {{ $profile->created_at->format('d.m.Y') }}</span>
                 <!-- Gallery Section -->
                 <div class="w-full lg:w-1/2 p-4">
                     <div class="flex flex-row h-full gap-4">
@@ -93,33 +99,27 @@
                             @if (isset($profile->video->path))
                                 <!-- Video Thumbnail (shown first) -->
                                 <div class="h-full rounded-xl cursor-pointer mb-2" onclick="showVideo()">
-                                     <div class="relative w-full h-full">
-                                         <video
-                                             src="{{ asset('storage/' . $profile->video->path) }}"
-                                             class="w-full h-[150px] object-cover opacity-75 rounded-xl"
-                                             muted
-                                             autoplay
-                                             loop
-                                             playsinline
-                                         ></video>
-                                         <div class="absolute inset-0 flex items-center justify-center">
-                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none"
-                                                 viewBox="0 0 24 24" stroke="currentColor">
-                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                     d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                     d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                             </svg>
-                                         </div>
-                                     </div>
-                                 </div>
-                                
+                                    <div class="relative w-full h-full">
+                                        <video src="{{ asset('storage/' . $profile->video->path) }}"
+                                            class="w-full h-[150px] object-cover opacity-75 rounded-xl" muted autoplay loop
+                                            playsinline></video>
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
                             @endif
 
                             @foreach ($profile->images as $image)
                                 <!-- Thumbnail  -->
-                                <div class="h-[150px] rounded-xl cursor-pointer mb-2" onclick="showSlide({{$slide}})">
-                                    <img src="{{ asset('storage/' . $image->path) }}" alt="Thumbnail {{$slide}}"
+                                <div class="h-[150px] rounded-xl cursor-pointer mb-2" onclick="showSlide({{ $slide }})">
+                                    <img src="{{ asset('storage/' . $image->path) }}" alt="Thumbnail {{ $slide }}"
                                         class="w-full h-[150px] object-cover rounded-xl" loading="lazy">
                                     @php
                                         $slide++;
@@ -136,7 +136,7 @@
                                     @if (isset($profile->video->path))
                                         <div
                                             class="w-7 h-7 flex items-center justify-center rounded-full bg-pink-500 text-white">
-                                            <img src="{{asset('assets/svg/vid.png')}}" class="w-4 h-3">
+                                            <img src="{{ asset('assets/svg/vid.png') }}" class="w-4 h-3">
                                         </div>
                                     @endif
                                     @if ($profile->created_at >= now()->subDays(7))
@@ -159,12 +159,12 @@
                                     @endphp
                                     <!-- Images (in carousel) -->
                                     @foreach ($profile->images as $image)
-                                        <div
-                                            class="carousel-slide absolute inset-0 opacity-100 transition-opacity rounded-xl duration-300 flex items-center justify-center bg-black"
+                                        <div class="carousel-slide absolute inset-0 opacity-100 transition-opacity rounded-xl duration-300 flex items-center justify-center bg-black"
                                             onclick="openFullscreenImage('{{ asset('storage/' . $image->path) }}', {{ $loop->index }})">
-                                            <img src="{{ asset('storage/' . $image->path) }}" alt="Image {{$slide}}"
+                                            <img src="{{ asset('storage/' . $image->path) }}" alt="Image {{ $slide }}"
                                                 class="w-auto rounded-xl h-full object-contain max-w-full"
-                                                loading="{{ $slide == 1 ? 'eager' : 'lazy' }}"> {{-- Load the first image eagerly, others lazily --}}
+                                                loading="{{ $slide == 1 ? 'eager' : 'lazy' }}"> {{-- Load the first image
+                                            eagerly, others lazily --}}
                                         </div>
                                         @php
                                             $slide++;
@@ -173,13 +173,13 @@
 
                                     @if (isset($profile->video->path))
                                         <!-- Video (hidden by default, initially muted) -->
-                                     <div class="video-slide absolute inset-0 opacity-0 transition-opacity duration-300 flex items-center justify-center bg-black pointer-events-none"
-                                         ondblclick="openVideoFullscreen(this.querySelector('video'))">
-                                         <video class="w-auto h-full object-contain max-w-full vidss" controls muted>
-                                             <source src="{{asset('storage/' . $profile->video->path)}}" type="video/mp4">
-                                             Your browser does not support the video tag.
-                                         </video>
-                                     </div>
+                                        <div class="video-slide absolute inset-0 opacity-0 transition-opacity duration-300 flex items-center justify-center bg-black pointer-events-none"
+                                            ondblclick="openVideoFullscreen(this.querySelector('video'))">
+                                            <video class="w-auto h-full object-contain max-w-full vidss" controls muted>
+                                                <source src="{{ asset('storage/' . $profile->video->path) }}" type="video/mp4">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        </div>
                                     @endif
                                 </div>
 
@@ -207,8 +207,7 @@
 
                                 <!-- Favorite button -->
                                 <div class="absolute top-4 right-4 z-10">
-                                    <button
-                                        class="like-button p-2 rounded-full hover:scale-105 transition"
+                                    <button class="like-button p-2 rounded-full hover:scale-105 transition"
                                         data-profile-id="{{ $profile->id }}" name="like" aria-label="Favorite profile">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
                                             fill="{{ (Auth::check() && Auth::user()->likedProfiles()->where('profile_id', $profile->id)->exists()) || (!Auth::check() && in_array($profile->id, session('liked_profiles', []))) ? 'red' : 'none' }}"
@@ -229,7 +228,7 @@
                 <div class="lg:block lg:w-1/2 p-4 hidden">
                     <div class="flex items-center ">
                         <h1 class="text-3xl capitalize font-semibold text-white mr-2 relative">
-                            {{  $seoH1 ?? ($profile->name . ', ' . $profile->age) }}
+                            {{ $seoH1 ?? $profile->name . ', ' . $profile->age }}
                             @if ($profile->is_verified)
                                 <span class="absolute -top-1 -right-5">
                                     <img src="{{ asset('assets/svg/verified.png') }}" class="w-4 h-4">
@@ -237,7 +236,7 @@
                             @endif
                         </h1>
                     </div>
-                    <p class="text-[#636363] mb-4">Была активна {{formatLastActive($profile->user->last_active) }}</p>
+                    <p class="text-[#636363] mb-4">Была активна {{ formatLastActive($profile->user->last_active) }}</p>
 
                     <!-- Location -->
                     <div class="flex items-center mb-2">
@@ -248,12 +247,12 @@
                                     font-family="Arial, sans-serif">M</text>
                             </svg>
                             <span class="text-[#C2C2C2]">
-                              @foreach ($profile->neighborhoods as $key => $neighborhood)
-                              <a href="{{ route('home.neighborhood', ['slug' => $neighborhood->slug]) }}"
-                                  class="hover:text-[#6340FF] transition-colors">
-                                  {{$neighborhood->name}}{{ $key < count($profile->neighborhoods) - 1 ? ',' : '' ;}}</a>
-                            @endforeach
-                        </span>
+                                @foreach ($profile->neighborhoods as $key => $neighborhood)
+                                    <a href="{{ route('home.neighborhood', ['slug' => $neighborhood->slug]) }}"
+                                        class="hover:text-[#6340FF] transition-colors">
+                                        {{ $neighborhood->name }}{{ $key < count($profile->neighborhoods) - 1 ? ',' : '' }}</a>
+                                @endforeach
+                            </span>
                     </div>
                     <div class="flex items-center mb-6">
                         <span class="inline-flex gap-2 items-center">
@@ -261,33 +260,38 @@
                                 <path
                                     d="M12 2C7.589 2 4 5.589 4 9.995C4 15.4 12 22 12 22C12 22 20 15.4 20 9.995C20 5.589 16.411 2 12 2ZM12 14C9.791 14 8 12.209 8 10C8 7.791 9.791 6 12 6C14.209 6 16 7.791 16 10C16 12.209 14.209 14 12 14Z" />
                             </svg>
-                            <span class="text-[#C2C2C2]">                              
+                            <span class="text-[#C2C2C2]">
                                 @foreach ($profile->metroStations as $key => $metroStation)
-                                <a href="{{ route('home.metro', ['slug' => $metroStation->slug]) }}"
-                                    class="hover:text-[#6340FF] transition-colors">
-                                    м. {{ $metroStation->name }}{{$key < count($profile->metroStations) - 1 ? ',' : '';}}</a>
-                              @endforeach
+                                    <a href="{{ route('home.metro', ['slug' => $metroStation->slug]) }}"
+                                        class="hover:text-[#6340FF] transition-colors">
+                                        м.
+                                        {{ $metroStation->name }}{{ $key < count($profile->metroStations) - 1 ? ',' : '' }}</a>
+                                @endforeach
                             </span>
                         </span>
                     </div>
 
                     <!-- Attributes -->
                     <div class="flex flex-wrap gap-3 mb-4">
-                        <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-base text-white">{{$profile->weight}}
+                        <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-base text-white">{{ $profile->weight }}
                             кг</span>
-                        <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-base text-white">{{$profile->height}}
+                        <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-base text-white">{{ $profile->height }}
                             см</span>
-                        <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-base text-white">{{$profile->size}}
+                        <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-base text-white">{{ $profile->size }}
                             размер</span>
-                        <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-sm text-white">{{$profile->hair_color}}</span>
+                        <span
+                            class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-base text-white">{{ $profile->hair_color }}</span>
                         {{-- <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-sm text-white">Славянка</span> --}}
-                        <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-sm text-white capitalize">{{$profile->tattoo}} тату</span>
-                        {{-- <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-sm text-white">Интимная стрижка</span> --}}
+                        <span
+                            class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-base text-white capitalize">{{ $profile->tattoo }}
+                            тату</span>
+                        {{-- <span class="bg-[#FFFFFF33] rounded-lg px-2 py-1 text-sm text-white">Интимная стрижка</span>
+                        --}}
                     </div>
 
                     <!-- Description -->
                     <p class="text-[#C2C2C2] mb-4">
-                        {{$profile->description}}
+                        {{ $profile->description }}
                     </p>
 
                     <!-- Contact Info -->
@@ -295,39 +299,63 @@
                         <h3 class="text-xl font-semibold mb-3">Контакты</h3>
                         <div class="flex items-center gap-4">
                             <!-- Phone -->
-                            <a href="tel:{{$profile->phone}}"
+                            <a href="tel:{{ $profile->phone }}"
                                 class="flex items-center text-[#C2C2C2] hover:text-[#6340FF]">
-                            {{ formatNumber($profile->phone) }}                            
+                                {{ formatNumber($profile->phone) }}
                             </a>
 
                             @if ($profile->has_whatsapp)
-                            <!-- WhatsApp -->
-                            <a href="{{$profile->whatsapp}}" target="_blank"
-                                class="flex gap-1 items-center text-[#C2C2C2] hover:text-[#25D366]">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#25D366]" viewBox="0 0 32 32"
-                                    fill="currentColor">
-                                    <path
-                                        d="M16.002 3C9.38 3 3.998 8.383 3.998 15.005c0 2.65.869 5.093 2.34 7.09L4 29l7.116-2.278A11.922 11.922 0 0 0 16 27c6.622 0 12.002-5.382 12.002-11.995C28.002 8.383 22.622 3 16.002 3zm.003 21.837c-1.954 0-3.897-.506-5.596-1.47l-.403-.237-3.36.985.976-3.275-.262-.417a10.328 10.328 0 0 1-1.62-5.598c0-5.724 4.655-10.378 10.382-10.378 5.723 0 10.375 4.654 10.375 10.378 0 5.726-4.652 10.37-10.375 10.37zm5.83-7.628c-.32-.16-1.89-.934-2.184-1.04-.293-.107-.506-.16-.72.16-.213.32-.826 1.04-1.014 1.254-.187.213-.373.24-.693.08-.32-.16-1.35-.498-2.57-1.59-.949-.844-1.59-1.882-1.775-2.2-.187-.32-.02-.494.14-.654.144-.143.32-.373.48-.56.16-.187.213-.32.32-.533.107-.213.054-.4-.027-.56-.08-.16-.72-1.74-.986-2.373-.26-.624-.524-.54-.72-.547l-.613-.01a1.177 1.177 0 0 0-.854.4c-.293.32-1.12 1.1-1.12 2.666 0 1.566 1.146 3.08 1.305 3.293.16.213 2.257 3.453 5.474 4.843.766.33 1.364.53 1.83.678.768.244 1.464.21 2.014.128.614-.092 1.89-.773 2.157-1.52.267-.747.267-1.387.187-1.52-.08-.133-.293-.213-.613-.373z" />
-                                </svg>
-                                WhatsApp
-                            </a>                                
+                                @php
+                                    $whatsappNumber = preg_replace('/[^0-9]/', '', $profile->whatsapp); // Extract only digits
+                                @endphp
+                                <!-- WhatsApp -->
+                                <a href="https://wa.me/+{{ $whatsappNumber }}" target="_blank"
+                                    class="flex gap-1 items-center text-[#C2C2C2] hover:text-[#25D366]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#25D366]" viewBox="0 0 32 32"
+                                        fill="currentColor">
+                                        <path
+                                            d="M16.002 3C9.38 3 3.998 8.383 3.998 15.005c0 2.65.869 5.093 2.34 7.09L4 29l7.116-2.278A11.922 11.922 0 0 0 16 27c6.622 0 12.002-5.382 12.002-11.995C28.002 8.383 22.622 3 16.002 3zm.003 21.837c-1.954 0-3.897-.506-5.596-1.47l-.403-.237-3.36.985.976-3.275-.262-.417a10.328 10.328 0 0 1-1.62-5.598c0-5.724 4.655-10.378 10.382-10.378 5.723 0 10.375 4.654 10.375 10.378 0 5.726-4.652 10.37-10.375 10.37zm5.83-7.628c-.32-.16-1.89-.934-2.184-1.04-.293-.107-.506-.16-.72.16-.213.32-.826 1.04-1.014 1.254-.187.213-.373.24-.693.08-.32-.16-1.35-.498-2.57-1.59-.949-.844-1.59-1.882-1.775-2.2-.187-.32-.02-.494.14-.654.144-.143.32-.373.48-.56.16-.187.213-.32.32-.533.107-.213.054-.4-.027-.56-.08-.16-.72-1.74-.986-2.373-.26-.624-.524-.54-.72-.547l-.613-.01a1.177 1.177 0 0 0-.854.4c-.293.32-1.12 1.1-1.12 2.666 0 1.566 1.146 3.08 1.305 3.293.16.213 2.257 3.453 5.474 4.843.766.33 1.364.53 1.83.678.768.244 1.464.21 2.014.128.614-.092 1.89-.773 2.157-1.52.267-.747.267-1.387.187-1.52-.08-.133-.293-.213-.613-.373z" />
+                                    </svg>
+                                    WhatsApp
+                                </a>
                             @endif
 
                             @if ($profile->has_telegram)
-                            @php
-    $telegramUsername = ltrim($profile->telegram, '@'); // Remove '@' if present
-@endphp
+                                @php
+                                    $telegramUsername = ltrim($profile->telegram, '@'); // Remove '@' if present
+                                @endphp
 
-<a href="https://t.me/{{ $telegramUsername }}" target="_blank"
-                                class="flex items-center text-[#C2C2C2] hover:text-[#0088cc]">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-[#0088cc]"
-                                    fill="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        d="M9.036 15.584l-.363 4.979c.519 0 .743-.222 1.02-.489l2.447-2.323 5.081 3.719c.933.514 1.595.243 1.822-.866L23.95 4.343c.269-1.192-.422-1.656-1.307-1.366L1.75 9.245C.606 9.636.617 10.296 1.522 10.57l5.597 1.745L18.273 5.82c.385-.253.735-.112.446.161z" />
-                                </svg>
-                                Telegram
-                            </a>                                
+                                <a href="https://t.me/{{ $telegramUsername }}" target="_blank"
+                                    class="flex items-center text-[#C2C2C2] hover:text-[#0088cc]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-[#0088cc]"
+                                        fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M9.036 15.584l-.363 4.979c.519 0 .743-.222 1.02-.489l2.447-2.323 5.081 3.719c.933.514 1.595.243 1.822-.866L23.95 4.343c.269-1.192-.422-1.656-1.307-1.366L1.75 9.245C.606 9.636.617 10.296 1.522 10.57l5.597 1.745L18.273 5.82c.385-.253.735-.112.446.161z" />
+                                    </svg>
+                                    Telegram
+                                </a>
                             @endif
+
+                            @if ($profile->has_viber)
+                                @php
+                                    $viberNumber = preg_replace('/[^0-9]/', '', $profile->viber); // Extract only digits
+                                @endphp
+                                <!-- Viber -->
+                                <a href="viber://chat?number=%2B+{{ $viberNumber }}" target="_blank"
+                                    class="flex items-center text-[#C2C2C2] hover:text-[#7B519C]">
+                                    <svg version="1.1" id="Icons" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32" xml:space="preserve" fill="#000000">
+                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                        <g id="SVGRepo_iconCarrier"> 
+                                            <style type="text/css"> .st0{fill:#FFFFFF;} .st1{fill:#3A559F;} .st2{fill:#F4F4F4;} .st3{fill:#FF0084;} .st4{fill:#0063DB;} .st5{fill:#00ACED;} .st6{fill:#FFEC06;} .st7{fill:#FF0000;} .st8{fill:#25D366;} .st9{fill:#0088FF;} .st10{fill:#314358;} .st11{fill:#EE6996;} .st12{fill:#01AEF3;} .st13{fill:#FFFEFF;} .st14{fill:#F06A35;} .st15{fill:#00ADEF;} .st16{fill:#1769FF;} .st17{fill:#1AB7EA;} .st18{fill:#6001D1;} .st19{fill:#E41214;} .st20{fill:#05CE78;} .st21{fill:#7B519C;} .st22{fill:#FF4500;} .st23{fill:#00F076;} .st24{fill:#FFC900;} .st25{fill:#00D6FF;} .st26{fill:#FF3A44;} .st27{fill:#FF6A36;} .st28{fill:#0061FE;} .st29{fill:#F7981C;} .st30{fill:#EE1B22;} .st31{fill:#EF3561;} .st32{fill:none;stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;} .st33{fill:#0097D3;} .st34{fill:#01308A;} .st35{fill:#019CDE;} .st36{fill:#FFD049;} .st37{fill:#16A05D;} .st38{fill:#4486F4;} .st39{fill:none;} .st40{fill:#34A853;} .st41{fill:#4285F4;} .st42{fill:#FBBC05;} .st43{fill:#EA4335;} </style>
+                                             <path class="st21" d="M16,0C8.1,0,0,1.7,0,14c0,6.6,2.3,10.7,7,12.6v3.7c0,0.7,0.4,1.3,1,1.6C8.2,32,8.5,32,8.7,32 c0.4,0,0.9-0.2,1.2-0.5l3.6-3.6c0.8,0,1.6,0.1,2.5,0.1c7.9,0,16-1.7,16-14S23.9,0,16,0z"></path> <g> <g> <path class="st0" d="M15.5,9.1c2.4,0,4.4,2,4.4,4.4c0,0.6,0.4,1,1,1s1-0.4,1-1c0-3.5-2.9-6.4-6.4-6.4c-0.6,0-1,0.4-1,1 S14.9,9.1,15.5,9.1z"></path> <path class="st0" d="M15.5,12.2c0.7,0,1.3,0.6,1.3,1.3c0,0.6,0.4,1,1,1s1-0.4,1-1c0-1.8-1.5-3.3-3.3-3.3c-0.6,0-1,0.4-1,1 S14.9,12.2,15.5,12.2z"></path> <path class="st0" d="M15.5,4c-0.6,0-1,0.4-1,1s0.4,1,1,1c4.1,0,7.5,3.4,7.5,7.5c0,0.6,0.4,1,1,1s1-0.4,1-1C25,8.3,20.7,4,15.5,4z"></path> <path class="st0" d="M21.9,17.1L21.7,17c0,0-2.2-1.1-2.6-1.2c-0.8-0.3-1.6-0.1-2.1,0.6l-0.1,0.2c-0.2,0.3-0.5,0.7-0.7,0.9l0,0 c-0.5-0.2-1.4-0.6-2.6-1.6c-0.8-0.7-1.4-1.6-1.7-2.1c0.1-0.1,0.1-0.1,0.2-0.2c0.1-0.1,0.2-0.2,0.3-0.3c0.2-0.2,0.3-0.4,0.5-0.7 c0.2-0.5,0.2-1,0-1.6c-0.1-0.2-0.5-1.1-0.8-1.8l-0.4-0.8c-0.4-1-1-1.2-1.7-1.2C9.9,7,9.8,7,9.6,7c-0.8,0-1.5,0.3-2,0.8 C7.1,8.3,6,9.4,6,11.6c0,1.8,1.1,3.5,1.7,4.4l0.1,0.1c1.9,2.8,4.3,4.8,6.7,5.8c2.1,0.9,3.3,1.1,4.1,1.1c0.4,0,0.7,0,0.9-0.1 c1.3-0.3,2.8-1.2,3.2-2.4c0.2-0.7,0.5-1.9,0.1-2.6C22.6,17.5,22.2,17.3,21.9,17.1z"></path> 
+                                    </g> </g> </g></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#7360F2]" viewBox="0 0 32 32"
+                                        fill="currentColor">
+                                    </svg>
+                                    Viber
+                                </a>
+                            @endif
+
                         </div>
                     </div>
 
@@ -339,15 +367,15 @@
                             <div class="space-y-3">
                                 <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
                                     <span class="text-[#FFFFFFCC]">За один час</span>
-                                    <span class="text-[#FFFFFFCC] font-semibold">{{round($profile->vyezd_1hour)}}</span>
+                                    <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->vyezd_1hour) }}</span>
                                 </div>
                                 <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
                                     <span class="text-[#FFFFFFCC]">За 2 часа</span>
-                                    <span class="text-[#FFFFFFCC] font-semibold">{{round($profile->vyezd_2hours)}}</span>
+                                    <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->vyezd_2hours) }}</span>
                                 </div>
                                 <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
                                     <span class="text-[#FFFFFFCC]">За всю ночь</span>
-                                    <span class="text-[#FFFFFFCC] font-semibold">{{round($profile->vyezd_night)}}</span>
+                                    <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->vyezd_night) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -358,21 +386,25 @@
                             <div class="space-y-3">
                                 <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
                                     <span class="text-[#FFFFFFCC]">За один час</span>
-                                    <span class="text-[#FFFFFFCC] font-semibold">{{round($profile->appartamenti_1hour)}}</span>
+                                    <span
+                                        class="text-[#FFFFFFCC] font-semibold">{{ round($profile->appartamenti_1hour) }}</span>
                                 </div>
                                 <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
                                     <span class="text-[#FFFFFFCC]">За 2 часа</span>
-                                    <span class="text-[#FFFFFFCC] font-semibold">{{round($profile->appartamenti_2hours)}}</span>
+                                    <span
+                                        class="text-[#FFFFFFCC] font-semibold">{{ round($profile->appartamenti_2hours) }}</span>
                                 </div>
                                 <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
                                     <span class="text-[#FFFFFFCC]">За всю ночь</span>
-                                    <span class="text-[#FFFFFFCC] font-semibold">{{round($profile->appartamenti_night)}}</span>
+                                    <span
+                                        class="text-[#FFFFFFCC] font-semibold">{{ round($profile->appartamenti_night) }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <span class="text-[#636363] px-4 text-sm md:hidden">Была активна {{formatLastActive($profile->user->last_active) }}</span>
+                <span class="text-[#636363] px-4 text-sm md:hidden">Была активна
+                    {{ formatLastActive($profile->user->last_active) }}</span>
             </div>
         </div>
 
@@ -380,16 +412,20 @@
 
         <!-- Attributes for small and medium screens -->
         <div class="hidden md:flex lg:hidden overflow-x-auto hide-scrollbar gap-3 px-4">
-            <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-base text-white">{{$profile->weight}}
+            <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-base text-white">{{ $profile->weight }}
                 кг</span>
-            <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-base text-white">{{$profile->height}}
+            <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-base text-white">{{ $profile->height }}
                 см</span>
-            <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-base text-white">{{$profile->size}}
+            <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-base text-white">{{ $profile->size }}
                 размер</span>
-            <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-sm text-white">{{$profile->hair_color}}</span>
+            <span
+                class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-sm text-white">{{ $profile->hair_color }}</span>
             {{-- <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-sm text-white">Славянка</span> --}}
-            <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-sm text-white capitalize">{{$profile->tattoo}} тату</span>
-            {{-- <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-sm text-white">Интимная стрижка</span> --}}
+            <span
+                class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-sm text-white capitalize">{{ $profile->tattoo }}
+                тату</span>
+            {{-- <span class="bg-[#FFFFFF33] rounded-lg shrink-0 px-2 py-1.5 text-sm text-white">Интимная стрижка</span>
+            --}}
         </div>
 
 
@@ -398,7 +434,7 @@
 
             <!-- Description -->
             <p class="text-[#C2C2C2] mb-3">
-                {{$profile->description}}
+                {{ $profile->description }}
             </p>
 
 
@@ -411,12 +447,12 @@
                             font-family="Arial, sans-serif">M</text>
                     </svg>
                     <span class="text-[#C2C2C2]">
-                      @foreach ($profile->neighborhoods as $key => $neighborhood)
-                      <a href="{{ route('home.neighborhood', ['slug' => $neighborhood->slug]) }}"
-                          class="hover:text-[#6340FF] transition-colors">
-                          {{$neighborhood->name}}{{ $key < count($profile->neighborhoods) - 1 ? ',' : '' ;}}</a>
-                    @endforeach
-                </span>
+                        @foreach ($profile->neighborhoods as $key => $neighborhood)
+                            <a href="{{ route('home.neighborhood', ['slug' => $neighborhood->slug]) }}"
+                                class="hover:text-[#6340FF] transition-colors">
+                                {{ $neighborhood->name }}{{ $key < count($profile->neighborhoods) - 1 ? ',' : '' }}</a>
+                        @endforeach
+                    </span>
             </div>
             <div class="flex items-center mb-6">
                 <span class="inline-flex gap-2 items-center">
@@ -424,12 +460,13 @@
                         <path
                             d="M12 2C7.589 2 4 5.589 4 9.995C4 15.4 12 22 12 22C12 22 20 15.4 20 9.995C20 5.589 16.411 2 12 2ZM12 14C9.791 14 8 12.209 8 10C8 7.791 9.791 6 12 6C14.209 6 16 7.791 16 10C16 12.209 14.209 14 12 14Z" />
                     </svg>
-                    <span class="text-[#C2C2C2]">                              
+                    <span class="text-[#C2C2C2]">
                         @foreach ($profile->metroStations as $key => $metroStation)
-                        <a href="{{ route('home.metro', ['slug' => $metroStation->slug]) }}"
-                            class="hover:text-[#6340FF] transition-colors">
-                            м. {{ $metroStation->name }}{{$key < count($profile->metroStations) - 1 ? ',' : '';}}</a>
-                      @endforeach
+                            <a href="{{ route('home.metro', ['slug' => $metroStation->slug]) }}"
+                                class="hover:text-[#6340FF] transition-colors">
+                                м.
+                                {{ $metroStation->name }}{{ $key < count($profile->metroStations) - 1 ? ',' : '' }}</a>
+                        @endforeach
                     </span>
                 </span>
             </div>
@@ -439,39 +476,61 @@
                 <h3 class="text-xl font-semibold mb-3">Контакты</h3>
                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                     <!-- Phone -->
-                    <a href="tel:{{$profile->phone}}"
-                        class="flex items-center text-[#C2C2C2] hover:text-[#6340FF]">
-                    {{ formatNumber($profile->phone) }}                            
+                    <a href="tel:{{ $profile->phone }}" class="flex items-center text-[#C2C2C2] hover:text-[#6340FF]">
+                        {{ formatNumber($profile->phone) }}
                     </a>
 
                     @if ($profile->has_whatsapp)
-                    <!-- WhatsApp -->
-                    <a href="{{$profile->whatsapp}}" target="_blank"
-                        class="flex gap-1 items-center text-[#C2C2C2] hover:text-[#25D366]">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#25D366]" viewBox="0 0 32 32"
-                            fill="currentColor">
-                            <path
-                                d="M16.002 3C9.38 3 3.998 8.383 3.998 15.005c0 2.65.869 5.093 2.34 7.09L4 29l7.116-2.278A11.922 11.922 0 0 0 16 27c6.622 0 12.002-5.382 12.002-11.995C28.002 8.383 22.622 3 16.002 3zm.003 21.837c-1.954 0-3.897-.506-5.596-1.47l-.403-.237-3.36.985.976-3.275-.262-.417a10.328 10.328 0 0 1-1.62-5.598c0-5.724 4.655-10.378 10.382-10.378 5.723 0 10.375 4.654 10.375 10.378 0 5.726-4.652 10.37-10.375 10.37zm5.83-7.628c-.32-.16-1.89-.934-2.184-1.04-.293-.107-.506-.16-.72.16-.213.32-.826 1.04-1.014 1.254-.187.213-.373.24-.693.08-.32-.16-1.35-.498-2.57-1.59-.949-.844-1.59-1.882-1.775-2.2-.187-.32-.02-.494.14-.654.144-.143.32-.373.48-.56.16-.187.213-.32.32-.533.107-.213.054-.4-.027-.56-.08-.16-.72-1.74-.986-2.373-.26-.624-.524-.54-.72-.547l-.613-.01a1.177 1.177 0 0 0-.854.4c-.293.32-1.12 1.1-1.12 2.666 0 1.566 1.146 3.08 1.305 3.293.16.213 2.257 3.453 5.474 4.843.766.33 1.364.53 1.83.678.768.244 1.464.21 2.014.128.614-.092 1.89-.773 2.157-1.52.267-.747.267-1.387.187-1.52-.08-.133-.293-.213-.613-.373z" />
-                        </svg>
-                        WhatsApp
-                    </a>                                
+                    @php
+                    $whatsappNumber = preg_replace('/[^0-9]/', '', $profile->whatsapp); // Extract only digits
+                @endphp
+                <!-- WhatsApp -->
+                <a href="https://wa.me/+{{ $whatsappNumber }}" target="_blank"
+                            class="flex gap-1 items-center text-[#C2C2C2] hover:text-[#25D366]">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#25D366]" viewBox="0 0 32 32"
+                                fill="currentColor">
+                                <path
+                                    d="M16.002 3C9.38 3 3.998 8.383 3.998 15.005c0 2.65.869 5.093 2.34 7.09L4 29l7.116-2.278A11.922 11.922 0 0 0 16 27c6.622 0 12.002-5.382 12.002-11.995C28.002 8.383 22.622 3 16.002 3zm.003 21.837c-1.954 0-3.897-.506-5.596-1.47l-.403-.237-3.36.985.976-3.275-.262-.417a10.328 10.328 0 0 1-1.62-5.598c0-5.724 4.655-10.378 10.382-10.378 5.723 0 10.375 4.654 10.375 10.378 0 5.726-4.652 10.37-10.375 10.37zm5.83-7.628c-.32-.16-1.89-.934-2.184-1.04-.293-.107-.506-.16-.72.16-.213.32-.826 1.04-1.014 1.254-.187.213-.373.24-.693.08-.32-.16-1.35-.498-2.57-1.59-.949-.844-1.59-1.882-1.775-2.2-.187-.32-.02-.494.14-.654.144-.143.32-.373.48-.56.16-.187.213-.32.32-.533.107-.213.054-.4-.027-.56-.08-.16-.72-1.74-.986-2.373-.26-.624-.524-.54-.72-.547l-.613-.01a1.177 1.177 0 0 0-.854.4c-.293.32-1.12 1.1-1.12 2.666 0 1.566 1.146 3.08 1.305 3.293.16.213 2.257 3.453 5.474 4.843.766.33 1.364.53 1.83.678.768.244 1.464.21 2.014.128.614-.092 1.89-.773 2.157-1.52.267-.747.267-1.387.187-1.52-.08-.133-.293-.213-.613-.373z" />
+                            </svg>
+                            WhatsApp
+                        </a>
                     @endif
 
                     @if ($profile->has_telegram)
-                    @php
-    $telegramUsername = ltrim($profile->telegram, '@'); // Remove '@' if present
-@endphp
+                        @php
+                            $telegramUsername = ltrim($profile->telegram, '@'); // Remove '@' if present
+                        @endphp
 
-<a href="https://t.me/{{ $telegramUsername }}" target="_blank"
-                        class="flex items-center text-[#C2C2C2] hover:text-[#0088cc]">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-[#0088cc]"
-                            fill="currentColor" viewBox="0 0 24 24">
-                            <path
-                                d="M9.036 15.584l-.363 4.979c.519 0 .743-.222 1.02-.489l2.447-2.323 5.081 3.719c.933.514 1.595.243 1.822-.866L23.95 4.343c.269-1.192-.422-1.656-1.307-1.366L1.75 9.245C.606 9.636.617 10.296 1.522 10.57l5.597 1.745L18.273 5.82c.385-.253.735-.112.446.161z" />
-                        </svg>
-                        Telegram
-                    </a>                                
+                        <a href="https://t.me/{{ $telegramUsername }}" target="_blank"
+                            class="flex items-center text-[#C2C2C2] hover:text-[#0088cc]">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-[#0088cc]" fill="currentColor"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M9.036 15.584l-.363 4.979c.519 0 .743-.222 1.02-.489l2.447-2.323 5.081 3.719c.933.514 1.595.243 1.822-.866L23.95 4.343c.269-1.192-.422-1.656-1.307-1.366L1.75 9.245C.606 9.636.617 10.296 1.522 10.57l5.597 1.745L18.273 5.82c.385-.253.735-.112.446.161z" />
+                            </svg>
+                            Telegram
+                        </a>
                     @endif
+
+                    @if ($profile->has_viber)
+                                @php
+                                    $viberNumber = preg_replace('/[^0-9]/', '', $profile->viber); // Extract only digits
+                                @endphp
+                                <!-- Viber -->
+                                <a href="viber://chat?number=%2B+{{ $viberNumber }}" target="_blank"
+                                    class="flex items-center text-[#C2C2C2] hover:text-[#7B519C]">
+                                    <svg version="1.1" id="Icons" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32" xml:space="preserve" fill="#000000">
+                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                        <g id="SVGRepo_iconCarrier"> 
+                                            <style type="text/css"> .st0{fill:#FFFFFF;} .st1{fill:#3A559F;} .st2{fill:#F4F4F4;} .st3{fill:#FF0084;} .st4{fill:#0063DB;} .st5{fill:#00ACED;} .st6{fill:#FFEC06;} .st7{fill:#FF0000;} .st8{fill:#25D366;} .st9{fill:#0088FF;} .st10{fill:#314358;} .st11{fill:#EE6996;} .st12{fill:#01AEF3;} .st13{fill:#FFFEFF;} .st14{fill:#F06A35;} .st15{fill:#00ADEF;} .st16{fill:#1769FF;} .st17{fill:#1AB7EA;} .st18{fill:#6001D1;} .st19{fill:#E41214;} .st20{fill:#05CE78;} .st21{fill:#7B519C;} .st22{fill:#FF4500;} .st23{fill:#00F076;} .st24{fill:#FFC900;} .st25{fill:#00D6FF;} .st26{fill:#FF3A44;} .st27{fill:#FF6A36;} .st28{fill:#0061FE;} .st29{fill:#F7981C;} .st30{fill:#EE1B22;} .st31{fill:#EF3561;} .st32{fill:none;stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;} .st33{fill:#0097D3;} .st34{fill:#01308A;} .st35{fill:#019CDE;} .st36{fill:#FFD049;} .st37{fill:#16A05D;} .st38{fill:#4486F4;} .st39{fill:none;} .st40{fill:#34A853;} .st41{fill:#4285F4;} .st42{fill:#FBBC05;} .st43{fill:#EA4335;} </style>
+                                             <path class="st21" d="M16,0C8.1,0,0,1.7,0,14c0,6.6,2.3,10.7,7,12.6v3.7c0,0.7,0.4,1.3,1,1.6C8.2,32,8.5,32,8.7,32 c0.4,0,0.9-0.2,1.2-0.5l3.6-3.6c0.8,0,1.6,0.1,2.5,0.1c7.9,0,16-1.7,16-14S23.9,0,16,0z"></path> <g> <g> <path class="st0" d="M15.5,9.1c2.4,0,4.4,2,4.4,4.4c0,0.6,0.4,1,1,1s1-0.4,1-1c0-3.5-2.9-6.4-6.4-6.4c-0.6,0-1,0.4-1,1 S14.9,9.1,15.5,9.1z"></path> <path class="st0" d="M15.5,12.2c0.7,0,1.3,0.6,1.3,1.3c0,0.6,0.4,1,1,1s1-0.4,1-1c0-1.8-1.5-3.3-3.3-3.3c-0.6,0-1,0.4-1,1 S14.9,12.2,15.5,12.2z"></path> <path class="st0" d="M15.5,4c-0.6,0-1,0.4-1,1s0.4,1,1,1c4.1,0,7.5,3.4,7.5,7.5c0,0.6,0.4,1,1,1s1-0.4,1-1C25,8.3,20.7,4,15.5,4z"></path> <path class="st0" d="M21.9,17.1L21.7,17c0,0-2.2-1.1-2.6-1.2c-0.8-0.3-1.6-0.1-2.1,0.6l-0.1,0.2c-0.2,0.3-0.5,0.7-0.7,0.9l0,0 c-0.5-0.2-1.4-0.6-2.6-1.6c-0.8-0.7-1.4-1.6-1.7-2.1c0.1-0.1,0.1-0.1,0.2-0.2c0.1-0.1,0.2-0.2,0.3-0.3c0.2-0.2,0.3-0.4,0.5-0.7 c0.2-0.5,0.2-1,0-1.6c-0.1-0.2-0.5-1.1-0.8-1.8l-0.4-0.8c-0.4-1-1-1.2-1.7-1.2C9.9,7,9.8,7,9.6,7c-0.8,0-1.5,0.3-2,0.8 C7.1,8.3,6,9.4,6,11.6c0,1.8,1.1,3.5,1.7,4.4l0.1,0.1c1.9,2.8,4.3,4.8,6.7,5.8c2.1,0.9,3.3,1.1,4.1,1.1c0.4,0,0.7,0,0.9-0.1 c1.3-0.3,2.8-1.2,3.2-2.4c0.2-0.7,0.5-1.9,0.1-2.6C22.6,17.5,22.2,17.3,21.9,17.1z"></path> 
+                                    </g> </g> </g></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#7360F2]" viewBox="0 0 32 32"
+                                        fill="currentColor">
+                                    </svg>
+                                    Viber
+                                </a>
+                            @endif
                 </div>
             </div>
         </div>
@@ -484,15 +543,15 @@
                 <div class="space-y-3">
                     <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
                         <span class="text-[#FFFFFFCC]">За один час</span>
-                        <span class="text-[#FFFFFFCC] font-semibold">{{round($profile->vyezd_1hour)}}</span>
+                        <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->vyezd_1hour) }}</span>
                     </div>
                     <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
                         <span class="text-[#FFFFFFCC]">За 2 часа</span>
-                        <span class="text-[#FFFFFFCC] font-semibold">{{round($profile->vyezd_2hours)}}</span>
+                        <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->vyezd_2hours) }}</span>
                     </div>
                     <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
                         <span class="text-[#FFFFFFCC]">За всю ночь</span>
-                        <span class="text-[#FFFFFFCC] font-semibold">{{round($profile->vyezd_night)}}</span>
+                        <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->vyezd_night) }}</span>
                     </div>
                 </div>
             </div>
@@ -503,15 +562,15 @@
                 <div class="space-y-3">
                     <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
                         <span class="text-[#FFFFFFCC]">За один час</span>
-                        <span class="text-[#FFFFFFCC] font-semibold">{{round($profile->appartamenti_1hour)}}</span>
+                        <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->appartamenti_1hour) }}</span>
                     </div>
                     <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
                         <span class="text-[#FFFFFFCC]">За 2 часа</span>
-                        <span class="text-[#FFFFFFCC] font-semibold">{{round($profile->appartamenti_2hours)}}</span>
+                        <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->appartamenti_2hours) }}</span>
                     </div>
                     <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
                         <span class="text-[#FFFFFFCC]">За всю ночь</span>
-                        <span class="text-[#FFFFFFCC] font-semibold">{{round($profile->appartamenti_night)}}</span>
+                        <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->appartamenti_night) }}</span>
                     </div>
                 </div>
             </div>
@@ -529,31 +588,31 @@
             <!-- Services Section -->
             <div class=" lg:w-1/2">
                 <h3 class="text-4xl font-semibold mb-8 capitalize">услуги</h3>
-            <div class="flex flex-col md:flex-row gap-8 mb-8">
-                <div class="md:w-1/2">
-                    <h3 class="text-lg font-semibold mb-4 capitalize">Базовые услуги</h3>
-                    <div class="grid grid-cols-1 gap-2">
-                        @foreach ($profile->services as $service)
-                        <div class="flex justify-between">
-                            <span class="text-[#C2C2C2]">{{$service->name}}</span>
+                <div class="flex flex-col md:flex-row gap-8 mb-8">
+                    <div class="md:w-1/2">
+                        <h3 class="text-lg font-semibold mb-4 capitalize">Базовые услуги</h3>
+                        <div class="grid grid-cols-1 gap-2">
+                            @foreach ($profile->services as $service)
+                                <div class="flex justify-between">
+                                    <span class="text-[#C2C2C2]">{{ $service->name }}</span>
+                                </div>
+                            @endforeach
                         </div>
-                        @endforeach
                     </div>
-                </div>
 
-                <div class="md:w-1/2">
-                    <h3 class="text-lg font-semibold mb-4 capitalize">Дополнительные услуги</h3>
-                    <div class="grid grid-cols-1 gap-2">
-                        @foreach ($profile->paidServices as $service)
-                        <div class="flex">
-                            <span class="text-[#C2C2C2]">{{$service->name}}</span>
-                            <span class="text-[#6340FF] ml-3">+{{round($service->pivot->price)}} руб</span>
+                    <div class="md:w-1/2">
+                        <h3 class="text-lg font-semibold mb-4 capitalize">Дополнительные услуги</h3>
+                        <div class="grid grid-cols-1 gap-2">
+                            @foreach ($profile->paidServices as $service)
+                                <div class="flex">
+                                    <span class="text-[#C2C2C2]">{{ $service->name }}</span>
+                                    <span class="text-[#6340FF] ml-3">+{{ round($service->pivot->price) }} руб</span>
+                                </div>
+                            @endforeach
                         </div>
-                        @endforeach
                     </div>
                 </div>
             </div>
-        </div>
 
             <!-- Map Location -->
             <div class="flex lg:w-1/2 flex-col md:flex-row gap-8 mb-8">
@@ -563,11 +622,13 @@
                         <div id="map" class="rounded-xl overflow-hidden" style="width: 100%; height: 400px;"></div>
                         <p id="map-address" class="text-[#A0A0A0] mt-2 mb-2"></p>
                         {{-- IMPORTANT: Replace YOUR_API_KEY_HERE with your actual Yandex Maps API key --}}
-@once
-                        <script src="https://api-maps.yandex.ru/2.1/?apikey={{ $yandexApiKey ?? 'ef000210-ee4f-45fe-a5a1-2f89cddce2cc' }}&lang=ru_RU" type="text/javascript" id="yandex-maps-api-script-profile-{{ $profile->id }}"></script>
-@endonce
+                        @once
+                            <script
+                                src="https://api-maps.yandex.ru/2.1/?apikey={{ $yandexApiKey ?? 'ef000210-ee4f-45fe-a5a1-2f89cddce2cc' }}&lang=ru_RU"
+                                type="text/javascript" id="yandex-maps-api-script-profile-{{ $profile->id }}"></script>
+                        @endonce
                         <script type="text/javascript">
-                            function init(){
+                            function init() {
                                 const mapContainer = document.getElementById('map');
                                 if (mapContainer && mapContainer.dataset.mapInitialized == 'true') {
                                     return; // Map already initialized
@@ -577,7 +638,7 @@
                                     setTimeout(init, 100);
                                     return;
                                 }
-                                if(mapContainer) {
+                                if (mapContainer) {
                                     mapContainer.dataset.mapInitialized = 'true';
                                 }
                                 var myMap = new ymaps.Map("map", {
@@ -605,7 +666,7 @@
                                     } else {
                                         var addressElement = document.getElementById('map-address');
                                         if (addressElement) {
-                                            addressElement.textContent = 'Адрес не определен.'; 
+                                            addressElement.textContent = 'Адрес не определен.';
                                         }
                                     }
                                 }).catch(function (err) {
@@ -634,17 +695,19 @@
                                     if (typeof ymaps != 'undefined') {
                                         ymaps.ready(init);
                                     } else {
-                                        const scriptTag = document.getElementById('yandex-maps-api-script-profile-{{ $profile->id }}');
+                                        const scriptTag = document.getElementById(
+                                            'yandex-maps-api-script-profile-{{ $profile->id }}');
                                         if (scriptTag) {
                                             scriptTag.onload = () => ymaps.ready(init);
-                                            scriptTag.onerror = () => console.error('Yandex Maps API script failed to load for profile page.');
+                                            scriptTag.onerror = () => console.error(
+                                                'Yandex Maps API script failed to load for profile page.');
                                         } else {
                                             console.error('Yandex Maps API script tag not found for profile page.');
                                         }
                                     }
                                 });
                             }
-                        </script>                
+                        </script>
                     @else
                         <p class="text-white">Информация о местоположении не указана.</p>
                     @endif
@@ -663,10 +726,10 @@
                 <button id="tab-reviews"
                     class="tab-button px-4 py-2 bg-transparent border border-gray-700 rounded-md text-white"
                     data-tab="reviews">
-                <span class="flex">
-                    <span>Отзывы</span>
-                    <span class="hidden md:flex">реальных клиентов</span>
-                </span>
+                    <span class="flex">
+                        <span>Отзывы</span>
+                        <span class="hidden md:flex">реальных клиентов</span>
+                    </span>
                 </button>
             </div>
 
@@ -675,7 +738,6 @@
                 <!-- Comments List -->
                 <div class="space-y-6">
                     @forelse($profile->comments->where('approved', true) as $comment)
-                    
                         <div class="bg-[#1A1A1A] rounded-xl p-6">
                             <div class="flex flex-col mb-6">
                                 <div class="text-2xl font-semibold mb-2">{{ $comment->name }}</div>
@@ -774,12 +836,10 @@
 
             <div id="profiles-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 @include('partials.similar-profiles', ['profiles' => $profiles])
-            </div>    
+            </div>
         </div>
-        
-    </div>
 
-   
+    </div>
 @endsection
 
 @push('scripts')
@@ -817,10 +877,10 @@
                 videoSlide.classList.add('opacity-0', 'pointer-events-none');
             @endif
 
-          
 
-            // Show the selected slide
-            if (index >= 0 && index < slides.length) {
+
+                // Show the selected slide
+                if (index >= 0 && index < slides.length) {
                 slides[index].classList.remove('opacity-0');
                 slides[index].classList.add('opacity-100');
                 currentSlide = index;
@@ -844,15 +904,15 @@
                 currentSlide = 0;
                 showSlide(currentSlide);
             } else if (currentSlide == totalSlides - 1) {
-               @if (isset($profile->video->path))
-                // If we're at the last image slide and video exists, show video
-                showVideo();
-               @else
-                // If we're at the last image slide and no video, loop back to first slide
-                currentSlide = 0;
-                showSlide(currentSlide);
-               @endif
-            } else {
+                @if (isset($profile->video->path))
+                    // If we're at the last image slide and video exists, show video
+                    showVideo();
+                @else
+                    // If we're at the last image slide and no video, loop back to first slide
+                    currentSlide = 0;
+                    showSlide(currentSlide);
+                @endif
+                } else {
                 // Otherwise, go to next slide
                 currentSlide = (currentSlide + 1) % totalSlides;
                 showSlide(currentSlide);
@@ -868,14 +928,14 @@
                 showSlide(currentSlide);
             } else if (currentSlide == 0) {
                 @if (isset($profile->video->path))
-                // If we're at the first slide and video exists, show video
-                showVideo();
+                    // If we're at the first slide and video exists, show video
+                    showVideo();
                 @else
-                // If we're at the first slide and no video, loop to the last slide
-                currentSlide = totalSlides - 1;
-                showSlide(currentSlide);
+                    // If we're at the first slide and no video, loop to the last slide
+                    currentSlide = totalSlides - 1;
+                    showSlide(currentSlide);
                 @endif
-            } else {
+                } else {
                 // Otherwise, go to previous slide
                 currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
                 showSlide(currentSlide);
@@ -883,34 +943,34 @@
         }
 
         @if (isset($profile->video->path))
-        // Function to show video
-        function showVideo() {
-            // Hide all image slides
-            const slides = document.querySelectorAll('.carousel-slide');
-            slides.forEach(slide => {
-                slide.classList.remove('opacity-100');
-                slide.classList.add('opacity-0');
-            });
+            // Function to show video
+            function showVideo() {
+                // Hide all image slides
+                const slides = document.querySelectorAll('.carousel-slide');
+                slides.forEach(slide => {
+                    slide.classList.remove('opacity-100');
+                    slide.classList.add('opacity-0');
+                });
 
-            // Show video slide
-            const videoSlide = document.querySelector('.video-slide');
-            videoSlide.classList.remove('opacity-0');
-            videoSlide.classList.add('opacity-100');
+                // Show video slide
+                const videoSlide = document.querySelector('.video-slide');
+                videoSlide.classList.remove('opacity-0');
+                videoSlide.classList.add('opacity-100');
 
-            // Mark video as active
-            isVideoActive = true;
+                // Mark video as active
+                isVideoActive = true;
 
-            // Set video source if not already set, unmute and play
-            const video = videoSlide.querySelector('video');
-            if (video) {
-                // The source is already set in the HTML
-                video.muted = false; // Unmute when video becomes active
-                video.play();
+                // Set video source if not already set, unmute and play
+                const video = videoSlide.querySelector('video');
+                if (video) {
+                    // The source is already set in the HTML
+                    video.muted = false; // Unmute when video becomes active
+                    video.play();
+                }
+
+                // Update mobile indicators
+                updateIndicators(true);
             }
-
-            // Update mobile indicators
-            updateIndicators(true);
-        }            
         @endif
 
         // Update mobile indicators
@@ -944,12 +1004,14 @@
             }, false);
 
             // Prevent default touch behavior to avoid page scrolling during swipe
-            carouselContainer.addEventListener('touchmove', function(e) {
+            carouselContainer.addEventListener('touchmove', function (e) {
                 // Only prevent default if swiping horizontally
                 if (Math.abs(e.touches[0].screenX - touchStartX) > 10) {
                     e.preventDefault();
                 }
-            }, { passive: false });
+            }, {
+                passive: false
+            });
 
             // Add click event to open fullscreen when clicking on the main image or video
             carouselContainer.addEventListener('click', function (e) {
@@ -963,14 +1025,15 @@
                     // when an image is currently active in the carousel.
                     // The first click (e.detail === 1) should have already handled
                     // opening the image in fullscreen.
-                    
+
                     const mainVideoElement = document.querySelector('.video-slide video');
-                    if (mainVideoElement && typeof mainVideoElement.pause == 'function' && !mainVideoElement.paused) {
+                    if (mainVideoElement && typeof mainVideoElement.pause == 'function' && !mainVideoElement
+                        .paused) {
                         mainVideoElement.pause(); // Explicitly pause if it somehow started playing
                     }
-                    
+
                     // Prevent default browser actions for the second click if it's part of a dblclick (e.g., text selection)
-                    e.preventDefault(); 
+                    e.preventDefault();
                     return; // Stop further processing for this specific click event
                 }
 
@@ -981,7 +1044,8 @@
                         openVideoFullscreen(video);
                     }
                 } else {
-                    const currentImage = document.querySelectorAll('.carousel-slide')[currentSlide].querySelector('img');
+                    const currentImage = document.querySelectorAll('.carousel-slide')[currentSlide]
+                        .querySelector('img');
                     if (currentImage) {
                         openFullscreen(currentImage.src);
                     }
@@ -1020,17 +1084,21 @@
 
             // Add navigation buttons
             const prevButton = document.createElement('button');
-            prevButton.className = 'absolute left-4 top-1/2 transform -translate-y-1/2 text-white p-2 rounded-full bg-black bg-opacity-50';
-            prevButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>';
-            prevButton.onclick = function(e) {
+            prevButton.className =
+                'absolute left-4 top-1/2 transform -translate-y-1/2 text-white p-2 rounded-full bg-black bg-opacity-50';
+            prevButton.innerHTML =
+                '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>';
+            prevButton.onclick = function (e) {
                 e.stopPropagation();
                 navigateFullscreenImage('prev');
             };
 
             const nextButton = document.createElement('button');
-            nextButton.className = 'absolute right-4 top-1/2 transform -translate-y-1/2 text-white p-2 rounded-full bg-black bg-opacity-50';
-            nextButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>';
-            nextButton.onclick = function(e) {
+            nextButton.className =
+                'absolute right-4 top-1/2 transform -translate-y-1/2 text-white p-2 rounded-full bg-black bg-opacity-50';
+            nextButton.innerHTML =
+                '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>';
+            nextButton.onclick = function (e) {
                 e.stopPropagation();
                 navigateFullscreenImage('next');
             };
@@ -1039,7 +1107,7 @@
             fullscreenOverlay.appendChild(closeButton);
             fullscreenOverlay.appendChild(prevButton);
             fullscreenOverlay.appendChild(nextButton);
-            
+
             fullscreenOverlay.onclick = function (e) {
                 if (e.target == fullscreenOverlay) {
                     document.body.removeChild(fullscreenOverlay);
@@ -1048,11 +1116,11 @@
 
             // Add touch event listeners for swipe in fullscreen
             let fsStartX, fsEndX;
-            fullscreenOverlay.addEventListener('touchstart', function(e) {
+            fullscreenOverlay.addEventListener('touchstart', function (e) {
                 fsStartX = e.changedTouches[0].screenX;
             }, false);
 
-            fullscreenOverlay.addEventListener('touchend', function(e) {
+            fullscreenOverlay.addEventListener('touchend', function (e) {
                 fsEndX = e.changedTouches[0].screenX;
                 if (fsEndX < fsStartX - 50) { // Swipe left (next)
                     navigateFullscreenImage('next');
@@ -1071,24 +1139,26 @@
             if (direction == 'next') {
                 newSlide = (currentSlide + 1) % document.querySelectorAll('.carousel-slide').length;
             } else {
-                newSlide = (currentSlide - 1 + document.querySelectorAll('.carousel-slide').length) % document.querySelectorAll('.carousel-slide').length;
+                newSlide = (currentSlide - 1 + document.querySelectorAll('.carousel-slide').length) % document
+                    .querySelectorAll('.carousel-slide').length;
             }
-            
+
             // Update the current slide index
             currentSlide = newSlide;
-            
+
             // Get the new image source
             const newImageSrc = document.querySelectorAll('.carousel-slide')[newSlide].querySelector('img').src;
-            
+
             // Update the fullscreen image
             document.getElementById('fullscreen-image').src = newImageSrc;
-            
+
             // Also update the main carousel
             showSlide(newSlide);
 
             // Pause and reset video if it's not the current slide
             const videoSlide = document.querySelector('.video-slide');
-            if (videoSlide && videoSlide.classList.contains('opacity-100') && newSlide != document.querySelectorAll('.carousel-slide').length - 1) {
+            if (videoSlide && videoSlide.classList.contains('opacity-100') && newSlide != document.querySelectorAll(
+                '.carousel-slide').length - 1) {
                 const video = videoSlide.querySelector('video');
                 if (video) {
                     video.pause();
@@ -1143,12 +1213,11 @@
                     document.body.removeChild(fullscreenOverlay);
                 }
             };
-            
+
 
             document.body.appendChild(fullscreenOverlay);
         }
-
-</script>
+    </script>
     <!-- Tab Functionality Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -1217,5 +1286,4 @@
             });
         });
     </script>
-
 @endpush

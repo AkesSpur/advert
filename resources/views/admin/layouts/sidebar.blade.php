@@ -231,7 +231,7 @@ class="dropdown {{ setActive([
     <li class="{{ setActive(['admin.customer.index']) }}"><a class="nav-link"
             href="{{ route('admin.customer.index') }}">Список клиентов</a></li> 
     <li class="{{ setActive(['admin.manage-user.index']) }}"><a class="nav-link"
-            href="{{ route('admin.manage-user.index') }}">Управление пользователями</a></li>
+            href="{{ route('admin.manage-user.index') }}">Создать пользователя</a></li>
 
 </ul>
 </li>
@@ -274,7 +274,7 @@ class="dropdown {{ setActive([
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-cog"></i> <span>Настройки</span></a>
                 <ul class="dropdown-menu">
                     <li class="{{setActive(['admin.settings.*'])}}"><a class="nav-link" href="{{route('admin.settings.index')}}">Общие настройки</a></li>
-                    <li class="{{setActive(['admin.hero-section-setting.*'])}}"><a class="nav-link" href="{{route('admin.hero-section-setting.index')}}">Настройки секции Hero</a></li>
+                    <li class="{{setActive(['admin.hero-section-setting.*'])}}"><a class="nav-link" href="{{route('admin.hero-section-setting.index')}}">Текст на главной</a></li>
                     <li class="{{ setActive(['admin.hero-section-override.index']) }}"><a class="nav-link"
                             href="{{ route('admin.hero-section-override.index') }}">Замена текстов на страницах категори</a></li>
                 </ul>

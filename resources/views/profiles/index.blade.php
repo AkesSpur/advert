@@ -166,7 +166,7 @@
                     
                     <form action="{{ route('user.profiles.destroy', $profile->id) }}" method="POST" class="block"
                       x-data="{}"
-                      @submit.prevent="if (confirm('Вы уверены, что хотите удалить этот профиль?')) $el.submit();">
+                      @submit.prevent="if (confirm('Вы точно хотите удалить анкету? Её нельзя восстановить!')) $el.submit();">
                       @csrf
                       @method('DELETE')
                       <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-800 hover:text-red-400">
@@ -342,7 +342,7 @@
                           
                           <form action="{{ route('user.profiles.destroy', $profile->id) }}" method="POST" class="block"
                             x-data="{}"
-                            @submit.prevent="if (confirm('Вы уверены, что хотите удалить этот профиль?')) $el.submit();">
+                            @submit.prevent="if (confirm('Вы точно хотите удалить анкету? Её нельзя восстановить!')) $el.submit();">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-800 hover:text-red-400">
@@ -647,7 +647,7 @@
       </a>
       
       <form action="{{ route('user.profiles.destroy', $profile->id) }}" method="POST" class="w-full" x-data="{}"
-      @submit.prevent="if (confirm('Вы уверены, что хотите удалить этот профиль?')) $el.submit();">
+      @submit.prevent="if (confirm('Вы точно хотите удалить анкету? Её нельзя восстановить!')) $el.submit();">
       @csrf
       @method('DELETE')
       <button type="submit" class="w-full py-3 text-red-500 hover:text-red-400">
@@ -799,7 +799,7 @@ class="mt-8 lg:hidden">
         </form>
         
         <form action="{{ route('user.profiles.destroy', $profile->id) }}" method="POST" class="w-full" x-data="{}"
-        @submit.prevent="if (confirm('Вы уверены, что хотите удалить этот профиль?')) $el.submit();">
+        @submit.prevent="if (confirm('Вы точно хотите удалить анкету? Её нельзя восстановить!')) $el.submit();">
         @csrf
         @method('DELETE')
         <button type="submit" class="w-full py-3 text-red-500 hover:text-red-400">

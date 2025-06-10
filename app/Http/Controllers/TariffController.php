@@ -141,7 +141,7 @@ class TariffController extends Controller
             $now = Carbon::now();
             $dailyCharge = 0;
             $expiresAt = null;
-            $isAdmin = ($user->id == 1); // Проверяем, является ли пользователь администратором
+            $isAdmin = ($user->role == 'admin'); // Проверяем, является ли пользователь администратором
             $totalCost = 0; // Инициализируем переменную для общей стоимости
 
             // Рассчитываем стоимость и дату окончания в зависимости от типа тарифа
