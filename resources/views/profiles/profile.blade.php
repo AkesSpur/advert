@@ -341,7 +341,7 @@
                                     $viberNumber = preg_replace('/[^0-9]/', '', $profile->viber); // Extract only digits
                                 @endphp
                                 <!-- Viber -->
-                                <a href="viber://chat?number=%2B+{{ $viberNumber }}" target="_blank"
+                                <a href="https://viber://chat?number=%2B+{{ $viberNumber }}" target="_blank"
                                     class="flex items-center text-[#C2C2C2] hover:text-[#7B519C]">
                                     <svg version="1.1" id="Icons" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32" xml:space="preserve" fill="#000000">
                                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -517,7 +517,7 @@
                                     $viberNumber = preg_replace('/[^0-9]/', '', $profile->viber); // Extract only digits
                                 @endphp
                                 <!-- Viber -->
-                                <a href="viber://chat?number=%2B+{{ $viberNumber }}" target="_blank"
+                                <a href="https://viber://chat?number=%2B+{{ $viberNumber }}" target="_blank"
                                     class="flex items-center text-[#C2C2C2] hover:text-[#7B519C]">
                                     <svg version="1.1" id="Icons" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32" xml:space="preserve" fill="#000000">
                                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>

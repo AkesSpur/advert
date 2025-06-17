@@ -24,6 +24,7 @@ class Profile extends Model
         'phone',
         'description',
         'name',
+        'slug',
         'age',
         'weight',
         'height',

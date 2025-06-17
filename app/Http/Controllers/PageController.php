@@ -1082,7 +1082,10 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
 
     public function show($slug, $id)
     {
-        $profile = Profile::with(['metroStations', 'services', 'images', 'video', 'neighborhoods'])->findOrFail($id);
+        $profile = Profile::with(['metroStations', 'services', 'images', 'video', 'neighborhoods'])
+        ->where('id', $id)
+        ->where('slug', $slug)
+        ->firstOrFail();
 
         if($profile->is_active == false) {
             abort(404, 'Профиль неактивен.');

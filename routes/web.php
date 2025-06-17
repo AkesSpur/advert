@@ -56,7 +56,7 @@ Route::get('/category/{slug}', [PageController::class, 'filterByCustomCategory']
 Route::get('/neighborhood/{slug}', [PageController::class, 'index'])->name('home.neighborhood');
 // profiles
 Route::get('/profiles/click/{id}', [PageController::class, 'profileClick'])->name('profiles.clicks');
-Route::get('/profiles/{slug}-{id}', [PageController::class, 'show'])->name('profiles.view');
+Route::get('/profiles/{slug}-{id}', [PageController::class, 'show'])->name('profiles.view')->where(['slug' => '[a-zA-Z0-9\-]+', 'id' => '[0-9]+']);
 // likes
 Route::post('/profile/{id}/toggle-like', [LikeController::class, 'toggle'])->name('profile.toggleLike');
 Route::get('/my-likes', [LikeController::class, 'likedProfiles'])->name('profile.likedProfiles');
