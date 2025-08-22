@@ -1080,12 +1080,26 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
         ));
     }
 
-    public function show($slug, $id)
+    public function show($slugId)
     {
+        // Parse the slug-id combination
+        $lastDashPos = strrpos($slugId, '-');
+        if ($lastDashPos === false) {
+            abort(404, 'Invalid profile URL format');
+        }
+        
+        $slug = substr($slugId, 0, $lastDashPos);
+        $id = substr($slugId, $lastDashPos + 1);
+        
+        // Validate that id is numeric
+        if (!is_numeric($id)) {
+            abort(404, 'Invalid profile ID');
+        }
+        
         $profile = Profile::with(['metroStations', 'services', 'images', 'video', 'neighborhoods'])
-        ->where('id', $id)
-        ->where('slug', $slug)
-        ->firstOrFail();
+            ->where('id', $id)
+            ->where('slug', $slug)
+            ->firstOrFail();
 
         if($profile->is_active == false) {
             abort(404, 'Профиль неактивен.');

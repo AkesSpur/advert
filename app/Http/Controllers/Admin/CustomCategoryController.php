@@ -146,8 +146,8 @@ class CustomCategoryController extends Controller
      */
     public function destroy(CustomCategory $customCategory)
     {
-        // $customCategory = CustomCategory::findOrFail($id);
-        // $customCategory->delete();
+
+        $customCategory->delete();
 
         return response(['status' => 'success', 'Удалено успешно!']);
     }

@@ -28,6 +28,7 @@
                                     </thead>
                                     <tbody>
                                         @foreach($reviews as $review)
+                                        @if($review->profile)
                                         <tr>
                                             {{-- <td>{{$review->id}}</td> --}}
                                             <td> <a href="{{ route('profiles.view', [
@@ -53,6 +54,7 @@
                                                 <a href="{{route('admin.reviews.destroy', $review->id)}}" class="btn btn-danger delete-item"><i class="fas fa-trash"></i></a>
                                             </td>
                                         </tr>
+                                        @endif
                                         @endforeach
                                     </tbody>
                                 </table>
