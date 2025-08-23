@@ -28,6 +28,8 @@
                                     </thead>
                                     <tbody>
                                         @foreach($comments as $comment)
+                                            @if($comment->profile)
+
                                         <tr>
                                             {{-- <td>{{$comment->id}}</td> --}}
                                             <td>
@@ -55,6 +57,7 @@
                                                 <a href="{{route('admin.comments.destroy', $comment->id)}}" class="btn btn-danger delete-item"><i class="fas fa-trash"></i></a>
                                             </td>
                                         </tr>
+                                            @endif
                                         @endforeach
                                     </tbody>
                                 </table>
