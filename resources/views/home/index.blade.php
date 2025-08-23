@@ -880,7 +880,7 @@
                 <div class="flex overflow-x-auto hide-scrollbar justify-start gap-3 mb-4 lg:w-[75%] lg:mb-0">
                     @foreach ($topMenus as $menu)
                         @if ($menu->all_accounts == true && $menu->status == true)
-                        <a href="{{ Request::url() }}" 
+                        <a href="/" 
                         class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'all' || !$filter ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
                         {{$menu->name}}
                         </a>                             
@@ -1120,7 +1120,7 @@
             <div class="flex flex-wrap justify-center gap-3 mb-4 lg:hidden">
                 @foreach ($footerMenus as $menu)
                     @if ($menu->all_accounts == true && $menu->status == true)
-                    <a href="{{ Request::url() }}" 
+                    <a href="/" 
                     class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'all' || !$filter ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
                     {{$menu->name}}
                     </a>                             
@@ -1187,7 +1187,7 @@
     <div class="hidden lg:flex flex-wrap justify-center gap-3 mb-4 ">
         @foreach ($footerMenus as $menu)
             @if ($menu->all_accounts == true && $menu->status == true)
-            <a href="{{ Request::url() }}" 
+            <a href="/" 
             class="px-4 py-2 shrink-0 text-white rounded-lg hover:bg-[#5030EF] transition-colors {{ $filter == 'all' || !$filter ? 'bg-[#6340FF]' : 'bg-[#191919] border border-[#8B8B8B] hover:bg-[#252525]' }}">
             {{$menu->name}}
             </a>                             

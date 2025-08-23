@@ -361,28 +361,9 @@
 
                     <!-- Pricing Tables -->
                     <div class="grid grid-cols-1 md:bg-[#191919] md:mx-2 p-4  rounded-2xl md:grid-cols-2 gap-8">
-                        <!-- Выезд Pricing -->
+                       <!-- Апартаменты Pricing -->
                         <div class="p-2">
-                            <h3 class="text-xl font-semibold mb-4">Цена выезд</h3>
-                            <div class="space-y-3">
-                                <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
-                                    <span class="text-[#FFFFFFCC]">За один час</span>
-                                    <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->vyezd_1hour) }}</span>
-                                </div>
-                                <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
-                                    <span class="text-[#FFFFFFCC]">За 2 часа</span>
-                                    <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->vyezd_2hours) }}</span>
-                                </div>
-                                <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
-                                    <span class="text-[#FFFFFFCC]">За всю ночь</span>
-                                    <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->vyezd_night) }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Апартаменты Pricing -->
-                        <div class="p-2">
-                            <h3 class="text-xl font-semibold mb-4">Цена апартаменты</h3>
+                            <h3 class="text-xl font-semibold mb-4">Цена в аппартаментах</h3>
                             <div class="space-y-3">
                                 <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
                                     <span class="text-[#FFFFFFCC]">За один час</span>
@@ -398,6 +379,24 @@
                                     <span class="text-[#FFFFFFCC]">За всю ночь</span>
                                     <span
                                         class="text-[#FFFFFFCC] font-semibold">{{ round($profile->appartamenti_night) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Выезд Pricing -->
+                        <div class="p-2">
+                            <h3 class="text-xl font-semibold mb-4">Цена на выезд</h3>
+                            <div class="space-y-3">
+                                <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
+                                    <span class="text-[#FFFFFFCC]">За один час</span>
+                                    <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->vyezd_1hour) }}</span>
+                                </div>
+                                <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
+                                    <span class="text-[#FFFFFFCC]">За 2 часа</span>
+                                    <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->vyezd_2hours) }}</span>
+                                </div>
+                                <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
+                                    <span class="text-[#FFFFFFCC]">За всю ночь</span>
+                                    <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->vyezd_night) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -537,9 +536,27 @@
 
         <!-- Pricing Tables -->
         <div class=" lg:hidden grid grid-cols-1 md:bg-[#191919] md:mx-2 p-4  rounded-2xl md:grid-cols-2 gap-8 mb-8">
+            <!-- Апартаменты Pricing -->
+            <div class="md:p-2">
+                <h3 class="text-xl font-semibold mb-4">Цена в аппартаментах</h3>
+                <div class="space-y-3">
+                    <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
+                        <span class="text-[#FFFFFFCC]">За один час</span>
+                        <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->appartamenti_1hour) }}</span>
+                    </div>
+                    <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
+                        <span class="text-[#FFFFFFCC]">За 2 часа</span>
+                        <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->appartamenti_2hours) }}</span>
+                    </div>
+                    <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
+                        <span class="text-[#FFFFFFCC]">За всю ночь</span>
+                        <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->appartamenti_night) }}</span>
+                    </div>
+                </div>
+            </div>
             <!-- Выезд Pricing -->
             <div class="md:p-2">
-                <h3 class="text-xl font-semibold mb-4">Цена выезд</h3>
+                <h3 class="text-xl font-semibold mb-4">Цена на выезд</h3>
                 <div class="space-y-3">
                     <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
                         <span class="text-[#FFFFFFCC]">За один час</span>
@@ -556,24 +573,6 @@
                 </div>
             </div>
 
-            <!-- Апартаменты Pricing -->
-            <div class="md:p-2">
-                <h3 class="text-xl font-semibold mb-4">Цена апартаменты</h3>
-                <div class="space-y-3">
-                    <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
-                        <span class="text-[#FFFFFFCC]">За один час</span>
-                        <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->appartamenti_1hour) }}</span>
-                    </div>
-                    <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
-                        <span class="text-[#FFFFFFCC]">За 2 часа</span>
-                        <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->appartamenti_2hours) }}</span>
-                    </div>
-                    <div class="flex border-b border-[#FFFFFF4D] justify-between items-center">
-                        <span class="text-[#FFFFFFCC]">За всю ночь</span>
-                        <span class="text-[#FFFFFFCC] font-semibold">{{ round($profile->appartamenti_night) }}</span>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Warning Message -->
