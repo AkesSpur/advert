@@ -613,57 +613,71 @@ class PageController extends Controller
 
         // Determine hero content for the index page
         $defaultHeroSettings = HeroSectionSetting::first();
-        $heroContent = $defaultHeroSettings; // Initialize with default settings
+        $heroContent = null; // Initialize as null
+        $shouldNotDisplayHeroSection = true; // Default to not display
 
-        // Collect all potential filter models with their specific IDs
-        $filterModels = [
-            'Service' => $serviceModel,
-            'MetroStation' => $metroModel,
-            'Price' => $priceModel,
-            'Age' => $ageModel,
-            'HairColor' => $hairColorModel,
-            'Height' => $heightModel,
-            'Weight' => $weightModel,
-            'Size' => $sizeModel,
-            'Neighborhood' => $neighborhoodModel,
-        ];
+        // Check if this is the home route (no filters applied)
+        $isHomeRoute = !$serviceModel && !$metroModel && !$priceModel && !$ageModel && 
+                      !$hairColorModel && !$heightModel && !$weightModel && !$sizeModel && 
+                      !$neighborhoodModel && !$customCategoryModel;
 
-        $foundOverride = false;
+        if ($isHomeRoute) {
+            // On home route, use default hero settings
+            $heroContent = $defaultHeroSettings;
+            $shouldNotDisplayHeroSection = null;
+        } else {
+            // On filtered routes, only show hero if there's an override
+            $filterModels = [
+                'Service' => $serviceModel,
+                'MetroStation' => $metroModel,
+                'Price' => $priceModel,
+                'Age' => $ageModel,
+                'HairColor' => $hairColorModel,
+                'Height' => $heightModel,
+                'Weight' => $weightModel,
+                'Size' => $sizeModel,
+                'Neighborhood' => $neighborhoodModel,
+            ];
 
-        foreach ($filterModels as $modelTypeShort => $modelInstance) {
-            if ($modelInstance) {
-                $fullModelClass = "App\\Models\\" . $modelTypeShort;
+            $foundOverride = false;
 
-                // 1. Try to find an override for the specific model instance (e.g., Service ID 5)
-                $specificOverride = HeroSectionOverride::where('model_type', $fullModelClass)
-                    ->where('model_id', $modelInstance->id)
-                    ->where('is_active', true)
-                    ->first();
-
-                if ($specificOverride) {
-                    $heroContent = $specificOverride;
-                    $foundOverride = true;
-                    break; // Specific override found, use it and stop checking
-                }
-            }
-        }
-
-        // If no specific override was found, check for 'all types' overrides (model_id = 0)
-        if (!$foundOverride) {
             foreach ($filterModels as $modelTypeShort => $modelInstance) {
-                if ($modelInstance) { // Only check if the model type is present in the current request
+                if ($modelInstance) {
                     $fullModelClass = "App\\Models\\" . $modelTypeShort;
 
-                    // 2. Try to find an 'all types' override for this model type (e.g., Service ID 0)
-                    $allTypesOverride = HeroSectionOverride::where('model_type', $fullModelClass)
-                        ->where('model_id', 0)
+                    // 1. Try to find an override for the specific model instance (e.g., Service ID 5)
+                    $specificOverride = HeroSectionOverride::where('model_type', $fullModelClass)
+                        ->where('model_id', $modelInstance->id)
                         ->where('is_active', true)
                         ->first();
 
-                    if ($allTypesOverride) {
-                        $heroContent = $allTypesOverride;
+                    if ($specificOverride) {
+                        $heroContent = $specificOverride;
                         $foundOverride = true;
-                        break; // 'All types' override found, use it and stop checking
+                        $shouldNotDisplayHeroSection = null;
+                        break; // Specific override found, use it and stop checking
+                    }
+                }
+            }
+
+            // If no specific override was found, check for 'all types' overrides (model_id = 0)
+            if (!$foundOverride) {
+                foreach ($filterModels as $modelTypeShort => $modelInstance) {
+                    if ($modelInstance) { // Only check if the model type is present in the current request
+                        $fullModelClass = "App\\Models\\" . $modelTypeShort;
+
+                        // 2. Try to find an 'all types' override for this model type (e.g., Service ID 0)
+                        $allTypesOverride = HeroSectionOverride::where('model_type', $fullModelClass)
+                            ->where('model_id', 0)
+                            ->where('is_active', true)
+                            ->first();
+
+                        if ($allTypesOverride) {
+                            $heroContent = $allTypesOverride;
+                            $foundOverride = true;
+                            $shouldNotDisplayHeroSection = null;
+                            break; // 'All types' override found, use it and stop checking
+                        }
                     }
                 }
             }
@@ -716,6 +730,7 @@ class PageController extends Controller
          'ages',
          'seoTitle',
          'heroContent',
+         'shouldNotDisplayHeroSection',
          'seoMetaDescription',
          'seoH1',
          'serviceModel',
@@ -1021,49 +1036,37 @@ if (empty($seoH1)) $seoH1 = $settings->default_h1_heading ?? 'Проститут
 
         // Determine hero content for CustomCategory page
         $defaultHeroSettings = HeroSectionSetting::first();
-        $heroContent = $defaultHeroSettings; // Initialize with default settings
+        $heroContent = null; // Initialize as null
+        $shouldNotDisplayHeroSection = true; // Default to not display
+
+        // For custom category routes, only show hero if there's an override
+        $foundOverride = false;
 
         // Priority 1: Current CustomCategory override
-        // $customCategory is the specific category for this page, passed into the method.
         if (isset($customCategory) && $customCategory instanceof CustomCategory && method_exists($customCategory, 'heroSectionOverride')) {
             $override = $customCategory->heroSectionOverride()->where('is_active', true)->first();
             if ($override) {
                 $heroContent = $override;
+                $foundOverride = true;
+                $shouldNotDisplayHeroSection = null;
             }
         }
 
-        // Priority 2: Generic override (if no specific CustomCategory override was applied for this category page)
-        // This applies if the current CustomCategory doesn't have its own active override.
-        if ($heroContent === $defaultHeroSettings && $defaultHeroSettings && method_exists($defaultHeroSettings, 'heroSectionOverride')) {
-            // Check for a generic override linked to the HeroSectionSetting model itself (model_type = HeroSectionSetting, model_id = $defaultHeroSettings->id)
-            // Or, if your generic override is identified differently (e.g., a specific HeroSectionOverride record not tied to any model, or tied to HeroSectionSetting with model_id=0 or 1 for global)
-            // For this example, assuming a generic override is one associated directly with the $defaultHeroSettings instance if it can have one.
-            // If HeroSectionSetting itself can have an override (e.g. for 'homepage' or 'default_filters_page')
-            $genericOverride = HeroSectionOverride::where('model_type', get_class($defaultHeroSettings))
-                                                ->where('model_id', $defaultHeroSettings->id)
+        // Priority 2: Generic override for CustomCategory model type
+        if (!$foundOverride) {
+            $genericOverride = HeroSectionOverride::where('model_type', 'App\\Models\\CustomCategory')
+                                                ->where('model_id', 0)
                                                 ->where('is_active', true)
                                                 ->first();
-            // If your generic override is a single record in HeroSectionOverride with a special marker (e.g. model_type = 'App\Models\HeroSectionSetting' and model_id = 0 or 1 for global)
-            // $genericOverride = HeroSectionOverride::where('model_type', 'App\Models\HeroSectionSetting')->where('model_id', 0)->where('is_active', true)->first(); 
             if ($genericOverride) {
                 $heroContent = $genericOverride;
+                $foundOverride = true;
+                $shouldNotDisplayHeroSection = null;
             }
         }
-        // At this point, $heroContent is either an override, the $defaultHeroSettings, or null if $defaultHeroSettings was null and no overrides found.
-
-        // If $heroContent is an override, its 'title', 'text_content', 'image' will be used.
-        // If it's still the default HeroSectionSetting, its properties will be used.
 
         $topMenus = TopMenu::all();
         $footerMenus = FooterMenu::all();
-
-        if (isset($heroContent) && ($heroContent->title || $heroContent->text_content || $heroContent->image))
-        {
-            $shouldNotDisplayHeroSection = null;
-        }else
-        {
-            $shouldNotDisplayHeroSection = true;
-        }
 
 
         return view('home.index', compact('services',
