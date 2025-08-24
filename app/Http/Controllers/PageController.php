@@ -717,7 +717,17 @@ class PageController extends Controller
          'seoTitle',
          'heroContent',
          'seoMetaDescription',
-         'seoH1'
+         'seoH1',
+         'serviceModel',
+         'metroModel',
+         'priceModel',
+         'ageModel',
+         'hairColorModel',
+         'heightModel',
+         'weightModel',
+         'sizeModel',
+         'neighborhoodModel',
+         'customCategoryModel'
         ));
     }
 

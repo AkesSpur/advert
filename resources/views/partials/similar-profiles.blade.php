@@ -21,9 +21,9 @@
             })->all() : []"
             :phone="$profile->phone"
             :prices="[
-                'hour' => $profile->vyezd_1hour ?? 0,
-                'two_hours' => $profile->vyezd_2hours ?? 0,
-                'night' => $profile->vyezd_night ?? 0,
+                'hour' => $profile->appartamenti_1hour ?? 0,
+                'two_hours' => $profile->appartamenti_2hours ?? 0,
+                'night' => $profile->appartamenti_night ?? 0,
             ]"
             :img="$profile->images"
         />

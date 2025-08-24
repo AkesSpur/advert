@@ -74,58 +74,149 @@
 
         init() {
             const urlParams = new URLSearchParams(window.location.search);
-            this.selectedService = urlParams.get('service') || (this.services.length > 0 ? null : null);
-            this.selectedMetro = urlParams.get('metro') || (this.metroStations && Object.keys(this.metroStations).length > 0 ? null : null);
-            this.selectedNeighborhood = urlParams.get('neighborhood') || (this.neighborhoods.length > 0 ? null : null);
-            this.selectedPrice = urlParams.get('price') || (this.prices.length > 0 ? null : null);
-            this.selectedAge = urlParams.get('age') || (this.ages.length > 0 ? null : null);
-            this.selectedHairColor = urlParams.get('hairColor') || (this.hairColors.length > 0 ? null : null);
-            this.selectedHeight = urlParams.get('height') || (this.heights.length > 0 ? null : null);
-            this.selectedWeight = urlParams.get('weight') || (this.weights.length > 0 ? null : null);
-            this.selectedSize = urlParams.get('size') || (this.sizes.length > 0 ? null : null);
+            
+            // Check for active filter models from controller first (directory-style routes)
+            @if(isset($serviceModel) && $serviceModel)
+                this.selectedService = '{{ $serviceModel->name }}';
+            @else
+                this.selectedService = urlParams.get('service') || null;
+            @endif
+            
+            @if(isset($metroModel) && $metroModel)
+                this.selectedMetro = '{{ $metroModel->name }}';
+            @else
+                this.selectedMetro = urlParams.get('metro') || null;
+            @endif
+            
+            @if(isset($neighborhoodModel) && $neighborhoodModel)
+                this.selectedNeighborhood = '{{ $neighborhoodModel->name }}';
+            @else
+                this.selectedNeighborhood = urlParams.get('neighborhood') || null;
+            @endif
+            
+            @if(isset($priceModel) && $priceModel)
+                this.selectedPrice = '{{ $priceModel->name }}';
+            @else
+                this.selectedPrice = urlParams.get('price') || null;
+            @endif
+            
+            @if(isset($ageModel) && $ageModel)
+                this.selectedAge = '{{ $ageModel->name }}';
+            @else
+                this.selectedAge = urlParams.get('age') || null;
+            @endif
+            
+            @if(isset($hairColorModel) && $hairColorModel)
+                this.selectedHairColor = '{{ $hairColorModel->name }}';
+            @else
+                this.selectedHairColor = urlParams.get('hairColor') || null;
+            @endif
+            
+            @if(isset($heightModel) && $heightModel)
+                this.selectedHeight = '{{ $heightModel->name }}';
+            @else
+                this.selectedHeight = urlParams.get('height') || null;
+            @endif
+            
+            @if(isset($weightModel) && $weightModel)
+                this.selectedWeight = '{{ $weightModel->name }}';
+            @else
+                this.selectedWeight = urlParams.get('weight') || null;
+            @endif
+            
+            @if(isset($sizeModel) && $sizeModel)
+                this.selectedSize = '{{ $sizeModel->name }}';
+            @else
+                this.selectedSize = urlParams.get('size') || null;
+            @endif
 
             // Initialize Name properties based on selected values
-            if (this.selectedService) {
-                const service = this.services.find(s => s.value === this.selectedService);
-                if (service) this.selectedServiceName = service.name;
-            }
-            if (this.selectedMetro) {
-                for (const letter in this.metroStations) {
-                    const station = this.metroStations[letter].find(s => s.value === this.selectedMetro);
-                    if (station) {
-                        this.selectedMetroName = station.name;
-                        break;
+            // Use active filter models first, then fall back to searching arrays
+            @if(isset($serviceModel) && $serviceModel)
+                 this.selectedServiceName = '{{ $serviceModel->name }}';
+             @else
+                 if (this.selectedService) {
+                     const service = this.services.find(s => s.value === this.selectedService);
+                     if (service) this.selectedServiceName = service.name;
+                 }
+             @endif
+            
+            @if(isset($metroModel) && $metroModel)
+                this.selectedMetroName = '{{ $metroModel->name }}';
+            @else
+                if (this.selectedMetro) {
+                    for (const letter in this.metroStations) {
+                        const station = this.metroStations[letter].find(s => s.value === this.selectedMetro);
+                        if (station) {
+                            this.selectedMetroName = station.name;
+                            break;
+                        }
                     }
                 }
-            }
-            if (this.selectedNeighborhood) {
-                const neighborhood = this.neighborhoods.find(n => n.value === this.selectedNeighborhood);
-                if (neighborhood) this.selectedNeighborhoodName = neighborhood.name;
-            }
-            if (this.selectedPrice) {
-                const price = this.prices.find(p => p.value === this.selectedPrice);
-                if (price) this.selectedPriceName = price.name;
-            }
-            if (this.selectedAge) {
-                const age = this.ages.find(a => a.value === this.selectedAge);
-                if (age) this.selectedAgeName = age.name;
-            }
-            if (this.selectedHairColor) {
-                const hairColor = this.hairColors.find(hc => hc.value === this.selectedHairColor);
-                if (hairColor) this.selectedHairColorName = hairColor.name;
-            }
-            if (this.selectedHeight) {
-                const height = this.heights.find(h => h.value === this.selectedHeight);
-                if (height) this.selectedHeightName = height.name;
-            }
-            if (this.selectedWeight) {
-                const weight = this.weights.find(w => w.value === this.selectedWeight);
-                if (weight) this.selectedWeightName = weight.name;
-            }
-            if (this.selectedSize) {
-                const size = this.sizes.find(s => s.value === this.selectedSize);
-                if (size) this.selectedSizeName = size.name;
-            }
+            @endif
+            
+            @if(isset($neighborhoodModel) && $neighborhoodModel)
+                this.selectedNeighborhoodName = '{{ $neighborhoodModel->name }}';
+            @else
+                if (this.selectedNeighborhood) {
+                    const neighborhood = this.neighborhoods.find(n => n.value === this.selectedNeighborhood);
+                    if (neighborhood) this.selectedNeighborhoodName = neighborhood.name;
+                }
+            @endif
+            
+            @if(isset($priceModel) && $priceModel)
+                this.selectedPriceName = '{{ $priceModel->name }}';
+            @else
+                if (this.selectedPrice) {
+                    const price = this.prices.find(p => p.value === this.selectedPrice);
+                    if (price) this.selectedPriceName = price.name;
+                }
+            @endif
+            
+            @if(isset($ageModel) && $ageModel)
+                this.selectedAgeName = '{{ $ageModel->name }}';
+            @else
+                if (this.selectedAge) {
+                    const age = this.ages.find(a => a.value === this.selectedAge);
+                    if (age) this.selectedAgeName = age.name;
+                }
+            @endif
+            
+            @if(isset($hairColorModel) && $hairColorModel)
+                this.selectedHairColorName = '{{ $hairColorModel->name }}';
+            @else
+                if (this.selectedHairColor) {
+                    const hairColor = this.hairColors.find(hc => hc.value === this.selectedHairColor);
+                    if (hairColor) this.selectedHairColorName = hairColor.name;
+                }
+            @endif
+            
+            @if(isset($heightModel) && $heightModel)
+                this.selectedHeightName = '{{ $heightModel->name }}';
+            @else
+                if (this.selectedHeight) {
+                    const height = this.heights.find(h => h.value === this.selectedHeight);
+                    if (height) this.selectedHeightName = height.name;
+                }
+            @endif
+            
+            @if(isset($weightModel) && $weightModel)
+                this.selectedWeightName = '{{ $weightModel->name }}';
+            @else
+                if (this.selectedWeight) {
+                    const weight = this.weights.find(w => w.value === this.selectedWeight);
+                    if (weight) this.selectedWeightName = weight.name;
+                }
+            @endif
+            
+            @if(isset($sizeModel) && $sizeModel)
+                this.selectedSizeName = '{{ $sizeModel->name }}';
+            @else
+                if (this.selectedSize) {
+                    const size = this.sizes.find(s => s.value === this.selectedSize);
+                    if (size) this.selectedSizeName = size.name;
+                }
+            @endif
 
             // ... rest of init
         },
