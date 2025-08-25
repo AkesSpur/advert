@@ -51,15 +51,15 @@
         showHeight: false,
         showWeight: false,
         showSize: false,
-        selectedService: '{{ request('service') }}' || null,
-        selectedMetro: '{{ request('metro') }}' || null,
-        selectedNeighborhood: '{{ request('neighborhood') }}' || null,
-        selectedPrice: '{{ request('price') }}' || null,
-        selectedAge: '{{ request('age') }}' || null,
-        selectedHairColor: '{{ request('hairColor') }}' || null,
-        selectedHeight: '{{ request('height') }}' || null,
-        selectedWeight: '{{ request('weight') }}' || null,
-        selectedSize: '{{ request('size') }}' || null,
+        selectedService: {{ request('service') ? "'" . request('service') . "'" : 'null' }},
+        selectedMetro: {{ request('metro') ? "'" . request('metro') . "'" : 'null' }},
+        selectedNeighborhood: {{ request('neighborhood') ? "'" . request('neighborhood') . "'" : 'null' }},
+        selectedPrice: {{ request('price') ? "'" . request('price') . "'" : 'null' }},
+        selectedAge: {{ request('age') ? "'" . request('age') . "'" : 'null' }},
+        selectedHairColor: {{ request('hairColor') ? "'" . request('hairColor') . "'" : 'null' }},
+        selectedHeight: {{ request('height') ? "'" . request('height') . "'" : 'null' }},
+        selectedWeight: {{ request('weight') ? "'" . request('weight') . "'" : 'null' }},
+        selectedSize: {{ request('size') ? "'" . request('size') . "'" : 'null' }},
 
         selectedServiceName: '',
         selectedMetroName: '',
@@ -389,11 +389,12 @@
                  style="display: none;">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-8">
                     <template x-for="service in services" :key="service.name">
-                        <div @click="selectService(service)" 
-                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
-                            <span x-text="service.name"></span>
-                            <span x-text="'(' + service.count + ')'"></span>
-                        </div>
+                                    <div @click="selectService(service)" 
+                                         class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                                         :class="selectedService === service.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
+                                        <span x-text="service.name"></span>
+                                        <span x-text="'(' + service.count + ')'"></span>
+                                    </div>
                     </template>
                 </div>
             </div>
@@ -429,7 +430,8 @@
                             <div class="space-y-2">
                                 <template x-for="station in stations" :key="station.name">
                                     <div @click="selectMetro(station)" 
-                                         class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                                         class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] "
+                                         :class="selectedMetro === station.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                                         <span x-text="station.name"></span>
                                         <span x-text="'(' + station.count + ')'"></span>
                                     </div>
@@ -467,7 +469,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-8">
             <template x-for="neighborhood in neighborhoods" :key="neighborhood.name">
                 <div @click="selectNeighborhood(neighborhood)" 
-                     class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                     class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] "
+                     :class="selectedNeighborhood === neighborhood.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                     <span x-text="neighborhood.name"></span>
                     <span x-text="'(' + neighborhood.count + ')'"></span>
                 </div>
@@ -502,7 +505,8 @@
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="price in prices" :key="price.name">
                         <div @click="selectPrice(price.value)" 
-                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                             :class="selectedPrice === price.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                             <span x-text="price.name"></span>
                         </div>
                     </template>
@@ -536,7 +540,8 @@
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="age in ages" :key="age.value"> {{-- Changed from age.range --}}
                         <div @click="selectAge(age.value); activeFilter = null" {{-- Changed from selectAge(age.value) --}}
-                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                             :class="selectedAge === age.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                             <span x-text="age.name"></span> {{-- Changed from age.range --}}
                         </div>
                     </template>
@@ -570,7 +575,8 @@
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="color in hairColors" :key="color.value">
                         <div @click="selectHairColor(color.value); activeFilter = null" {{-- Changed from selectHairColor(color.value) --}}
-                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] "
+                             :class="selectedHairColor === color.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                             <span x-text="color.name"></span>
                         </div>
                     </template>
@@ -604,7 +610,8 @@
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="height in heights" :key="height.value"> {{-- Changed from height.range --}}
                         <div @click="selectHeight(height.value)" {{-- Changed from selectHeight(height.value) --}}
-                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                             :class="selectedHeight === height.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                             <span x-text="height.name"></span> {{-- Changed from height.range --}}
                         </div>
                     </template>
@@ -637,7 +644,8 @@
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="weight in weights" :key="weight.value">
                         <div @click="selectWeight(weight.value); activeFilter = null" 
-                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                             :class="selectedWeight === weight.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                             <span x-text="weight.name"></span>
                         </div>
                     </template>
@@ -671,7 +679,8 @@
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="size in sizes" :key="size.value"> {{-- Changed from size.range --}}
                         <div @click="selectSize(size.value)" {{-- Changed from selectSize(size.value) --}}
-                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                             :class="selectedSize === size.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                             <span x-text="size.name"></span> {{-- Changed from size.range --}}
                         </div>
                     </template>
@@ -728,7 +737,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
                     <template x-for="service in services" :key="service.name">
                         <div @click="selectService(service); activeFilter = null" 
-                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                             :class="selectedService === service.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                             <span x-text="service.name"></span>
                             <span x-text="'(' + service.count + ')'"></span>
                         </div>
@@ -758,7 +768,8 @@
                             <div class="space-y-2">
                                 <template x-for="station in stations" :key="station.name">
                                     <div @click="selectMetro(station); activeFilter = null" 
-                                         class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                                         class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                                         :class="selectedMetro === station.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                                         <span x-text="station.name"></span>
                                         <span x-text="'(' + station.count + ')'"></span>
                                     </div>
@@ -787,7 +798,8 @@
                       <div class="grid grid-cols-1 gap-y-4">
                           <template x-for="neighborhood in neighborhoods" :key="neighborhood.name">
                               <div @click="selectNeighborhood(neighborhood); activeFilter = null" 
-                                   class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                                   class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                                   :class="selectedNeighborhood === neighborhood.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                                   <span x-text="neighborhood.name"></span>
                                   <span x-text="'(' + neighborhood.count + ')'"></span>
                               </div>
@@ -832,7 +844,8 @@
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="color in hairColors" :key="color.value"> {{-- Changed from color.name --}}
                         <div @click="selectHairColor(color.value); activeFilter = null" {{-- Changed from selectHairColor(color.value) --}}
-                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                             :class="selectedHairColor === color.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                             <span x-text="color.name"></span>
                         </div>
                     </template>
@@ -844,7 +857,8 @@
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="size in sizes" :key="size.value"> {{-- Changed from size.range --}}
                         <div @click="selectSize(size.value); activeFilter = null" {{-- Changed from selectSize(size.value) --}}
-                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                             :class="selectedSize === size.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                             <span x-text="size.name"></span> {{-- Changed from size.range --}}
                         </div>
                     </template>
@@ -886,7 +900,8 @@
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="height in heights" :key="height.value"> {{-- Changed from height.range --}}
                         <div @click="selectHeight(height.value); activeFilter = null" {{-- Changed from selectHeight(height.value) --}}
-                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                             :class="selectedHeight === height.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                             <span x-text="height.name"></span> {{-- Changed from height.range --}}
                         </div>
                     </template>
@@ -898,7 +913,8 @@
                 <div class="grid grid-cols-1 gap-y-4">
                     <template x-for="weight in weights" :key="weight.value">
                         <div @click="selectWeight(weight.value); activeFilter = null" 
-                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                             :class="selectedWeight === weight.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                             <span x-text="weight.name"></span>
                         </div>
                     </template>
@@ -941,7 +957,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
                     <template x-for="price in prices" :key="price.value">
                         <div @click="selectPrice(price.value); activeFilter = null" 
-                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                             :class="selectedPrice === price.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                             <span x-text="price.name"></span>
                         </div>
                     </template>
@@ -953,7 +970,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
                     <template x-for="age in ages" :key="age.value">
                         <div @click="selectAge(age.value); activeFilter = null" 
-                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF] text-[#FFFFFFCC]">
+                             class="flex items-center justify-between cursor-pointer hover:text-[#6340FF]"
+                             :class="selectedAge === age.name ? 'text-[#6340FF]' : 'text-[#FFFFFFCC]'">
                             <span x-text="age.name"></span>
                         </div>
                     </template>
